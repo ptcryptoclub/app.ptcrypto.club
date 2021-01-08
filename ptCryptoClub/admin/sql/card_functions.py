@@ -110,9 +110,3 @@ def volume(base, quote, market, delta):
         db.session.add(error_log)
         db.session.commit()
     return sum_base, sum_quote
-
-
-"""print(price_change('btc', 'eur', 'kraken', 180))
-print(max_min('btc', 'eur', 'kraken', 180))
-print(last_price('btc', 'eur', 'kraken'))
-print(volume('btc', 'eur', 'kraken', 180))"""
