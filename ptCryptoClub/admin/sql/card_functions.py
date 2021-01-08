@@ -110,3 +110,28 @@ def volume(base, quote, market, delta):
         db.session.add(error_log)
         db.session.commit()
     return sum_base, sum_quote
+
+
+def small_chart(base, quote, market, delta):
+    divide = int(delta / 20)
+    print(divide)
+    sql_query = f"""
+    SELECT t.closetime, t.closeprice
+        FROM (
+          SELECT m.*, row_number() OVER(ORDER BY closetime ASC) AS row
+          FROM (
+            select * from "liveOHLC"
+                where closetime >= now() - interval '{delta} minute' and base = '{base}' and "quote" = '{quote}' and market = '{market}'
+                order by closetime asc
+          ) m
+        ) t
+        WHERE t.row % {divide} = 0
+        order by t.closetime asc
+    """
+    data = pd.read_sql_query(sql=sql_query, con=engine_live_data)
+    print(data)
+
+    return None
+
+
+small_chart('btc', 'eur', 'kraken', 24*60)
