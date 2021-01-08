@@ -67,10 +67,10 @@ def price_change(base, quote, market, delta):
 
 def max_min(base, quote, market, delta):
     sql_query = f"""
-    select 	max(highprice),
-            min(lowprice)
-        from "liveOHLC"
-        where closetime >= now() - interval '{delta} minute' and base = '{base}' and "quote" = '{quote}' and market = '{market}'
+    select 	max(price),
+            min(price) 
+        from "liveTransactions"
+        where date_created >= now() - interval '{delta} minute' and base = '{base}' and "quote" = '{quote}' and market = '{market}';
     """
     try:
         data = pd.read_sql_query(sql=sql_query, con=engine_live_data)

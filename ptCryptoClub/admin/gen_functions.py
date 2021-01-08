@@ -32,12 +32,14 @@ def get_all_pairs(market):
 def card_generic(base, quote, market, delta):
     maximum, minimum = max_min(base, quote, market, delta)
     sum_base, sum_quote = volume(base, quote, market, delta)
+    change = price_change(base, quote, market, delta)
+    price = last_price(base, quote, market)
     to_return = {
         'base': base,
         'quote': quote,
         'market': market,
-        'change': price_change(base, quote, market, delta),
-        'last_price': last_price(base, quote, market),
+        'change': change,
+        'last_price': price,
         'high': maximum,
         'low': minimum,
         'volume': int(sum_base),
