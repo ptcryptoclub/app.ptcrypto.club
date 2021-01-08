@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+{% endblock %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto text-light">Market: {{market}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
+        {% for card in cards %}
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+            <a href="#" class="text-decoration-none">
+                {% if card["change"] < 0 %}
+                {% set color = "danger" %}
+                {% elif card["change"] == 0 %}
+                {% set color = "warning" %}
+                {% else %}
+                {% set color = "success" %}
+                {% endif %}
+                <div class="p-2 border border-{{color}} rounded-lg">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-light">{{card["base"].upper()+card["quote"].upper()}}</h4>
+                        </div>
+                        <div class="col-auto text-right">
+                            <h5 class="text-{{color}} ml-3">{{card["change"]}}%</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-right text-{{color}}">{{card["last_price"] | numberFormat}}</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-auto">
+                            <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
+                            <div class="row-fluid text-muted small">
+                                <strong>High: </strong>{{card["high"] | numberFormat}}
+                            </div>
+                            <div class="row-fluid text-muted small">
+                                <strong>Low: </strong>{{card["low"] | numberFormat}}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="row justify-content-end mr-2 text-muted"><strong>Volume:</strong></div>
+                            <div class="row justify-content-end mr-2 text-muted small">{{card["volume"] |
+                                numberFormat}} {{card["base"].upper()}}
+                            </div>
+                            <div class="row justify-content-end mr-2 text-muted small">{{card["volume_quote"] |
+                                numberFormat}} {{card["quote"].upper()}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</div>
+
+{% endblock %}
