@@ -57,6 +57,46 @@
                     </div>
                 </a>
             </div>
+        <script>
+                let general{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("general-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let market{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("market-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let change{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("change-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let last{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("last-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let high{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("high-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let low{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("low-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let volume{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("volume-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                let volumeQuote{{card['market']}}{{card['base']}}{{card['quote']}} = document.getElementById("volumeQuote-{{card['market']}}-{{card['base']}}-{{card['quote']}}");
+                function func{{card['market']}}{{card['base']}}{{card['quote']}} () {
+                    fetch('/api/home/cards/{{card['base']}}/{{card['quote']}}/{{card['market']}}/{{card['delta']}}/').then(
+                        function(response){
+                            response.json().then(
+                                function (data) {
+                                    change{{card['market']}}{{card['base']}}{{card['quote']}}.innerHTML = data['change'] + '%';
+                                    if (data['change'] < 0) {
+                                        general{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'p-2 border border-danger rounded-lg'
+                                        change{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'text-danger ml-3'
+                                        last{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'text-right text-danger'
+                                    } else if (data['change'] === 0) {
+                                        general{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'p-2 border border-warning rounded-lg'
+                                        change{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'text-warning ml-3'
+                                        last{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'text-right text-warning'
+                                    } else {
+                                        general{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'p-2 border border-success rounded-lg'
+                                        change{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'text-success ml-3'
+                                        last{{card['market']}}{{card['base']}}{{card['quote']}}.className = 'text-right text-success'
+                                    }
+                                    last{{card['market']}}{{card['base']}}{{card['quote']}}.innerHTML = numberFormat(data['last_price']);
+                                    high{{card['market']}}{{card['base']}}{{card['quote']}}.innerHTML = '<strong>High: </strong>' + numberFormat(data['high']);
+                                    low{{card['market']}}{{card['base']}}{{card['quote']}}.innerHTML = '<strong>Low: </strong>' + numberFormat(data['low']);
+                                    volume{{card['market']}}{{card['base']}}{{card['quote']}}.innerHTML = numberFormat(data['volume']);
+                                    volumeQuote{{card['market']}}{{card['base']}}{{card['quote']}}.innerHTML = numberFormat(data['volume_quote']);
+                                }
+                            )
+                        }
+                    );
+                };
+                var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval(func{{card['market']}}{{card['base']}}{{card['quote']}},2000);
+            </script>
         {% endfor %}
     </div>
 </div>

@@ -41,6 +41,7 @@ def card_generic(base, quote, market, delta):
         'high': maximum,
         'low': minimum,
         'volume': int(sum_base),
-        'volume_quote': int(sum_quote)
+        'volume_quote': int(sum_quote),
+        'delta': delta
     }
     return to_return

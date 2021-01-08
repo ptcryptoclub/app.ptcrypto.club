@@ -7,7 +7,7 @@ import werkzeug
 
 # local imports
 from ptCryptoClub import app, db, bcrypt
-from ptCryptoClub.admin.config import admins_emails, TRANSACTION_SUCCESS_STATUSES
+from ptCryptoClub.admin.config import admins_emails, default_delta, TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic
 
@@ -36,7 +36,7 @@ def home():
     cards = []
     for market in get_all_markets():
         for pair in get_all_pairs(market):
-            dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=60*24)
+            dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
             cards.append(dict_)
     tables = []
     return render_template(
@@ -47,11 +47,18 @@ def home():
     )
 
 
-@app.route("/market/<market>")
+@app.route("/api/home/cards/<base>/<quote>/<market>/<delta>/")
+def api_home_cards(base, quote, market, delta):
+    return jsonify(
+        card_generic(base=base, quote=quote, market=market, delta=delta)
+    )
+
+
+@app.route("/market/<market>/")
 def market(market):
     cards = []
     for pair in get_all_pairs(market):
-        dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=60 * 24)
+        dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
         cards.append(dict_)
     return render_template(
         "market.html",
