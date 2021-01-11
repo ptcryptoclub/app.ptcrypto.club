@@ -114,24 +114,27 @@ def volume(base, quote, market, delta):
 
 def small_chart(base, quote, market, delta):
     divide = int(delta / 20)
-    print(divide)
     sql_query = f"""
-    SELECT t.closetime, t.closeprice
-        FROM (
-          SELECT m.*, row_number() OVER(ORDER BY closetime ASC) AS row
-          FROM (
-            select * from "liveOHLC"
-                where closetime >= now() - interval '{delta} minute' and base = '{base}' and "quote" = '{quote}' and market = '{market}'
-                order by closetime asc
+    select t.closetime, t.closeprice 
+        from (
+            select m.*, row_number() OVER(ORDER BY closetime DESC) AS row
+                from (
+                    select lo.* from "liveOHLC" lo
+                    where closetime >= now() - interval '{delta} minute' and base = '{base}' and "quote" = '{quote}' and market = '{market}'
           ) m
         ) t
-        WHERE t.row % {divide} = 0
-        order by t.closetime asc
+        WHERE t.row % {divide} = 0 or t.row = 1
     """
     data = pd.read_sql_query(sql=sql_query, con=engine_live_data)
-    print(data)
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                'date': data.closetime[i],
+                'close': data.closeprice[i]
+            }
+        )
+    return to_return
 
-    return None
 
-
-small_chart('btc', 'eur', 'kraken', 24*60)
+print(small_chart('btc', 'eur', 'kraken', 24*60))
