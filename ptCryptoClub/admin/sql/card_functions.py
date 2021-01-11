@@ -124,7 +124,7 @@ def small_chart(base, quote, market, delta):
         )
         db.session.add(error_log)
         db.session.commit()
-    divide = int(delta / 20)
+    divide = int(delta / 50)
     sql_query = f"""
     select t.closetime, t.closeprice 
         from (
@@ -151,7 +151,7 @@ def small_chart(base, quote, market, delta):
     for i in data.index:
         to_return.append(
             {
-                'date': data.closetime[i],
+                'date': str(data.closetime[i]),
                 'close': data.closeprice[i]
             }
         )

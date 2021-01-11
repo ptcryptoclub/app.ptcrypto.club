@@ -57,7 +57,7 @@ function smallChart(divID, base, quote, market, delta) {
 
 
     chart.cursor = new am4charts.XYCursor();
-    chart.cursor.lineY.opacity = 0;
-    chart.cursor.lineX.opacity = 0;
+    //chart.cursor.lineY.opacity = 0;
+    //chart.cursor.lineX.opacity = 0;
     chart.cursor.behavior = "none";
 }
