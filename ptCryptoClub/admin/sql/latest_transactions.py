@@ -21,7 +21,7 @@ def table_latest_trans(base, quote, market, number_of_trans):
         data = pd.DataFrame()
         # noinspection PyArgumentList
         error_log = ErrorLogs(
-            route='card functions last price',
+            route='latest transactions',
             log=str(e).replace("'", "")
         )
         db.session.add(error_log)
