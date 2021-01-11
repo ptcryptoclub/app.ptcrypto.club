@@ -23,7 +23,7 @@ function numberFormat(to_format) {
     return parts.join(".");
 }
 
-function smallChart(divID, market, pair) {
+function smallChart(divID, base, quote, market, delta) {
     // Themes begin
     am4core.useTheme(am4themes_dark);
     am4core.useTheme(am4themes_animated);
@@ -33,7 +33,8 @@ function smallChart(divID, market, pair) {
     var chart = am4core.create(divID, am4charts.XYChart);
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
-    chart.dataSource.url = '/api/charts/ohlc/' + market + '/' + pair + '/24/3600/'
+
+    chart.dataSource.url = '/api/home/cards/small-chart/' + base + '/' + quote + '/' + market + '/' + delta + '/'
     chart.dataSource.load();
     chart.dataSource.parser = new am4core.JSONParser();
 

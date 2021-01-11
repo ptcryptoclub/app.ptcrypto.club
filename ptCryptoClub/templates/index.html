@@ -7,7 +7,11 @@
 
 {% block content %}
 <div class="container mt-4">
-
+    <script src="{{url_for('static', filename='js/ohlc.js')}}"></script>
+    <script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+    <script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+    <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+    <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
         {% for card in cards %}
             <div class="col-xl-4 col-lg-4 col-sm-6 mb-2">
@@ -37,9 +41,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col" style="height: 0px;" id="smallChart-{{card['market']}}-{{card['base']}}-{{card['quote']}}"></div>
+                            <div class="col" style="height: 100px;" id="smallChart-{{card['market']}}-{{card['base']}}-{{card['quote']}}"></div>
                             <script>
-
+                                smallChart("smallChart-{{card['market']}}-{{card['base']}}-{{card['quote']}}", "{{card['base']}}", "{{card['quote']}}", "{{card['market']}}", {{card['delta']}})
                             </script>
                         </div>
                         <div class="row">
