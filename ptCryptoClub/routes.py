@@ -10,6 +10,7 @@ from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic
+from ptCryptoClub.admin.sql.card_functions import small_chart
 
 
 @app.before_request
@@ -51,6 +52,13 @@ def home():
 def api_home_cards(base, quote, market, delta):
     return jsonify(
         card_generic(base=base, quote=quote, market=market, delta=delta)
+    )
+
+
+@app.route("/api/home/cards/small-chart/<base>/<quote>/<market>/<delta>/")
+def api_home_cards_small_chart(base, quote, market, delta):
+    return jsonify(
+        small_chart(base=base, quote=quote, market=market, delta=delta)
     )
 
 

@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData
+from ptCryptoClub.admin.config import CryptoData, default_delta
 from ptCryptoClub import db
 from ptCryptoClub.admin.models import ErrorLogs
 
@@ -113,6 +113,17 @@ def volume(base, quote, market, delta):
 
 
 def small_chart(base, quote, market, delta):
+    try:
+        delta = int(delta)
+    except Exception as e:
+        delta = default_delta
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='card functions small chart',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
     divide = int(delta / 20)
     sql_query = f"""
     select t.closetime, t.closeprice 
@@ -125,7 +136,17 @@ def small_chart(base, quote, market, delta):
         ) t
         WHERE t.row % {divide} = 0 or t.row = 1
     """
-    data = pd.read_sql_query(sql=sql_query, con=engine_live_data)
+    try:
+        data = pd.read_sql_query(sql=sql_query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame()
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='card functions small chart',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
     to_return = []
     for i in data.index:
         to_return.append(
@@ -135,6 +156,3 @@ def small_chart(base, quote, market, delta):
             }
         )
     return to_return
-
-
-print(small_chart('btc', 'eur', 'kraken', 24*60))
