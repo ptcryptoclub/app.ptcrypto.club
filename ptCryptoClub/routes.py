@@ -41,16 +41,18 @@ def home():
             dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
             cards.append(dict_)
     tables = []
+    number_of_trans = default_latest_transactions
     for market in markets:
         for pair in get_all_pairs(market):
             tables.append(
-                table_latest_transactions(base=pair['base'], quote=pair['quote'], market=pair['market'], number_of_trans=default_latest_transactions)
+                table_latest_transactions(base=pair['base'], quote=pair['quote'], market=pair['market'], number_of_trans=number_of_trans)
             )
     return render_template(
         "index.html",
         title="Home",
         cards=cards,
-        tables=tables
+        tables=tables,
+        number_of_trans=number_of_trans
     )
 
 
@@ -58,6 +60,13 @@ def home():
 def api_home_cards(base, quote, market, delta):
     return jsonify(
         card_generic(base=base, quote=quote, market=market, delta=delta)
+    )
+
+
+@app.route("/api/home/latest-transactions/<base>/<quote>/<market>/<number_of_trans>/")
+def api_home_latest_transactions(base, quote, market, number_of_trans):
+    return jsonify(
+        table_latest_transactions(base=base, quote=quote, market=market, number_of_trans=number_of_trans)
     )
 
 

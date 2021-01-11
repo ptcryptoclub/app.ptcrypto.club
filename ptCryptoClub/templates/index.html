@@ -93,7 +93,7 @@
     <div class="row justify-content-end mr-2">
         <H6><a href="#" class="text-light text-decoration-none">Lastest transactions</a></H6>
     </div>
-    {% for table in tables %}
+    {% for i in range(tables.__len__()) %}
     <table class="table table-sm table-borderless table-hover table-dark" style="background-color: #000000;">
         <thead class="text-muted">
         <tr>
@@ -104,8 +104,8 @@
             <th class="text-right">Price</th>
         </tr>
         </thead>
-        <tbody class="text-muted small">
-        {% for line in table %}
+        <tbody class="text-muted small" id="table-{{i}}">
+        {% for line in tables[i] %}
         <tr>
             <td class="d-none d-sm-none d-md-table-cell">{{line['ind']}}</td>
             <td>{{line['base'].upper()}}{{line['quote'].upper()}}</td>
@@ -115,8 +115,11 @@
         </tr>
         {% endfor %}
         </tbody>
+        <script>
+            var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 10000 );
+
+        </script>
     </table>
     {% endfor %}
 </div>
 {% endblock %}
-        

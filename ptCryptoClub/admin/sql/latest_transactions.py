@@ -33,6 +33,7 @@ def table_latest_trans(base, quote, market, number_of_trans):
                 'ind': i + 1,
                 'base': base,
                 'quote': quote,
+                'market': market,
                 'date': str(data.date_created[i]),
                 'price': float(data.price[i]),
                 'amount': float(data.amount[i])

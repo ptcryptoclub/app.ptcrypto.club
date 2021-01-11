@@ -101,3 +101,18 @@ function cardUpdate(base, quote, market, delta) {
         }
     );
 };
+
+
+function tableUpdate(base, quote, market, number_of_trans, elementId) {
+
+    let tableId = document.getElementById(elementId);
+    fetch('/api/home/latest-transactions/'+ base +'/'+ quote +'/'+ market +'/'+ number_of_trans +'/').then(function(response) {
+        response.json().then(function(data) {
+            let linesHTML = '';
+            for (let line of data) {
+                linesHTML += '<tr><td class="d-none d-sm-none d-md-table-cell">' + line['ind'] +'</td><td>' + line['base'].toUpperCase() + line['quote'].toUpperCase() +'</td><td class="text-center">' + line['date'] +'</td><td class="text-right">' + numberFormat(line['amount']) +'</td><td class="text-right">' + numberFormat(line['price']) +'</td></tr>'
+            }
+            tableId.innerHTML = linesHTML
+        })
+    })
+}
