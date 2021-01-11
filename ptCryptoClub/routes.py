@@ -7,9 +7,9 @@ import werkzeug
 
 # local imports
 from ptCryptoClub import app, db, bcrypt
-from ptCryptoClub.admin.config import admins_emails, default_delta, TRANSACTION_SUCCESS_STATUSES
+from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User
-from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic
+from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.card_functions import small_chart
 
 
@@ -35,11 +35,17 @@ def send_my_func():
 @app.route("/")
 def home():
     cards = []
-    for market in get_all_markets():
+    markets = get_all_markets()
+    for market in markets:
         for pair in get_all_pairs(market):
             dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
             cards.append(dict_)
     tables = []
+    for market in markets:
+        for pair in get_all_pairs(market):
+            tables.append(
+                table_latest_transactions(base=pair['base'], quote=pair['quote'], market=pair['market'], number_of_trans=default_latest_transactions)
+            )
     return render_template(
         "index.html",
         title="Home",
@@ -55,6 +61,7 @@ def api_home_cards(base, quote, market, delta):
     )
 
 
+# NOT IN USE YET #
 @app.route("/api/home/cards/small-chart/<base>/<quote>/<market>/<delta>/")
 def api_home_cards_small_chart(base, quote, market, delta):
     return jsonify(
@@ -72,5 +79,6 @@ def market(market):
         "market.html",
         title="Markets",
         market=market,
-        cards=cards
+        cards=cards,
+        num_pairs= len(cards)
     )

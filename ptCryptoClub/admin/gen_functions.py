@@ -1,6 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData
 from ptCryptoClub.admin.models import LivePairs
 from ptCryptoClub.admin.sql.card_functions import last_price, price_change, max_min, volume
+from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 
 from sqlalchemy import create_engine
 
@@ -47,3 +48,7 @@ def card_generic(base, quote, market, delta):
         'delta': delta
     }
     return to_return
+
+
+def table_latest_transactions(base, quote, market, number_of_trans):
+    return table_latest_trans(base, quote, market, number_of_trans)
