@@ -61,3 +61,43 @@ function smallChart(divID, base, quote, market, delta) {
     //chart.cursor.lineX.opacity = 0;
     chart.cursor.behavior = "none";
 }
+
+
+function cardUpdate(base, quote, market, delta) {
+
+    let generalID = document.getElementById("general-"+ market +"-"+ base +"-"+ quote);
+    let changeID = document.getElementById("change-"+ market +"-"+ base +"-"+ quote);
+    let lastID = document.getElementById("last-"+ market +"-"+ base +"-"+ quote);
+    let highID = document.getElementById("high-"+ market +"-"+ base +"-"+ quote);
+    let lowID = document.getElementById("low-"+ market +"-"+ base +"-"+ quote);
+    let volumeID = document.getElementById("volume-"+ market +"-"+ base +"-"+ quote);
+    let volumeQuoteID = document.getElementById("volumeQuote-"+ market +"-"+ base +"-"+ quote);
+
+    fetch('/api/home/cards/'+ base +'/'+ quote +'/'+ market +'/'+ delta +'/').then(
+        function(response){
+            response.json().then(
+                function (data) {
+                    changeID.innerHTML = data['change'] + '%';
+                    if (data['change'] < 0) {
+                        generalID.className = 'p-2 border border-danger rounded-lg'
+                        changeID.className = 'text-danger ml-3'
+                        lastID.className = 'text-right text-danger'
+                    } else if (data['change'] === 0) {
+                        generalID.className = 'p-2 border border-warning rounded-lg'
+                        changeID.className = 'text-warning ml-3'
+                        lastID.className = 'text-right text-warning'
+                    } else {
+                        generalID.className = 'p-2 border border-success rounded-lg'
+                        changeID.className = 'text-success ml-3'
+                        lastID.className = 'text-right text-success'
+                    }
+                    lastID.innerHTML = numberFormat(data['last_price']);
+                    highID.innerHTML = '<strong>High: </strong>' + numberFormat(data['high']);
+                    lowID.innerHTML = '<strong>Low: </strong>' + numberFormat(data['low']);
+                    volumeID.innerHTML = numberFormat(data['volume']) + ' ' + base.toUpperCase();
+                    volumeQuoteID.innerHTML = numberFormat(data['volume_quote']) + ' ' + quote.toUpperCase();
+                }
+            )
+        }
+    );
+};
