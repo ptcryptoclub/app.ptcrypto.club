@@ -89,5 +89,5 @@ def market(market):
         title="Markets",
         market=market,
         cards=cards,
-        num_pairs= len(cards)
+        num_pairs=len(cards)
     )
