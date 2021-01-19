@@ -163,9 +163,3 @@ def small_chart(base, quote, market, delta):
             }
         )
     return to_return
-
-
-print(last_price(base='btc', quote='eur', market='kraken'))
-print(price_change(base='btc', quote='eur', market='kraken', delta=24*60))
-print(max_min(base='btc', quote='eur', market='kraken', delta=24*60))
-print("################")
