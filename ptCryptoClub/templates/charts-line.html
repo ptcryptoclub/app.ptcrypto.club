@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row my-1">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="row">
+                    <div class="col-auto">
+                        <a href="#"
+                           class="text-decoration-none text-light">Line chart</a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="#"
+                           class="text-decoration-none text-muted">Ohlc chart</a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="#"
+                           class="text-decoration-none text-muted">Live market</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<script src="{{url_for('static', filename='js/line.js')}}"></script>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10">
+
+            <div class="p-4 my-4 border border-secondary rounded-lg" id="general">
+                <div id="base" hidden>{{base}}</div>
+                <div id="quote" hidden>{{quote}}</div>
+                <div id="delta" hidden>{{delta}}</div>
+                <div class="row">
+                    <div class="col">
+                        <h4 class="text-light">BTCEUR</h4>
+                    </div>
+                    <div class="col-auto text-right">
+                        <small class="font-italic text-muted"id="market">kraken</small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-auto">
+                        <h5 class="text-danger ml-3" id="change">10%</h5>
+                    </div>
+                    <div class="col">
+                        <h4 class="text-right text-danger"id="last">{{12345.67 | numberFormat}}</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-auto">
+                        <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
+                        <div class="row-fluid text-muted small"
+                             id="high"><strong>High: </strong>{{23456.78 | numberFormat}}
+                        </div>
+                        <div class="row-fluid text-muted small"
+                             id="low"><strong>Low: </strong>{{01234.56 | numberFormat}}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
+                        </div>
+                        <div class="row justify-content-end mr-2 text-muted small"
+                             id="volume">{{5555 | numberFormat}} BTC
+                        </div>
+                        <div class="row justify-content-end mr-2 text-muted small"
+                             id="volumequote">
+                            {{999999999 | numberFormat}} EUR
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        update_values()
+        var runUpdates=setInterval(update_values,6*1000);
+
+
+    </script>
+    <div id="line-chart" style="height: 400px;"></div>
+    <script>
+        lineChart()
+
+
+    </script>
+
+</div>
+
+{% endblock %}

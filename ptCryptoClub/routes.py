@@ -76,6 +76,7 @@ def api_home_cards_small_chart(base, quote, market, delta):
     return jsonify(
         small_chart(base=base, quote=quote, market=market, delta=delta)
     )
+##################
 
 
 @app.route("/market/<market>/")
@@ -90,4 +91,23 @@ def market(market):
         market=market,
         cards=cards,
         num_pairs=len(cards)
+    )
+
+
+@app.route("/charts/line/<market>/<base>/<quote>/")
+def chart_line(market, base, quote):
+    return render_template(
+        "charts-line.html",
+        title="Charts",
+        market=market,
+        base=base,
+        quote=quote,
+        delta=default_delta
+    )
+
+
+@app.route("/api/line-chart/info/<market>/<base>/<quote>/<delta>/")
+def api_charts_line_info(market, base, quote, delta):
+    return jsonify(
+        card_generic(base, quote, market, delta)
     )
