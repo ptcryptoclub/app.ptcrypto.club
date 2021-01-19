@@ -10,7 +10,7 @@ engine_live_data = create_engine(CryptoData.string)
 
 def table_latest_trans(base, quote, market, number_of_trans):
     sql_query = f"""
-    select date_created, price, amount from "liveTransactions" lt
+    select date_created, price, amount from public."liveTransactions" lt
         where base = '{base}' and "quote" = '{quote}' and market = '{market}'
         order by date_created DESC
         limit {number_of_trans}
