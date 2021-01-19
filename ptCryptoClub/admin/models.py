@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean, default=False)
     date_active = db.Column(db.DateTime)
     qrcode_secret = db.Column(db.String(255), nullable=False)
+    api_secret = db.Column(db.String(255), nullable=False)
 
 
 class LoginUser(db.Model, UserMixin):
