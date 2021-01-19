@@ -11,6 +11,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.card_functions import small_chart
+from ptCryptoClub.admin.sql.ohlc_functions import line_chat_data
 
 
 @app.before_request
@@ -110,4 +111,11 @@ def chart_line(market, base, quote):
 def api_charts_line_info(market, base, quote, delta):
     return jsonify(
         card_generic(base, quote, market, delta)
+    )
+
+
+@app.route("/api/charts/line/<market>/<base>/<quote>/<delta>/")
+def api_charts_line_data(market, base, quote, delta):
+    return jsonify(
+        line_chat_data(base, quote, market, delta)
     )

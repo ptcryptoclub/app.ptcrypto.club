@@ -48,4 +48,34 @@ def ohlc_20s_data(base, quote, market, last_x_hours):
     return to_return
 
 
-print(ohlc_20s_data(base='btc', quote='eur', market='kraken', last_x_hours=1))
+def line_chat_data(base, quote, market, last_x_hours):
+    query = f"""
+    select 	closetime,
+            closeprice
+        from public.ohlc_20s os
+        where closetime >= now() - interval '{str(last_x_hours)} hour' and base = '{base}' and "quote" = '{quote}' and market = '{market}'
+        order by closetime asc
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(columns=["closetime", "openprice", "highprice", "lowprice", "closeprice", "volume", "volumequote"])
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='ohlc functions 20s data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "date": str(data.closetime[i])[:19],
+                "closeValue": data.closeprice[i]
+            }
+        )
+    return to_return
+
+
+print(line_chat_data(base='btc', quote='eur', market='kraken', last_x_hours=1))

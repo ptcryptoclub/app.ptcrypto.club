@@ -50,8 +50,11 @@ function update_values () {
 
 
 function lineChart() {
-    let pair = document.getElementById("pair");
     let market = document.getElementById("market");
+    let base = document.getElementById("base");
+    let quote = document.getElementById("quote");
+    let delta = document.getElementById("delta");
+    
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -64,10 +67,10 @@ function lineChart() {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     // Load external data
-    chart.dataSource.url = "/api/charts/line/" + market.innerHTML + '/' + pair.innerHTML;
+    chart.dataSource.url = "/api/charts/line/" + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/1/';
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
-    chart.dataSource.reloadFrequency = 60 * 1000;
+    chart.dataSource.reloadFrequency = 20 * 1000;
     chart.dataSource.updateCurrentData = true;
 
     // the following line makes value axes to be arranged vertically.
