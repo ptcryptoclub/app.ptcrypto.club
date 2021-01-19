@@ -39,9 +39,8 @@ function update_values () {
                     price.innerHTML = numberFormat(data['last_price']);
                     high.innerHTML = '<strong>High: </strong>' + numberFormat(data['high']);
                     low.innerHTML = '<strong>Low: </strong>' + numberFormat(data['low']);
-                    volume.innerHTML = numberFormat(data['volume']);
-                    volumeQuote.innerHTML = numberFormat(data['volume_quote']);
-                    borderLine.hidden = false
+                    volume.innerHTML = numberFormat(data['volume']) + ' ' + base.innerHTML.toUpperCase();
+                    volumeQuote.innerHTML = numberFormat(data['volume_quote']) + ' ' + quote.innerHTML.toUpperCase();
                 }
             )
         }

@@ -44,7 +44,7 @@
                 <div id="delta" hidden>{{delta}}</div>
                 <div class="row">
                     <div class="col">
-                        <h4 class="text-light">BTCEUR</h4>
+                        <h4 class="text-light">{{base.upper()}}{{quote.upper()}}</h4>
                     </div>
                     <div class="col-auto text-right">
                         <small class="font-italic text-muted"id="market">kraken</small>
@@ -52,31 +52,30 @@
                 </div>
                 <div class="row">
                     <div class="col-auto">
-                        <h5 class="text-danger ml-3" id="change">10%</h5>
+                        <h5 class="text-muted ml-3" id="change">0%</h5>
                     </div>
                     <div class="col">
-                        <h4 class="text-right text-danger"id="last">{{12345.67 | numberFormat}}</h4>
+                        <h4 class="text-right text-muted" id="last">0.0</h4>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-auto">
                         <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
                         <div class="row-fluid text-muted small"
-                             id="high"><strong>High: </strong>{{23456.78 | numberFormat}}
+                             id="high"><strong>High: </strong>0.0
                         </div>
                         <div class="row-fluid text-muted small"
-                             id="low"><strong>Low: </strong>{{01234.56 | numberFormat}}
+                             id="low"><strong>Low: </strong>0.0
                         </div>
                     </div>
                     <div class="col">
                         <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
                         </div>
-                        <div class="row justify-content-end mr-2 text-muted small"
-                             id="volume">{{5555 | numberFormat}} BTC
+                        <div class="row justify-content-end mr-2 text-muted small" id="volume">
+                            0.0 {{base.upper()}}
                         </div>
-                        <div class="row justify-content-end mr-2 text-muted small"
-                             id="volumequote">
-                            {{999999999 | numberFormat}} EUR
+                        <div class="row justify-content-end mr-2 text-muted small" id="volumequote">
+                            0.0 {{quote.upper()}}
                         </div>
                     </div>
                 </div>
