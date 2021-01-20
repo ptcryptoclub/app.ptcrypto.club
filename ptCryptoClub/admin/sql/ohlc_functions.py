@@ -8,7 +8,7 @@ import pandas as pd
 engine_live_data = create_engine(CryptoData.string)
 
 
-def ohlc_20s_data(base, quote, market, last_x_hours):
+def ohlc_chart_data(base, quote, market, last_x_hours):
     query = f"""
     select 	closetime,
             openprice,
@@ -23,6 +23,8 @@ def ohlc_20s_data(base, quote, market, last_x_hours):
     """
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)
+        data['pct_change'] = data.closeprice.pct_change()
+        data['pct_change'] = data['pct_change'].fillna(0)
     except Exception as e:
         data = pd.DataFrame(columns=["closetime", "openprice", "highprice", "lowprice", "closeprice", "volume", "volumequote"])
         # noinspection PyArgumentList
@@ -42,13 +44,13 @@ def ohlc_20s_data(base, quote, market, last_x_hours):
                 "lowprice": data.lowprice[i],
                 "closeprice": data.closeprice[i],
                 "volume": data.volume[i],
-                "volumequote": data.volumequote[i]
+                "rel_change": data['pct_change'][i]
             }
         )
     return to_return
 
 
-def line_chat_data(base, quote, market, last_x_hours):
+def line_chart_data(base, quote, market, last_x_hours):
     query = f"""
     select 	closetime,
             closeprice
@@ -76,6 +78,3 @@ def line_chat_data(base, quote, market, last_x_hours):
             }
         )
     return to_return
-
-
-print(line_chat_data(base='btc', quote='eur', market='kraken', last_x_hours=1))

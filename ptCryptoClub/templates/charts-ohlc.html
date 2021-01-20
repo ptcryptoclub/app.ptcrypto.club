@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+
+{% endblock %}
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row my-1">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="row">
+                    <div class="col-auto">
+                        <a href="{{url_for('chart_line', market=market, base=base, quote=quote)}}"
+                           class="text-decoration-none text-muted">Line chart</a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{url_for('chart_ohlc', market=market, base=base, quote=quote)}}"
+                           class="text-decoration-none text-light">Ohlc chart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='js/ohlc.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<div>
+    <div id="market" hidden>{{market}}</div>
+    <div id="base" hidden>{{base}}</div>
+    <div id="quote" hidden>{{quote}}</div>
+    <div id="last_x_hours" hidden>{{last_x_hours}}</div>
+</div>
+
+<div class="container-fluid">
+    <div class="row no-gutters">
+        <div class="col-xl col-lg p-2">
+            <div id="ohlc-chart" style="height: 700px;"></div>
+            <script>
+                ohlc_chart()
+
+            </script>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

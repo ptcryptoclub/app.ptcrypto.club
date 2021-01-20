@@ -7,9 +7,10 @@ function numberFormat(x) {
 
 function ohlc_chart() {
 
-    var market = document.getElementById("market").value;
-    var pair = document.getElementById("pair").value;
-    var interval = document.getElementById("interval").value;
+    var market = document.getElementById("market");
+    var base = document.getElementById("base");
+    var quote = document.getElementById("quote");
+    var last_x_hours = document.getElementById("last_x_hours");
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -22,13 +23,12 @@ function ohlc_chart() {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
 
-
-    chart.dataSource.url = '/api/charts/ohlc/' + market + '/' + pair + '/1000/' + interval;
+    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + last_x_hours.innerHTML + '/';
     chart.dataSource.load();
-    // chart.dataSource.keepCount = true;
+    //chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
     chart.dataSource.updateCurrentData = true;
-    chart.dataSource.reloadFrequency = 60 * 1000;
+    chart.dataSource.reloadFrequency = 20 * 1000;
     
 
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -51,7 +51,7 @@ function ohlc_chart() {
     valueAxis.zIndex = 1;
     valueAxis.renderer.baseGrid.disabled = true;
     // height of axis
-    valueAxis.height = am4core.percent(75);
+    valueAxis.height = am4core.percent(65);
 
     valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
     valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
@@ -63,11 +63,11 @@ function ohlc_chart() {
     valueAxis.renderer.fontSize = "0.8em";
 
     var series = chart.series.push(new am4charts.CandlestickSeries());
-    series.dataFields.dateX = "date";
-    series.dataFields.valueY = "close";
-    series.dataFields.openValueY = "open";
-    series.dataFields.lowValueY = "low";
-    series.dataFields.highValueY = "high";
+    series.dataFields.dateX = "closetime";
+    series.dataFields.valueY = "closeprice";
+    series.dataFields.openValueY = "openprice";
+    series.dataFields.lowValueY = "lowprice";
+    series.dataFields.highValueY = "highprice";
     series.tooltipText = "Open:{openValueY.value}\nHigh:{highValueY.value}\nLow:{lowValueY.value}\nClose:{valueY.value}";
 
     // important!
@@ -84,7 +84,7 @@ function ohlc_chart() {
     var valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis2.tooltip.disabled = true;
     // height of axis
-    valueAxis2.height = am4core.percent(15);
+    valueAxis2.height = am4core.percent(20);
     valueAxis2.zIndex = 3;
     // this makes gap between panels
     // valueAxis2.marginTop = 30;
@@ -99,7 +99,7 @@ function ohlc_chart() {
     valueAxis2.renderer.gridContainer.background.fillOpacity = 0.05;
 
     var series2 = chart.series.push(new am4charts.ColumnSeries());
-    series2.dataFields.dateX = "date";
+    series2.dataFields.dateX = "closetime";
     series2.clustered = false;
     series2.dataFields.valueY = "volume";
     series2.yAxis = valueAxis2;
@@ -114,7 +114,7 @@ function ohlc_chart() {
 
     valueAxis3.tooltip.disabled = true;
     // height of axis
-    valueAxis3.height = am4core.percent(10);
+    valueAxis3.height = am4core.percent(15);
     valueAxis3.zIndex = 2;
     // this makes gap between panels
     // valueAxis2.marginTop = 30;
@@ -134,7 +134,7 @@ function ohlc_chart() {
     // Create series
     var series3 = chart.series.push(new am4charts.StepLineSeries());
     series3.dataFields.valueY = "rel_change";
-    series3.dataFields.dateX = "date";
+    series3.dataFields.dateX = "closetime";
     series3.noRisers = true;
     series3.strokeWidth = 2;
     series3.fill = am4core.color("green")
@@ -168,7 +168,6 @@ function ohlc_chart() {
     // Create scrollbars
     chart.scrollbarX = new am4core.Scrollbar();
 
-    orderBook()
 }
 
 function latest_transactions() {

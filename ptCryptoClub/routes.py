@@ -11,7 +11,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.card_functions import small_chart
-from ptCryptoClub.admin.sql.ohlc_functions import line_chat_data
+from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 
 
 @app.before_request
@@ -118,5 +118,24 @@ def api_charts_line_info(market, base, quote, delta):
 @app.route("/api/charts/line/<market>/<base>/<quote>/<last_x_hours>/")
 def api_charts_line_data(market, base, quote, last_x_hours):
     return jsonify(
-        line_chat_data(base, quote, market, last_x_hours)
+        line_chart_data(base, quote, market, last_x_hours)
+    )
+
+
+@app.route("/charts/ohlc/<market>/<base>/<quote>/")
+def chart_ohlc(market, base, quote):
+    return render_template(
+        "charts-ohlc.html",
+        title="Charts",
+        market=market,
+        base=base,
+        quote=quote,
+        last_x_hours=default_last_x_hours
+    )
+
+
+@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<last_x_hours>/")
+def api_charts_ohlc_data(market, base, quote, last_x_hours):
+    return jsonify(
+        ohlc_chart_data(base, quote, market, last_x_hours)
     )

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - ptcrypto.club</title>
+    <title>{{ title }} - app.ptcrypto.club</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -61,7 +61,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="chartsDropdown">
                         <a class="dropdown-item" href="{{url_for('chart_line', market='kraken', base='btc', quote='eur')}}">Line</a>
-                        <a class="dropdown-item" href="#">Ohlc</a>
+                        <a class="dropdown-item" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur')}}">Ohlc</a>
                     </div>
                 </li>
 

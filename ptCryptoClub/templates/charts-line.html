@@ -8,11 +8,11 @@
             <div class="row justify-content-start">
                 <div class="row">
                     <div class="col-auto">
-                        <a href="#"
+                        <a href="{{url_for('chart_line', market=market, base=base, quote=quote)}}"
                            class="text-decoration-none text-light">Line chart</a>
                     </div>
                     <div class="col-auto">
-                        <a href="#"
+                        <a href="{{url_for('chart_ohlc', market=market, base=base, quote=quote)}}"
                            class="text-decoration-none text-muted">Ohlc chart</a>
                     </div>
                 </div>
