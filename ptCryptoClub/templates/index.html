@@ -18,7 +18,7 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
         {% for card in cards %}
         <div class="col-xl-4 col-lg-4 col-sm-6 mb-2">
-            <a href="#" class="text-decoration-none">
+            <a href="{{url_for('chart_line', market=card['market'], base=card['base'], quote=card['quote'])}}" class="text-decoration-none">
                 {% if card["change"] < 0 %}
                 {% set color = "danger" %}
                 {% elif card["change"] == 0 %}

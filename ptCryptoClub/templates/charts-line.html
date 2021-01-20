@@ -15,10 +15,6 @@
                         <a href="#"
                            class="text-decoration-none text-muted">Ohlc chart</a>
                     </div>
-                    <div class="col-auto">
-                        <a href="#"
-                           class="text-decoration-none text-muted">Live market</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -42,12 +38,13 @@
                 <div id="base" hidden>{{base}}</div>
                 <div id="quote" hidden>{{quote}}</div>
                 <div id="delta" hidden>{{delta}}</div>
+                <div id="last_x_hours" hidden>{{last_x_hours}}</div>
                 <div class="row">
                     <div class="col">
                         <h4 class="text-light">{{base.upper()}}{{quote.upper()}}</h4>
                     </div>
                     <div class="col-auto text-right">
-                        <small class="font-italic text-muted"id="market">kraken</small>
+                        <small class="font-italic text-muted" id="market">kraken</small>
                     </div>
                 </div>
                 <div class="row">

@@ -7,7 +7,7 @@ import werkzeug
 
 # local imports
 from ptCryptoClub import app, db, bcrypt
-from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, TRANSACTION_SUCCESS_STATUSES
+from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.card_functions import small_chart
@@ -103,7 +103,8 @@ def chart_line(market, base, quote):
         market=market,
         base=base,
         quote=quote,
-        delta=default_delta
+        delta=default_delta,
+        last_x_hours=default_last_x_hours
     )
 
 
@@ -114,8 +115,8 @@ def api_charts_line_info(market, base, quote, delta):
     )
 
 
-@app.route("/api/charts/line/<market>/<base>/<quote>/<delta>/")
-def api_charts_line_data(market, base, quote, delta):
+@app.route("/api/charts/line/<market>/<base>/<quote>/<last_x_hours>/")
+def api_charts_line_data(market, base, quote, last_x_hours):
     return jsonify(
-        line_chat_data(base, quote, market, delta)
+        line_chat_data(base, quote, market, last_x_hours)
     )

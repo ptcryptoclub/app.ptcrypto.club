@@ -53,7 +53,7 @@ function lineChart() {
     let market = document.getElementById("market");
     let base = document.getElementById("base");
     let quote = document.getElementById("quote");
-    let delta = document.getElementById("delta");
+    let last_x_hours = document.getElementById("last_x_hours");
     
 
     // Themes begin
@@ -67,7 +67,7 @@ function lineChart() {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     // Load external data
-    chart.dataSource.url = "/api/charts/line/" + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/1/';
+    chart.dataSource.url = "/api/charts/line/" + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + last_x_hours.innerHTML + '/';
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
     chart.dataSource.reloadFrequency = 20 * 1000;

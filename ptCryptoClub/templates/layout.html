@@ -49,6 +49,22 @@
                     </div>
                 </li>
 
+                {% if title == "Charts" %}
+                {% set active = "active" %}
+                {% else %}
+                {% set active = "" %}
+                {% endif %}
+                <li class="nav-item {{active}} dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="chartsDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Charts
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="chartsDropdown">
+                        <a class="dropdown-item" href="{{url_for('chart_line', market='kraken', base='btc', quote='eur')}}">Line</a>
+                        <a class="dropdown-item" href="#">Ohlc</a>
+                    </div>
+                </li>
+
             </ul>
             <div class="form-inline my-2 my-lg-0 small">
                 <label for="clock" class="my-1 mr-2 text-secondary">UTC time: </label>
