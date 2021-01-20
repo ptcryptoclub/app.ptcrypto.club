@@ -7,7 +7,8 @@ import werkzeug
 
 # local imports
 from ptCryptoClub import app, db, bcrypt
-from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, TRANSACTION_SUCCESS_STATUSES
+from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
+                                        TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.card_functions import small_chart
@@ -130,12 +131,12 @@ def chart_ohlc(market, base, quote):
         market=market,
         base=base,
         quote=quote,
-        last_x_hours=default_last_x_hours
+        datapoints=default_datapoints
     )
 
 
-@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<last_x_hours>/")
-def api_charts_ohlc_data(market, base, quote, last_x_hours):
+@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<datapoints>/")
+def api_charts_ohlc_data(market, base, quote, datapoints):
     return jsonify(
-        ohlc_chart_data(base, quote, market, last_x_hours)
+        ohlc_chart_data(base, quote, market, datapoints)
     )

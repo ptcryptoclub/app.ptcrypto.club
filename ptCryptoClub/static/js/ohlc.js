@@ -10,7 +10,7 @@ function ohlc_chart() {
     var market = document.getElementById("market");
     var base = document.getElementById("base");
     var quote = document.getElementById("quote");
-    var last_x_hours = document.getElementById("last_x_hours");
+    var datapoints = document.getElementById("datapoints");
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -23,12 +23,12 @@ function ohlc_chart() {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
 
-    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + last_x_hours.innerHTML + '/';
+    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + datapoints.innerHTML + '/';
     chart.dataSource.load();
-    //chart.dataSource.keepCount = true;
+    chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
     chart.dataSource.updateCurrentData = true;
-    chart.dataSource.reloadFrequency = 20 * 1000;
+    chart.dataSource.reloadFrequency = 10 * 1000;
     
 
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -42,7 +42,7 @@ function ohlc_chart() {
     dateAxis.renderer.maxLabelPosition = 0.99;
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
-    dateAxis.groupData = true;
+    ///dateAxis.groupData = true;
 
     // dateAxis.minZoomCount = 120;
 
@@ -51,7 +51,7 @@ function ohlc_chart() {
     valueAxis.zIndex = 1;
     valueAxis.renderer.baseGrid.disabled = true;
     // height of axis
-    valueAxis.height = am4core.percent(65);
+    valueAxis.height = am4core.percent(80);
 
     valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
     valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
@@ -106,62 +106,7 @@ function ohlc_chart() {
     series2.tooltipText = "{valueY.value}";
     series2.fillOpacity = 0.2;
     // volume should be summed
-    series2.groupFields.valueY = "sum";
-
-
-    // Create value axis
-    var valueAxis3 = chart.yAxes.push(new am4charts.ValueAxis());
-
-    valueAxis3.tooltip.disabled = true;
-    // height of axis
-    valueAxis3.height = am4core.percent(15);
-    valueAxis3.zIndex = 2;
-    // this makes gap between panels
-    // valueAxis2.marginTop = 30;
-    valueAxis3.renderer.baseGrid.disabled = true;
-    valueAxis3.renderer.inside = false;
-    // valueAxis3.renderer.labels.template.verticalCenter = "bottom";
-    valueAxis3.renderer.labels.template.padding(2, 2, 2, 2);
-    valueAxis3.renderer.maxLabelPosition = 0.95;
-    valueAxis3.renderer.fontSize = "0.8em";
-
-
-    valueAxis3.baseValue = 0;
-    valueAxis3.renderer.grid.template.strokeOpacity = 0;
-    valueAxis3.renderer.labels.template.fontSize = 10;
-    valueAxis3.tooltip.disabled = true;
-
-    // Create series
-    var series3 = chart.series.push(new am4charts.StepLineSeries());
-    series3.dataFields.valueY = "rel_change";
-    series3.dataFields.dateX = "closetime";
-    series3.noRisers = true;
-    series3.strokeWidth = 2;
-    series3.fill = am4core.color("green")
-    series3.stroke = am4core.color("green")
-    series3.fillOpacity = 0.2;
-    series3.groupFields.valueY = "sum";
-    series3.yAxis = valueAxis3;
-    series3.clustered = false;
-
-
-    // bullet is added because we add tooltip to a bullet for it to change color
-    var bullet = series3.bullets.push(new am4charts.Bullet());
-    bullet.tooltipText = "Pct change\nPrevious candle\n{valueY}%";
-
-    bullet.adapter.add("fill", function (fill, target) {
-        if (target.dataItem.valueY < 0) {
-            return am4core.color("#FF0000");
-        }
-        return fill;
-    })
-    var range = valueAxis3.createSeriesRange(series3);
-    range.value = 0;
-    range.endValue = -1000;
-    range.contents.stroke = am4core.color("#FF0000");
-    range.contents.fill = range.contents.stroke;
-    range.contents.fillOpacity = 0.2;
-
+    ///series2.groupFields.valueY = "sum";
 
 
     chart.cursor = new am4charts.XYCursor();
