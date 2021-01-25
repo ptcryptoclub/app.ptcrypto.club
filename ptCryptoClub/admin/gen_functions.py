@@ -101,6 +101,3 @@ def card_generic(base, quote, market, delta):
 
 def table_latest_transactions(base, quote, market, number_of_trans):
     return table_latest_trans(base, quote, market, number_of_trans)
-
-
-print(card_generic(base="btc", quote="eur", market="kraken", delta=1440))

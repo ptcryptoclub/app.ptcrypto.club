@@ -8,6 +8,7 @@ import pandas as pd
 engine_live_data = create_engine(CryptoData.string)
 
 
+# NOT IN USE ##
 def last_price(base, quote, market):
     sql_query = f"""
     select 	price,
@@ -35,6 +36,7 @@ def last_price(base, quote, market):
     return last_price  # , delay
 
 
+# NOT IN USE ##
 def price_change(base, quote, market, delta):
     sql_query = f"""
     select	date_created, base, "quote", market, round(avg(price)::numeric, 2) as price
@@ -72,6 +74,7 @@ def price_change(base, quote, market, delta):
     return price_change
 
 
+# NOT IN USE ##
 def max_min(base, quote, market, delta):
     sql_query = f"""
     select 	max(price),
@@ -96,6 +99,7 @@ def max_min(base, quote, market, delta):
     return maximum, minimum
 
 
+# NOT IN USE ##
 def volume(base, quote, market, delta):
     sql_query = f"""
     select base, "quote", sum(amount) sum_base, sum(price * amount) sum_quote from "liveTransactions"
@@ -119,6 +123,7 @@ def volume(base, quote, market, delta):
     return sum_base, sum_quote
 
 
+# NOT IN USE ##
 def small_chart(base, quote, market, delta):
     try:
         delta = int(delta)

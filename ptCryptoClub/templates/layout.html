@@ -32,6 +32,24 @@
                     <a class="nav-link {{active}}" href="{{url_for('home')}}">Home</a>
                 </li>
 
+                {% if title == "Login" %}
+                {% set active = "active" %}
+                {% else %}
+                {% set active = "" %}
+                {% endif %}
+                <li class="nav-item {{active}}">
+                    <a class="nav-link" href="{{url_for('login')}}">Login</a>
+                </li>
+
+                {% if title == "Register" %}
+                {% set active = "active" %}
+                {% else %}
+                {% set active = "" %}
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {{active}}" href="{{url_for('register')}}">Register</a>
+                </li>
+
                 {% if title == "Markets" %}
                 {% set active = "active" %}
                 {% else %}
@@ -42,9 +60,9 @@
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Markets
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="marketsDropdown">
+                    <div class="dropdown-menu bg-dark" aria-labelledby="marketsDropdown">
                         {% for market in all_markets %}
-                        <a class="dropdown-item" href="{{url_for('market', market=market)}}">{{market}}</a>
+                        <a class="dropdown-item text-light" href="{{url_for('market', market=market)}}">{{market}}</a>
                         {% endfor %}
                     </div>
                 </li>
@@ -59,9 +77,9 @@
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Charts
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="chartsDropdown">
-                        <a class="dropdown-item" href="{{url_for('chart_line', market='kraken', base='btc', quote='eur')}}">Line</a>
-                        <a class="dropdown-item" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle)}}">Ohlc</a>
+                    <div class="dropdown-menu bg-dark" aria-labelledby="chartsDropdown">
+                        <a class="dropdown-item text-light" href="{{url_for('chart_line', market='kraken', base='btc', quote='eur')}}">Line</a>
+                        <a class="dropdown-item text-light" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle)}}">Ohlc</a>
                     </div>
                 </li>
 

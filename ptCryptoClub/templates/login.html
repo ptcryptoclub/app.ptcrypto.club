@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+<style>
+    body, html {
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid mt-4 h-75">
+    <div class="row align-items-center justify-content-center mx-1 px-2 h-100">
+        <div class="col-xl-5 col-lg-6 col-md-7 col-sm-9 justify-content-center p-4 rounded border">
+            <form action="{{url_for('login')}}" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.username(class="form-control bg-dark text-light border-0", placeholder="Username*") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password(class="form-control bg-dark text-light border-0", placeholder="Password*") }}
+                </div>
+                {{ form.submit(class="btn btn-outline-dark text-light px-5") }}
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

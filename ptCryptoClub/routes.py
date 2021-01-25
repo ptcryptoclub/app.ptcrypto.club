@@ -12,6 +12,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
+from ptCryptoClub.admin.forms import RegistrationForm, LoginForm
 
 
 @app.before_request
@@ -69,6 +70,26 @@ def api_home_cards(base, quote, market, delta):
 def api_home_latest_transactions(base, quote, market, number_of_trans):
     return jsonify(
         table_latest_transactions(base=base, quote=quote, market=market, number_of_trans=number_of_trans)
+    )
+
+
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    return render_template(
+        "login.html",
+        title="Login",
+        form=form
+    )
+
+
+@app.route("/register/", methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+    return render_template(
+        "register.html",
+        title="Register",
+        form=form
     )
 
 
