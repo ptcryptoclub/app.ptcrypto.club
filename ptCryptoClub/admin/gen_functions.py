@@ -1,6 +1,4 @@
 from ptCryptoClub.admin.config import CryptoData
-from ptCryptoClub.admin.models import LivePairs
-from ptCryptoClub.admin.sql.card_functions import last_price, price_change, max_min, volume
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import ErrorLogs
 from ptCryptoClub import db
@@ -70,24 +68,39 @@ def get_all_pairs(market):
 
 
 def card_generic(base, quote, market, delta):
-    maximum, minimum = max_min(base, quote, market, delta)
-    sum_base, sum_quote = volume(base, quote, market, delta)
-    change = price_change(base, quote, market, delta)
-    price = last_price(base, quote, market)
+    query = f"""
+    SELECT base, "quote", market, "change", price, high, low, volume, volumequote
+        FROM public."infoCards"
+        where base = '{base}' and quote = '{quote}' and market = '{market}' and delta = {str(delta)};
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions card generic for {base}, {quote} and {market}',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        data = pd.DataFrame(columns=["base", "quote", "market", "change", "price", "high", "low", "volume", "volumequote"])
     to_return = {
-        'base': base,
-        'quote': quote,
-        'market': market,
-        'change': change,
-        'last_price': price,
-        'high': maximum,
-        'low': minimum,
-        'volume': int(sum_base),
-        'volume_quote': int(sum_quote),
-        'delta': delta
+        'base': data.base[0],
+        'quote': data.quote[0],
+        'market': data.market[0],
+        'change': float(data.change[0]),
+        'last_price': float(data.price[0]),
+        'high': float(data.high[0]),
+        'low': float(data.low[0]),
+        'volume': int(data.volume[0]),
+        'volume_quote': int(data.volumequote[0]),
+        'delta': int(delta)
     }
     return to_return
 
 
 def table_latest_transactions(base, quote, market, number_of_trans):
     return table_latest_trans(base, quote, market, number_of_trans)
+
+
+print(card_generic(base="btc", quote="eur", market="kraken", delta=1440))

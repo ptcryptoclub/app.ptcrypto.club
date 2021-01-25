@@ -9,14 +9,8 @@ import time
 engine_live_data = create_engine(CryptoData.string)
 
 
-def ohlc_chart_data(base, quote, market, datapoints):
-    def convert_time(date_str):
-        time_tuple = time.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-        x = int(time.mktime(time_tuple))
-        return x
-
+def ohlc_chart_data(base, quote, market, datapoints, candle):
     query = f"""
-    
     select t.*
         from (
             select 	closetime,
@@ -25,7 +19,7 @@ def ohlc_chart_data(base, quote, market, datapoints):
                     lowprice,
                     closeprice,
                     volume
-                from public.ohlc_20s os
+                from public.ohlc_{str(candle)}s os
                 where base = '{base}' and "quote" = '{quote}' and market = '{market}'
                 order by closetime desc
                 limit {str(datapoints)}
@@ -34,8 +28,13 @@ def ohlc_chart_data(base, quote, market, datapoints):
     """
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)
+        data['moving_avg'] = data.closeprice.rolling(12, min_periods=1).mean()
+        # data['moving_exp'] = data.closeprice.rolling(4, min_periods=1).mean()
+        data['moving_exp'] = data.closeprice.ewm(com=4).mean()
     except Exception as e:
-        data = pd.DataFrame(columns=["closetime", "openprice", "highprice", "lowprice", "closeprice", "volume", "volumequote"])
+        data = pd.DataFrame(
+            columns=["closetime", "openprice", "highprice", "lowprice", "closeprice", "volume", "volumequote", "moving_avg", "moving_exp"]
+        )
         # noinspection PyArgumentList
         error_log = ErrorLogs(
             route='ohlc functions 20s data',
@@ -52,7 +51,9 @@ def ohlc_chart_data(base, quote, market, datapoints):
                 "highprice": data.highprice[i],
                 "lowprice": data.lowprice[i],
                 "closeprice": data.closeprice[i],
-                "volume": data.volume[i]
+                "volume": data.volume[i],
+                "moving_avg": data.moving_avg[i],
+                "moving_exp": data.moving_exp[i]
             }
         )
     return to_return

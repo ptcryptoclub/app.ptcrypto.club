@@ -8,10 +8,9 @@ import werkzeug
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-                                        TRANSACTION_SUCCESS_STATUSES
+                                        candle_options, default_candle, TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
-from ptCryptoClub.admin.sql.card_functions import small_chart
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 
 
@@ -30,7 +29,8 @@ def numberFormat(value):
 def send_my_func():
     return {
         "admins_emails": admins_emails,
-        "all_markets": get_all_markets()
+        "all_markets": get_all_markets(),
+        "default_candle": default_candle
     }
 
 
@@ -70,15 +70,6 @@ def api_home_latest_transactions(base, quote, market, number_of_trans):
     return jsonify(
         table_latest_transactions(base=base, quote=quote, market=market, number_of_trans=number_of_trans)
     )
-
-
-# NOT IN USE YET #
-@app.route("/api/home/cards/small-chart/<base>/<quote>/<market>/<delta>/")
-def api_home_cards_small_chart(base, quote, market, delta):
-    return jsonify(
-        small_chart(base=base, quote=quote, market=market, delta=delta)
-    )
-##################
 
 
 @app.route("/market/<market>/")
@@ -123,20 +114,36 @@ def api_charts_line_data(market, base, quote, last_x_hours):
     )
 
 
-@app.route("/charts/ohlc/<market>/<base>/<quote>/")
-def chart_ohlc(market, base, quote):
+@app.route("/charts/ohlc/<market>/<base>/<quote>/<candle>")
+def chart_ohlc(market, base, quote, candle):
+    try:
+        candle = int(candle)
+    except Exception as e:
+        print(e)
+        candle = 60
+    if candle == 20:
+        candle_in_use_display = "20 sec"
+    elif candle == 60:
+        candle_in_use_display = "1 min"
+    elif candle == 300:
+        candle_in_use_display = "5 min"
+    else:
+        return redirect(url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle))
     return render_template(
         "charts-ohlc.html",
         title="Charts",
         market=market,
         base=base,
         quote=quote,
-        datapoints=default_datapoints
+        datapoints=default_datapoints,
+        candles=candle_options,
+        candle_in_use=candle,
+        candle_in_use_display=candle_in_use_display
     )
 
 
-@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<datapoints>/")
-def api_charts_ohlc_data(market, base, quote, datapoints):
+@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<datapoints>/<candle>/")
+def api_charts_ohlc_data(market, base, quote, datapoints, candle):
     return jsonify(
-        ohlc_chart_data(base, quote, market, datapoints)
+        ohlc_chart_data(base, quote, market, datapoints, candle)
     )

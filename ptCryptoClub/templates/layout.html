@@ -61,7 +61,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="chartsDropdown">
                         <a class="dropdown-item" href="{{url_for('chart_line', market='kraken', base='btc', quote='eur')}}">Line</a>
-                        <a class="dropdown-item" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur')}}">Ohlc</a>
+                        <a class="dropdown-item" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle)}}">Ohlc</a>
                     </div>
                 </li>
 

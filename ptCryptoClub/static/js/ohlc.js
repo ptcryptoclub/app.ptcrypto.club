@@ -11,6 +11,8 @@ function ohlc_chart() {
     var base = document.getElementById("base");
     var quote = document.getElementById("quote");
     var datapoints = document.getElementById("datapoints");
+    var candle = document.getElementById("candle");
+    var candle_rate = document.getElementById("candle_rate");
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -23,12 +25,15 @@ function ohlc_chart() {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
 
-    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + datapoints.innerHTML + '/';
+    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + datapoints.innerHTML + '/' + candle.innerHTML + '/';
     chart.dataSource.load();
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
     chart.dataSource.updateCurrentData = true;
-    chart.dataSource.reloadFrequency = 10 * 1000;
+    chart.dataSource.reloadFrequency = parseInt(candle_rate.innerHTML) * 1000;
+
+
+    
     
 
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -43,6 +48,12 @@ function ohlc_chart() {
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
     ///dateAxis.groupData = true;
+
+
+    dateAxis.start = 0.8;
+    dateAxis.end = 1;
+    dateAxis.keepSelection = true;
+
 
     // dateAxis.minZoomCount = 120;
 
@@ -77,8 +88,28 @@ function ohlc_chart() {
     series.riseFromOpenState.properties.stroke = am4core.color("#00ff00");
     series.dropFromOpenState.properties.stroke = am4core.color("#FF0000");
 
-    // series.riseFromPreviousState.properties.fillOpacity = 1;
-    // series.dropFromPreviousState.properties.fillOpacity = 0;
+    series.riseFromPreviousState.properties.fillOpacity = 1;
+    series.dropFromPreviousState.properties.fillOpacity = 0;
+
+    // moving average BLUE
+
+    var series_ma = chart.series.push(new am4charts.LineSeries());
+    series_ma.dataFields.valueY = "moving_avg";
+    series_ma.dataFields.dateX = "closetime";
+    series_ma.strokeWidth = 1;
+    series_ma.stroke = am4core.color("#002aff");
+
+    /////////////
+
+    // moving average exp YELLOW
+
+    var series_ma = chart.series.push(new am4charts.LineSeries());
+    series_ma.dataFields.valueY = "moving_exp";
+    series_ma.dataFields.dateX = "closetime";
+    series_ma.strokeWidth = 1;
+    series_ma.stroke = am4core.color("#ffc400");
+
+    /////////////
 
 
     var valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
@@ -110,6 +141,8 @@ function ohlc_chart() {
 
 
     chart.cursor = new am4charts.XYCursor();
+    chart.cursor.behavior = "panX";
+    chart.cursor.maxPanOut = 0.005
     // Create scrollbars
     chart.scrollbarX = new am4core.Scrollbar();
 

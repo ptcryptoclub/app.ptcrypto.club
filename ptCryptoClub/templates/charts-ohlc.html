@@ -16,7 +16,7 @@
                            class="text-decoration-none text-muted">Line chart</a>
                     </div>
                     <div class="col-auto">
-                        <a href="{{url_for('chart_ohlc', market=market, base=base, quote=quote)}}"
+                        <a href="{{url_for('chart_ohlc', market=market, base=base, quote=quote, candle=default_candle)}}"
                            class="text-decoration-none text-light">Ohlc chart</a>
                     </div>
                 </div>
@@ -38,14 +38,43 @@
     <div id="base" hidden>{{base}}</div>
     <div id="quote" hidden>{{quote}}</div>
     <div id="datapoints" hidden>{{datapoints}}</div>
+    <div id="candle" hidden>{{candle_in_use}}</div>
+    {% for i in candles %}
+    {% if i['value'] == candle_in_use %}
+    <div id="candle_rate" hidden>{{i['update_rate']}}</div>
+    {% endif %}
+    {% endfor %}
 </div>
 
 <div class="container">
+    <div class="row justify-content-end align-items-center p-1 mt-1 small">
+        <div class="col-auto text-light">
+            Market: {{market.upper()}}
+        </div>
+        <div class="col-auto text-light">
+            Pair: {{base.upper()}}{{quote.upper()}}
+        </div>
+        <div class="col-auto text-light">
+            <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    {{candle_in_use_display}}
+                </button>
+                <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
+                    {% for candle in candles %}
+                    <a class="dropdown-item text-light small" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=candle['value'])}}">{{candle['display']}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row no-gutters">
-        <div class="col-xl col-lg p-2">
+        <div class="col-xl col-lg py-2">
             <div id="ohlc-chart" style="height: 700px;"></div>
             <script>
                 ohlc_chart()
+
+
 
             </script>
         </div>
