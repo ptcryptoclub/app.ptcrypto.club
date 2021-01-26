@@ -31,8 +31,6 @@ class LoginUser(db.Model, UserMixin):
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     ipAddress = db.Column(db.String(255))
     status = db.Column(db.Boolean)
-    cookie = db.Column(db.Text)
-    raw = db.Column(db.Text)
 
 
 class ErrorLogs(db.Model, UserMixin):

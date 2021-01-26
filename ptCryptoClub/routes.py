@@ -11,7 +11,7 @@ import werkzeug
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
                                         candle_options, default_candle, QRCode, TRANSACTION_SUCCESS_STATUSES
-from ptCryptoClub.admin.models import User
+from ptCryptoClub.admin.models import User, LoginUser, ErrorLogs
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm
@@ -95,9 +95,21 @@ def login():
                 return redirect(url_for('home'))
             elif bcrypt.check_password_hash(user.password, password) and totp.verify(given_code):
                 login_user(user, remember=False)
+                # noinspection PyArgumentList
+                log = LoginUser(user_ID=user.id,
+                                ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                status=True)
+                db.session.add(log)
+                db.session.commit()
                 flash(f'You are now logged in', 'success')
                 return redirect(url_for('home'))
             else:
+                # noinspection PyArgumentList
+                log = LoginUser(user_ID=user.id,
+                                ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                status=False)
+                db.session.add(log)
+                db.session.commit()
                 flash(f'Incorrect login details, please try again.', 'danger')
                 return render_template(
                     "login.html",
@@ -105,6 +117,12 @@ def login():
                     form=form
                 )
         else:
+            # noinspection PyArgumentList
+            log = LoginUser(username=username,
+                            ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                            status=False)
+            db.session.add(log)
+            db.session.commit()
             flash(f'Incorrect username or password, please try again.', 'danger')
             return render_template(
                 "login.html",
