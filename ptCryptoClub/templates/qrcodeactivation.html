@@ -47,7 +47,7 @@
                             {% endfor %}
                         </div>
                         {% else %}
-                        {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off", value="") }}
+                        {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off", placeholder="MFA*", value="", maxlength="6") }}
                         {% endif %}
                     </div>
                     <div class="col">

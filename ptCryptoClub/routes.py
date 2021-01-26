@@ -101,7 +101,6 @@ def login():
                                 status=True)
                 db.session.add(log)
                 db.session.commit()
-                flash(f'You are now logged in', 'success')
                 return redirect(url_for('home'))
             else:
                 # noinspection PyArgumentList
@@ -241,6 +240,15 @@ def activate_account():
         else:
             flash(f'Your activation details are incorrect, please try again.', 'danger')
             return redirect(url_for('home'))
+
+
+@app.route("/account/")
+@login_required
+def account_user():
+    return render_template(
+        "account-user.html",
+        title="Account"
+    )
 
 
 @app.route("/market/<market>/")

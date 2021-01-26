@@ -39,7 +39,7 @@
                 {% set active = "" %}
                 {% endif %}
                 <li class="nav-item {{active}}">
-                    <a class="nav-link" href="#">Account</a>
+                    <a class="nav-link" href="{{url_for('account_user')}}">Account</a>
                 </li>
                 {% else %}
                 {% if title == "Login" %}
@@ -93,12 +93,6 @@
                         <a class="dropdown-item text-light" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle)}}">Ohlc</a>
                     </div>
                 </li>
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{{url_for('logout')}}">Logout</a>
-                </li>
-                {% endif %}
-
             </ul>
             <div class="form-inline my-2 my-lg-0 small">
                 <label for="clock" class="my-1 mr-2 text-secondary">UTC time: </label>
