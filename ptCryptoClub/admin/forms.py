@@ -27,3 +27,8 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+
+class AuthorizationForm(FlaskForm):
+    pin = StringField('Pin', validators=[DataRequired(), Length(min=6, max=6)])
+    submit = SubmitField('Confirm MFA')

@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+<style>
+    body, html {
+        height: 100%;
+    }
+
+
+
+</style>
+{% endblock %}
+
+
+{% block info_line %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid mt-4 h-75">
+    <div class="row align-items-center justify-content-center mx-1 px-2 h-100">
+        <div class="col-xl-5 col-lg-6 col-md-7 col-sm-9 justify-content-center p-4 rounded border border-light">
+            <div class="text-light"><H1>MFA - Setup</H1></div>
+            <div class="row mt-2">
+                <div class="col">
+                    <p class="text-muted mb-3">You can use Google Authenticator, Microsoft Authenticator or
+                        other MFA generator in you phone to generate a passcode.</p>
+                    <p class="text-muted">Just scan the QR code and enter a passcode to complete you registration.</p>
+                    <small class="text-muted"><i><u>You will be asked to enter a passcode everytime you login or when you are making important changes to your account.</u></i></small>
+                </div>
+                <div class="col-auto">
+                    <img src="{{ url_for('static', filename='qrcodes/'+qrcode_img) }}" alt="" style="width:120px;height:120px;">
+                </div>
+            </div>
+            <div class="mt-3"></div>
+            <form class="border-top border-secondary" action="" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-row mt-3">
+                    <div class="col">
+                        {% if form.pin.errors %}
+                        {{ form.pin(class="form-control bg-dark text-light is-invalid", autocomplete="off", value="") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.pin.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off", value="") }}
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        {{ form.submit(class="btn btn-outline-dark text-light px-5") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -16,9 +16,11 @@ class User(db.Model, UserMixin):
     account_type = db.Column(db.Integer, nullable=False, default=1)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     hash = db.Column(db.String(255), nullable=False)
+    active_qr = db.Column(db.Boolean, default=False)
     active = db.Column(db.Boolean, default=False)
     date_active = db.Column(db.DateTime)
     qrcode_secret = db.Column(db.String(255), nullable=False)
+    qrcode_img = db.Column(db.String(255), unique=True)
     api_secret = db.Column(db.String(255), nullable=False)
 
 
