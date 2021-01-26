@@ -54,3 +54,15 @@ class LivePairs(db.Model, UserMixin):
     in_use = db.Column(db.Boolean, nullable=False)
     added_by = db.Column(db.Integer, nullable=False)
 
+
+class UpdateAuthorizationDetails(db.Model, UserMixin):
+    pin_id = db.Column(db.Integer, primary_key=True)
+    pin_hash = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    old_username = db.Column(db.String(255))
+    old_email = db.Column(db.String(255))
+    new_username = db.Column(db.String(255))
+    new_email = db.Column(db.String(255))
+    valid = db.Column(db.Boolean, nullable=False, default=True)
+    used = db.Column(db.Boolean, nullable=False, default=False)

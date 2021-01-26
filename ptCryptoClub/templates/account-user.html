@@ -37,9 +37,9 @@
                             <div class="text-light p-2">Member since:</div>
                         </div>
                         <div class="col-auto">
-                            <div class="text-muted p-2"><small>username</small></div>
-                            <div class="text-muted p-2"><small>email</small></div>
-                            <div class="text-muted p-2"><small>member_since</small></div>
+                            <div class="text-muted p-2"><small>{{username}}</small></div>
+                            <div class="text-muted p-2"><small>{{email}}</small></div>
+                            <div class="text-muted p-2"><small>{{member_since}}</small></div>
                         </div>
                     </div>
 
@@ -50,9 +50,47 @@
                             Update details
                         </a>
                     </div>
-                    <div class="collapse" id="updateDetails">
+                    {% if form.username.errors or form.email.errors %}
+                    {% set show = "show" %}
+                    {% else %}
+                    {% set show = "" %}
+                    {% endif %}
+                    <div class="collapse {{show}}" id="updateDetails">
                         <div class="card card-body" style="background-color: #000000;">
-                            <div>In progress...</div>
+                            <form action="{{url_for('account_user')}}" method="POST">
+                                {{ form.hidden_tag() }}
+                                <div class="form-group">
+                                    {% if form.username.errors %}
+                                    {{ form.username(class="form-control form-control-sm bg-dark text-light is-invalid",
+                                    placeholder="Username", autocomplete="off") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ form.username(class="form-control form-control-sm bg-dark text-light border-0",
+                                    placeholder="Username", autocomplete="off") }}
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    {% if form.email.errors %}
+                                    {{ form.email(class="form-control form-control-sm bg-dark text-light is-invalid",
+                                    type="email", placeholder="Email", autocomplete="off") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ form.email(class="form-control form-control-sm bg-dark text-light border-0",
+                                    type="email", placeholder="Email", autocomplete="off") }}
+                                    {% endif %}
+                                    <small id="emailHelp" class="form-text text-muted">An email will be sent with a
+                                        verification code to your current email address.</small>
+                                </div>
+                                {{ form.submit(class="btn btn-sm btn-outline-dark text-light px-5") }}
+                            </form>
                         </div>
                     </div>
                     <div class="text-light text-center mt-4 mb-1 pb-2">Last logins</div>
@@ -65,10 +103,12 @@
                             </tr>
                             </thead>
                             <tbody>
+                            {% for line in logins_table %}
                             <tr>
-                                <td>2021-01-01</td>
-                                <td>0.0.0.0</td>
+                                <td>{{line['date']}}</td>
+                                <td>{{line['ipAddress']}}</td>
                             </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

@@ -10,11 +10,11 @@ import werkzeug
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-                                        candle_options, default_candle, QRCode, TRANSACTION_SUCCESS_STATUSES
-from ptCryptoClub.admin.models import User, LoginUser, ErrorLogs
+    candle_options, default_candle, QRCode, TRANSACTION_SUCCESS_STATUSES
+from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
-from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm
+from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm
 from ptCryptoClub.admin.auto_email import Email
 
 
@@ -242,13 +242,133 @@ def activate_account():
             return redirect(url_for('home'))
 
 
-@app.route("/account/")
+@app.route("/account/", methods=["GET", "POST"])
 @login_required
 def account_user():
+    for update_request in UpdateAuthorizationDetails.query.filter_by(user_id=current_user.id, valid=True):
+        update_request.valid = False
+    db.session.commit()
+    update_details_form = UpdateDetailsForm()
+    if update_details_form.validate_on_submit():
+        if update_details_form.username.data == '' and update_details_form.email.data == '':
+            return redirect(url_for('account_user'))
+        else:
+            if update_details_form.username.data == '':
+                # THIS WILL ONLY UPDATE THE EMAIL
+                pin_hash = str(random.getrandbits(128))
+                new_email = update_details_form.email.data
+                print(new_email)
+                # noinspection PyArgumentList
+                update_request = UpdateAuthorizationDetails(
+                    pin_hash=pin_hash,
+                    user_id=current_user.id,
+                    old_email=current_user.email,
+                    new_email=new_email
+                )
+                db.session.add(update_request)
+                db.session.commit()
+                return redirect(url_for('mfa_authorization', user_id=current_user.id, pin_hash=pin_hash))
+            elif update_details_form.email.data == '':
+                # THIS WILL ONLY UPDATE THE USERNAME
+                pin_hash = str(random.getrandbits(128))
+                new_username = update_details_form.username.data
+                print(new_username)
+                # noinspection PyArgumentList
+                update_request = UpdateAuthorizationDetails(
+                    pin_hash=pin_hash,
+                    user_id=current_user.id,
+                    old_username=current_user.username,
+                    new_username=new_username
+                )
+                db.session.add(update_request)
+                db.session.commit()
+                return redirect(url_for('mfa_authorization', user_id=current_user.id, pin_hash=pin_hash))
+            else:
+                # THIS WILL UPDATE THE USERNAME AND EMAIL
+                pin_hash = str(random.getrandbits(128))
+                new_username = update_details_form.username.data
+                new_email = update_details_form.email.data
+                print(new_email)
+                print(new_username)
+                # noinspection PyArgumentList
+                update_request = UpdateAuthorizationDetails(
+                    pin_hash=pin_hash,
+                    user_id=current_user.id,
+                    old_username=current_user.username,
+                    old_email=current_user.email,
+                    new_username=new_username,
+                    new_email=new_email
+                )
+                db.session.add(update_request)
+                db.session.commit()
+                return redirect(url_for('mfa_authorization', user_id=current_user.id, pin_hash=pin_hash))
+    logins_table = []
+    for i in LoginUser.query.filter_by(user_ID=current_user.id, status=True).order_by(LoginUser.date.desc()).limit(10):
+        logins_table.append(
+            {
+                'date': str(i.date)[:19],
+                'ipAddress': i.ipAddress
+            }
+        )
     return render_template(
         "account-user.html",
-        title="Account"
+        title="Account",
+        username=current_user.username,
+        email=current_user.email,
+        member_since=str(current_user.date)[:19],
+        logins_table=logins_table,
+        form=update_details_form
     )
+
+
+@app.route("/mfa-authorization/update-details/<user_id>/<pin_hash>/", methods=["GET", "POST"])
+@login_required
+def mfa_authorization(user_id, pin_hash):
+    if str(current_user.id) != user_id:
+        return redirect(url_for('account_user'))
+    form = AuthorizationForm()
+    if form.validate_on_submit() and request.method == "POST":
+        totp = pyotp.TOTP(current_user.qrcode_secret)
+        if totp.verify(form.pin.data):
+            update_details = UpdateAuthorizationDetails.query.filter_by(user_id=user_id, pin_hash=pin_hash, valid=True).first()
+            if update_details is not None:
+                new_username = update_details.new_username
+                new_email = update_details.new_email
+                user = User.query.filter_by(id=user_id).first()
+                if new_username:
+                    user.username = new_username
+                if new_email:
+                    user.email = new_email
+                update_details.valid = False
+                update_details.used = True
+                db.session.commit()
+                logout_user()
+                login_user(user, remember=False)
+                flash(f'Your details have been updated.', 'success')
+                return redirect(url_for('account_user'))
+            else:
+                return redirect(url_for('account_user'))
+        else:
+            flash(f'Passcode provided was incorrect, please try again.', 'danger')
+            return redirect(url_for("mfa_authorization", user_id=user_id, pin_hash=pin_hash))
+    else:
+        update_details = UpdateAuthorizationDetails.query.filter_by(user_id=user_id, pin_hash=pin_hash, valid=True).first()
+        if update_details is not None:
+            old_username = update_details.old_username
+            new_username = update_details.new_username
+            old_email = update_details.old_email
+            new_email = update_details.new_email
+            return render_template(
+                "qrcodeauthorization.html",
+                title="MFA",
+                form=form,
+                old_username=old_username,
+                new_username=new_username,
+                old_email=old_email,
+                new_email=new_email,
+            )
+        else:
+            return redirect(url_for('account_user'))
 
 
 @app.route("/market/<market>/")

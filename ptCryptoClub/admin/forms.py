@@ -33,3 +33,20 @@ class LoginForm(FlaskForm):
 class AuthorizationForm(FlaskForm):
     pin = StringField('Pin', validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField('Confirm MFA')
+    submit_2 = SubmitField('Update')
+
+
+class UpdateDetailsForm(FlaskForm):
+    username = StringField('Username', validators=[Length(max=20)])
+    email = StringField('Email', validators=[Length(max=255)])
+    submit = SubmitField('Update')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Username already in use!')
+
+    def validate_email(self, email):
+        email = User.query.filter_by(email=email.data).first()
+        if email:
+            raise ValidationError('Please choose a different email!')
