@@ -82,24 +82,23 @@ def login():
     if form.validate_on_submit() and request.method == "POST":
         username = form.username.data
         password = form.password.data
+        given_code = form.pin.data
         user = User.query.filter_by(username=username).first()
         if user is not None:
+            secret = user.qrcode_secret
+            totp = pyotp.TOTP(secret)
             if not user.active_qr:
                 flash(f'Please set up MFA to complete your registration process.', 'info')
                 return redirect(url_for('qr_activation', ID=user.qrcode_img))
             elif not user.active:
                 flash(f'Your account has not been activated yet, please check your email.', 'info')
-                return render_template(
-                    "login.html",
-                    title="Login",
-                    form=form
-                )
-            elif bcrypt.check_password_hash(user.password, password):
+                return redirect(url_for('home'))
+            elif bcrypt.check_password_hash(user.password, password) and totp.verify(given_code):
                 login_user(user, remember=False)
-                flash(f'You are now logged in.', 'success')
+                flash(f'You are now logged in', 'success')
                 return redirect(url_for('home'))
             else:
-                flash(f'Incorrect username or password, please try again.', 'danger')
+                flash(f'Incorrect login details, please try again.', 'danger')
                 return render_template(
                     "login.html",
                     title="Login",
@@ -174,11 +173,11 @@ def qr_activation(ID):
         totp = pyotp.TOTP(secret)
         given_code = form.pin.data
         if totp.verify(given_code):
+            os.remove(f'/home/heldercepeda/PycharmProjects/production/appPtCryptoClub/ptCryptoClub/static/qrcodes/{user.qrcode_img}.png')
             user.active_qr = True
             # Email().send_email(email=form.email.data, hash=hash)
             user.qrcode_img = None
             db.session.commit()
-            os.remove(f'/home/heldercepeda/PycharmProjects/production/appPtCryptoClub/ptCryptoClub/static/qrcodes/{user.qrcode_img}.png')
             flash(f'Your account has been create. Please check your email to activate your account.', 'success')
             return redirect(url_for('market', market="kraken"))
         else:
