@@ -472,3 +472,11 @@ def api_charts_ohlc_data(market, base, quote, datapoints, candle):
     return jsonify(
         ohlc_chart_data(base, quote, market, datapoints, candle)
     )
+
+
+@app.route("/account/portfolio/")
+def portfolio():
+    return render_template(
+        "portfolio-home.html",
+        title="Account",
+    )

@@ -1,0 +1,140 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-light text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="#" class="text-muted text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<script src="{{url_for('static', filename='js/line.js')}}"></script>
+<div class="container mt-3">
+    <div class="row align-items-center py-2">
+        <div class="col-auto">
+            <a href="#" class="text-decoration-none text-success">
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto"><span class="material-icons p-1">add_circle</span></div>
+                    <div class="col-auto">Buy asset</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-auto">
+            <a href="#" class="text-decoration-none text-danger">
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto"><span class="material-icons p-1">remove_circle</span></div>
+                    <div class="col-auto">Sell asset</div>
+                </div>
+            </a>
+        </div>
+        <div class="col">
+            <div class="row no-gutters align-items-center justify-content-end text-light">
+                <div class="col-auto"><span class="material-icons p-1">account_balance_wallet</span></div>
+                <div class="col-auto">1,000.00 <small>EUR</small></div>
+            </div>
+        </div>
+    </div>
+    <div class="row align-items-center p-2">
+        <div class="col-lg-4">
+            <small class="text-light">Current value:</small>
+            <div class="row no-gutters">
+                <div class="col-auto"><H1 class="display-4 text-light">1,250.00</H1></div>
+                <div class="col-auto"><small class="text-light">EUR</small></div>
+                <div class="col-auto"><span class="material-icons text-success" style="font-size:48px">north</span></div>
+                <div class="col-auto mr-2 text-success"><h5>25%</h5></div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <p class="p-2 text-center text-light">Wallet vs Assets</p>
+            <div id="chartdiv" style="height: 200px;"></div>
+        </div>
+        <script>
+            // Create chart instance
+            var chart = am4core.create("chartdiv", am4charts.PieChart);
+
+            // Add data
+            chart.data = [ {
+              "type": "Wallet",
+              "value": 501.9
+            }, {
+              "type": "Assets",
+              "value": 301.9
+            }];
+
+            // Set inner radius
+            chart.innerRadius = am4core.percent(50);
+
+            // Add and configure Series
+            var pieSeries = chart.series.push(new am4charts.PieSeries());
+            pieSeries.dataFields.value = "value";
+            pieSeries.dataFields.category = "type";
+            pieSeries.slices.template.stroke = am4core.color("#fff");
+            pieSeries.slices.template.strokeWidth = 2;
+            pieSeries.slices.template.strokeOpacity = 1;
+
+            // This creates initial animation
+            pieSeries.hiddenState.properties.opacity = 1;
+            pieSeries.hiddenState.properties.endAngle = -90;
+            pieSeries.hiddenState.properties.startAngle = -90;
+
+
+        </script>
+        <div class="col-sm-6 col-lg-4">
+            <p class="p-2 text-center text-light">Assets: BTC vs ETH</p>
+            <div id="chartdiv2" style="height: 200px;"></div>
+        </div>
+        <script>
+            // Create chart instance
+            var chart = am4core.create("chartdiv2", am4charts.PieChart);
+
+            // Add data
+            chart.data = [ {
+              "type": "BTC",
+              "value": 12
+            }, {
+              "type": "ETH",
+              "value": 35
+            }];
+
+            // Set inner radius
+            chart.innerRadius = am4core.percent(50);
+
+            // Add and configure Series
+            var pieSeries = chart.series.push(new am4charts.PieSeries());
+            pieSeries.dataFields.value = "value";
+            pieSeries.dataFields.category = "type";
+            pieSeries.slices.template.stroke = am4core.color("#fff");
+            pieSeries.slices.template.strokeWidth = 2;
+            pieSeries.slices.template.strokeOpacity = 1;
+
+            // This creates initial animation
+            pieSeries.hiddenState.properties.opacity = 1;
+            pieSeries.hiddenState.properties.endAngle = -90;
+            pieSeries.hiddenState.properties.startAngle = -90;
+
+
+        </script>
+    </div>
+</div>
+
+{% endblock %}

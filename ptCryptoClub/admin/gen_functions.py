@@ -112,6 +112,3 @@ def hide_ip(ip):
         else:
             hidden_ip += "*"
     return hidden_ip
-
-
-print(hide_ip("80.7.187.167"))
