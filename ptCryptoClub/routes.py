@@ -192,7 +192,7 @@ def qr_activation(ID):
         if totp.verify(given_code):
             os.remove(f'/home/heldercepeda/PycharmProjects/production/appPtCryptoClub/ptCryptoClub/static/qrcodes/{user.qrcode_img}.png')
             user.active_qr = True
-            # Email().send_email(email=form.email.data, hash=hash)
+            Email().activation_email(email=user.email, hash=user.hash, username=user.username)
             user.qrcode_img = None
             db.session.commit()
             flash(f'Your account has been create. Please check your email to activate your account.', 'success')
@@ -335,17 +335,43 @@ def mfa_authorization(user_id, pin_hash):
                 new_username = update_details.new_username
                 new_email = update_details.new_email
                 user = User.query.filter_by(id=user_id).first()
-                if new_username:
+                if new_username and new_email:
                     user.username = new_username
-                if new_email:
                     user.email = new_email
-                update_details.valid = False
-                update_details.used = True
-                db.session.commit()
-                logout_user()
-                login_user(user, remember=False)
-                flash(f'Your details have been updated.', 'success')
-                return redirect(url_for('account_user'))
+                    user.active = False
+                    new_hash = bcrypt.generate_password_hash(str(random.getrandbits(64))).decode('utf-8')
+                    user.hash = new_hash
+                    update_details.valid = False
+                    update_details.used = True
+                    db.session.commit()
+                    Email().reactivation_email(email=new_email, hash=new_hash, username=new_username)
+                    logout_user()
+                    flash(f'Your username and email have been updated. Please check the new email provided to reactivate your account.', 'success')
+                    return redirect(url_for('home'))
+                elif new_username:
+                    user.username = new_username
+                    update_details.valid = False
+                    update_details.used = True
+                    db.session.commit()
+                    logout_user()
+                    login_user(user, remember=False)
+                    flash(f'Your username has been updated.', 'success')
+                    return redirect(url_for('account_user'))
+                elif new_email:
+                    user.email = new_email
+                    user.active = False
+                    new_hash = bcrypt.generate_password_hash(str(random.getrandbits(64))).decode('utf-8')
+                    user.hash = new_hash
+                    update_details.valid = False
+                    update_details.used = True
+                    db.session.commit()
+                    Email().reactivation_email(email=new_email, hash=new_hash, username=user.username)
+                    logout_user()
+                    flash(f'Your email has been updated. Please check the new email provided to reactivate your account.', 'success')
+                    return redirect(url_for('home'))
+                else:
+                    # THIS SHOULD NEVER RUN
+                    return redirect(url_for('account_user'))
             else:
                 return redirect(url_for('account_user'))
         else:
