@@ -101,3 +101,17 @@ def card_generic(base, quote, market, delta):
 
 def table_latest_transactions(base, quote, market, number_of_trans):
     return table_latest_trans(base, quote, market, number_of_trans)
+
+
+def hide_ip(ip):
+    hidden_ip = ""
+    length = len(ip) - 4
+    for i, char in enumerate(ip):
+        if i == 0 or i > length:
+            hidden_ip += char
+        else:
+            hidden_ip += "*"
+    return hidden_ip
+
+
+print(hide_ip("80.7.187.167"))
