@@ -55,16 +55,17 @@
         </div>
     </div>
     <div class="row align-items-center p-2">
-        <div class="col-lg-4">
+        <div class="col-lg-6 border-top border-bottom border-secondary py-5">
             <small class="text-light">Current value:</small>
             <div class="row no-gutters">
                 <div class="col-auto"><H1 class="display-4 text-light">1,250.00</H1></div>
                 <div class="col-auto"><small class="text-light">EUR</small></div>
-                <div class="col-auto"><span class="material-icons text-success" style="font-size:48px">north</span></div>
+                <div class="col-auto"><span class="material-icons text-success" style="font-size:48px">north</span>
+                </div>
                 <div class="col-auto mr-2 text-success"><h5>25%</h5></div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-4">
+        <div class="col-sm-6 col-lg-3">
             <p class="p-2 text-center text-light">Wallet vs Assets</p>
             <div id="chartdiv" style="height: 200px;"></div>
         </div>
@@ -98,9 +99,12 @@
             pieSeries.hiddenState.properties.startAngle = -90;
 
 
+
+
+
         </script>
-        <div class="col-sm-6 col-lg-4">
-            <p class="p-2 text-center text-light">Assets: BTC vs ETH</p>
+        <div class="col-sm-6 col-lg-3">
+            <p class="p-2 text-center text-light">Assets <small>(count)</small></p>
             <div id="chartdiv2" style="height: 200px;"></div>
         </div>
         <script>
@@ -110,10 +114,10 @@
             // Add data
             chart.data = [ {
               "type": "BTC",
-              "value": 12
+              "value": 10
             }, {
               "type": "ETH",
-              "value": 35
+              "value": 30
             }];
 
             // Set inner radius
@@ -133,6 +137,197 @@
             pieSeries.hiddenState.properties.startAngle = -90;
 
 
+
+
+
+        </script>
+    </div>
+    <div class="row p-2 mt-3 border-top border-bottom border-secondary">
+        <div class="col-md-6 py-2">
+            <table class="table table-sm table-borderless table-hover small">
+                <thead>
+                <tr class="text-light">
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in range(5) %}
+                <tr class="text-success">
+                    <td>2021-01-01</td>
+                    <td>Buy</td>
+                    <td>BTC</td>
+                    <td>500.00 <small>EUR</small></td>
+                    <td><a href="#" class="text-decoration-none text-success"><span
+                            class="material-icons" style="font-size:20px">text_snippet</span></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6 py-2">
+            <table class="table table-sm table-borderless table-hover small">
+                <thead>
+                <tr class="text-light">
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in range(5) %}
+                <tr class="text-danger">
+                    <td>2021-01-01</td>
+                    <td>Sell</td>
+                    <td>BTC</td>
+                    <td>500.00 <small>EUR</small></td>
+                    <td><a href="#" class="text-decoration-none text-danger"><span
+                            class="material-icons" style="font-size:20px">text_snippet</span></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="my-4">
+        <div id="chartdiv3" style="height: 200px;"></div>
+        <script>
+            // Themes begin
+            am4core.useTheme(am4themes_dark);
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            // Create chart instance
+            var chart = am4core.create("chartdiv3", am4charts.XYChart);
+
+            chart.colors.step = 2;
+            chart.maskBullets = false;
+
+            // Add data
+            chart.data = [{
+                "date": "2012-01-01",
+                "count": 227,
+                "duration": 408
+            }, {
+                "date": "2012-01-02",
+                "count": 371,
+                "duration": 482
+            }, {
+                "date": "2012-01-03",
+                "count": 433,
+                "duration": 562
+            }, {
+                "date": "2012-01-04",
+                "count": 345,
+                "duration": 379
+            }, {
+                "date": "2012-01-05",
+                "count": 480,
+                "duration": 501
+            }, {
+                "date": "2012-01-06",
+                "count": 386,
+                "duration": 443
+            }, {
+                "date": "2012-01-07",
+                "count": 348,
+                "duration": 405
+            }, {
+                "date": "2012-01-08",
+                "count": 238,
+                "duration": 309
+            }, {
+                "date": "2012-01-09",
+                "count": 218,
+                "duration": 287
+            }, {
+                "date": "2012-01-10",
+                "count": 349,
+                "duration": 485
+            }, {
+                "date": "2012-01-11",
+                "count": 603,
+                "duration": 890
+            }, {
+                "date": "2012-01-12",
+                "count": 534,
+                "duration": 810
+            }, {
+                "date": "2012-01-13",
+                "count": 425,
+                "duration": 670
+            }];
+
+            // Create axes
+            var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            dateAxis.renderer.grid.template.location = 0;
+            dateAxis.renderer.minGridDistance = 50;
+            dateAxis.renderer.grid.template.disabled = true;
+            dateAxis.renderer.fullWidthTooltip = true;
+
+            var countAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            //countAxis.title.text = "Count of transactions";
+            //countAxis.renderer.grid.template.disabled = true;
+
+            var totalAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            //totalAxis.title.text = "Total amount";
+            //totalAxis.renderer.grid.template.disabled = true;
+            totalAxis.renderer.opposite = true;
+
+
+            // Create series
+            var distanceSeries = chart.series.push(new am4charts.ColumnSeries());
+            distanceSeries.dataFields.valueY = "count";
+            distanceSeries.dataFields.dateX = "date";
+            distanceSeries.yAxis = countAxis;
+            distanceSeries.tooltipText = "{valueY} transactions";
+            distanceSeries.name = "Transactions";
+            distanceSeries.columns.template.fillOpacity = 0.7;
+            distanceSeries.columns.template.propertyFields.strokeDasharray = "dashLength";
+            distanceSeries.columns.template.propertyFields.fillOpacity = "alpha";
+            distanceSeries.showOnInit = true;
+
+            var distanceState = distanceSeries.columns.template.states.create("hover");
+            distanceState.properties.fillOpacity = 0.9;
+
+            var durationSeries = chart.series.push(new am4charts.LineSeries());
+            durationSeries.dataFields.valueY = "duration";
+            durationSeries.dataFields.dateX = "date";
+            durationSeries.yAxis = totalAxis;
+            durationSeries.name = "Duration";
+            durationSeries.strokeWidth = 2;
+            durationSeries.propertyFields.strokeDasharray = "dashLength";
+            durationSeries.tooltipText = "{valueY} EUR";
+            durationSeries.showOnInit = true;
+
+            var durationBullet = durationSeries.bullets.push(new am4charts.Bullet());
+            var durationRectangle = durationBullet.createChild(am4core.Rectangle);
+            durationBullet.horizontalCenter = "middle";
+            durationBullet.verticalCenter = "middle";
+            durationBullet.width = 7;
+            durationBullet.height = 7;
+            durationRectangle.width = 7;
+            durationRectangle.height = 7;
+
+            var durationState = durationBullet.states.create("hover");
+            durationState.properties.scale = 1.2;
+
+
+            // Add legend
+            chart.legend = new am4charts.Legend();
+
+            // Add cursor
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.fullWidthLineX = true;
+            chart.cursor.xAxis = dateAxis;
+            chart.cursor.lineX.strokeOpacity = 0;
+            chart.cursor.lineX.fill = am4core.color("#000");
+            chart.cursor.lineX.fillOpacity = 0.1;
         </script>
     </div>
 </div>
