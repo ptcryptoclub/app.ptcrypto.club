@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from ptCryptoClub.admin.models import User
 
@@ -50,3 +50,11 @@ class UpdateDetailsForm(FlaskForm):
         email = User.query.filter_by(email=email.data).first()
         if email:
             raise ValidationError('Please choose a different email!')
+
+
+class BuyAssetForm(FlaskForm):
+    base = SelectField('base', choices=[('', 'Select asset'), ('btc', 'BTC'), ('eth', 'ETH')], validators=[DataRequired()])
+    quote = SelectField('quote', choices=[('eur', 'EUR')], validators=[DataRequired()])
+    market = SelectField('market', choices=[('kraken', 'Kraken')], validators=[DataRequired()])
+    amount_spent = IntegerField('Amount')
+    submit = SubmitField('Buy asset')

@@ -14,7 +14,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
-from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm
+from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm
 from ptCryptoClub.admin.auto_email import Email
 
 
@@ -477,14 +477,16 @@ def api_charts_ohlc_data(market, base, quote, datapoints, candle):
 @app.route("/account/portfolio/", methods=["GET", "POST"])
 @login_required
 def portfolio():
+    form = BuyAssetForm()
     return render_template(
         "portfolio-home.html",
         title="Account",
+        form=form
     )
 
 
-@app.route("/api/account/portfolio/price/<base>/<quote>/<market>/")
-def api_account_portfolio_price(base, quote, market):
+@app.route("/api/account/portfolio/price/<market>/<base>/<quote>/")
+def api_account_portfolio_price(market, base, quote):
     return jsonify(
         get_last_price(base=base, quote=quote, market=market)
     )
