@@ -112,3 +112,26 @@ def hide_ip(ip):
         else:
             hidden_ip += "*"
     return hidden_ip
+
+
+def get_last_price(base, quote, market):
+    query = f"""
+        SELECT price
+            FROM public."infoCards"
+            where base = '{base}' and quote = '{quote}' and market = '{market}' and delta = 60;
+        """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions get last price for {base}, {quote} and {market}',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        data = pd.DataFrame(columns=["price"])
+    to_return = {
+        'price': float(data.price[0])
+    }
+    return to_return
