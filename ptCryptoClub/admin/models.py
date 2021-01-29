@@ -66,3 +66,17 @@ class UpdateAuthorizationDetails(db.Model, UserMixin):
     new_email = db.Column(db.String(255))
     valid = db.Column(db.Boolean, nullable=False, default=True)
     used = db.Column(db.Boolean, nullable=False, default=False)
+
+
+class TransactionsPTCC(db.Model, UserMixin):
+    trans_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    type = db.Column(db.String(255))
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    market = db.Column(db.String(255))
+    base = db.Column(db.String(255))
+    quote = db.Column(db.String(255))
+    asset_amount = db.Column(db.Float)
+    asset_price = db.Column(db.Float)
+    value = db.Column(db.Float)
+    fee = db.Column(db.Float)

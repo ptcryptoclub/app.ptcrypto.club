@@ -497,10 +497,33 @@ def portfolio():
 @login_required
 def portfolio_buy():
     form = BuyAssetForm()
-    if form.validate_on_submit() and request.method == "POST":
+    try:
+        market = str(form.market.data)
+        base = str(form.base.data)
+        quote = str(form.quote.data)
+        amount = float(form.amount_spent.data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'portfolio buy',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        flash("Something went wrong, please try again later.", "danger")
+        return redirect(url_for('portfolio'))
+    if market not in get_all_markets():
+        market = None
+    validate = False
+    for item in get_all_pairs(market):
+        if market == item['market'] and base == item['base'] and quote == item['quote']:
+            validate = True
+            break
+    if validate:
         flash("Congratulations, you bought an asset!!!!", "success")
         return redirect(url_for('portfolio'))
     else:
+        flash("Form didn't validate", "danger")
         return redirect(url_for('portfolio'))
 
 

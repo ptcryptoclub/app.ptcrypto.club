@@ -53,8 +53,8 @@ class UpdateDetailsForm(FlaskForm):
 
 
 class BuyAssetForm(FlaskForm):
-    base = SelectField('base', choices=[], validators=[DataRequired()])
-    quote = SelectField('quote', choices=[], validators=[DataRequired()])
-    market = SelectField('market', choices=[], validators=[DataRequired()])
-    amount_spent = IntegerField('Amount')
+    base = SelectField('base', validators=[DataRequired()])
+    quote = SelectField('quote', validators=[DataRequired()])
+    market = SelectField('market', validators=[DataRequired()])
+    amount_spent = StringField('Amount', validators=[DataRequired()])
     submit = SubmitField('Buy asset')
