@@ -478,11 +478,23 @@ def api_charts_ohlc_data(market, base, quote, datapoints, candle):
 @login_required
 def portfolio():
     form = BuyAssetForm()
+    form.base.choices = [('', 'Select asset'), ('btc', 'BTC'), ('eth', 'ETH')]
     return render_template(
         "portfolio-home.html",
         title="Account",
         form=form
     )
+
+
+@app.route("/account/portfolio/buy/", methods=["POST"])
+@login_required
+def portfolio_buy():
+    form = BuyAssetForm()
+    if form.validate_on_submit() and request.method == "POST":
+        flash("Congratulations, you bought an asset!!!!", "success")
+        return redirect(url_for('portfolio'))
+    else:
+        return redirect(url_for('portfolio'))
 
 
 @app.route("/api/account/portfolio/price/<market>/<base>/<quote>/")

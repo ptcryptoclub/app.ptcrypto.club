@@ -116,3 +116,45 @@ function tableUpdate(base, quote, market, number_of_trans, elementId) {
         })
     })
 }
+
+
+function buyReport() {
+    let base = document.getElementById("base").value;
+    let quote = document.getElementById("quote").value;
+    let market = document.getElementById("market").value;
+    if (base === '') {
+        price = 'Please select asset'
+        amountSpent = document.getElementById("amount_spent").value
+        amountAsset = 0
+        base = ''
+
+        displayPrice = document.getElementById("price");
+        displayAmount = document.getElementById("amount");
+        displayResult = document.getElementById("result");
+
+        displayPrice.innerHTML = price;
+        displayAmount.innerHTML = amountSpent + ' <small>EUR</small>';
+        displayResult.innerHTML = amountAsset + ' <small>' + base.toUpperCase() + '</small>';
+    }
+    else {
+        fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
+            function(response){
+                response.json().then(
+                    function (data){
+                        price = data['price']
+                        amountSpent = document.getElementById("amount_spent").value
+                        amountAsset = amountSpent/price
+
+                        displayPrice = document.getElementById("price");
+                        displayAmount = document.getElementById("amount");
+                        displayResult = document.getElementById("result");
+
+                        displayPrice.innerHTML = price + ' <small>EUR</small>';
+                        displayAmount.innerHTML = amountSpent + ' <small>EUR</small>';
+                        displayResult.innerHTML = amountAsset.toFixed(8) + ' <small>' + base.toUpperCase() + '</small>';
+                        }
+                    )
+                }
+        )
+    }
+}
