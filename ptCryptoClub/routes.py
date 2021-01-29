@@ -12,7 +12,8 @@ from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, TRANSACTION_SUCCESS_STATUSES
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs
-from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price
+from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
+    get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm
 from ptCryptoClub.admin.auto_email import Email
@@ -477,8 +478,14 @@ def api_charts_ohlc_data(market, base, quote, datapoints, candle):
 @app.route("/account/portfolio/", methods=["GET", "POST"])
 @login_required
 def portfolio():
+    all_markets = get_all_markets()
+    markets_choices = []
+    for market in all_markets:
+        markets_choices.append(
+            (market, market)
+        )
     form = BuyAssetForm()
-    form.base.choices = [('', 'Select asset'), ('btc', 'BTC'), ('eth', 'ETH')]
+    form.market.choices = markets_choices
     return render_template(
         "portfolio-home.html",
         title="Account",
@@ -501,4 +508,18 @@ def portfolio_buy():
 def api_account_portfolio_price(market, base, quote):
     return jsonify(
         get_last_price(base=base, quote=quote, market=market)
+    )
+
+
+@app.route("/api/account/portfolio/dropdowns/base/<market>/")
+def api_account_portfolio_dropdown_base(market):
+    return jsonify(
+        get_pairs_for_portfolio_dropdown(market)
+    )
+
+
+@app.route("/api/account/portfolio/dropdowns/quote/<market>/<base>/")
+def api_account_portfolio_dropdown_quote(market, base):
+    return jsonify(
+        get_quotes_for_portfolio_dropdown(market=market, base=base)
     )

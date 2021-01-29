@@ -135,3 +135,57 @@ def get_last_price(base, quote, market):
         'price': float(data.price[0])
     }
     return to_return
+
+
+def get_pairs_for_portfolio_dropdown(market):
+    query = f"""
+        select distinct (base) as base
+            from public.live_pairs lp
+            where market = '{market}' and in_use is true
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions get pairs for portfolio dropdown - {market}',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        data = pd.DataFrame(columns=["base"])
+    to_return = [{'base': ''}]
+    for base in data.base:
+        to_return.append(
+            {
+                'base': base
+            }
+        )
+    return to_return
+
+
+def get_quotes_for_portfolio_dropdown(market, base):
+    query = f"""
+        select distinct (quote) as quote
+            from public.live_pairs lp
+            where market = '{market}' and base = '{base}' and in_use is true
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions get quotes for portfolio dropdown - {market} and {base}',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        data = pd.DataFrame(columns=["quote"])
+    to_return = [{'quote': ''}]
+    for quote in data.quote:
+        to_return.append(
+            {
+                'quote': quote
+            }
+        )
+    return to_return

@@ -1,42 +1,69 @@
 
 
 function buyReport() {
+    let market = document.getElementById("market").value;
     let base = document.getElementById("base").value;
     let quote = document.getElementById("quote").value;
+    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    price = data['price']
+                    amountSpent = document.getElementById("amount_spent").value
+                    amountAsset = amountSpent/price
+
+                    displayPrice = document.getElementById("price");
+                    displayAmount = document.getElementById("amount");
+                    displayResult = document.getElementById("result");
+
+                    displayPrice.innerHTML = price + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayAmount.innerHTML = amountSpent + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayResult.innerHTML = amountAsset.toFixed(8) + ' <small>' + base.toUpperCase() + '</small>';
+                }
+            )
+        }
+    )
+}
+
+
+function updateBase() {
     let market = document.getElementById("market").value;
+    let base_select = document.getElementById("base");
+    fetch('/api/account/portfolio/dropdowns/base/' + market + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    let linesHTML = '';
+                    for (let line of data) {
+                        linesHTML += '<option value="' + line['base'] + '">' + line['base'].toUpperCase() + '</option>'
+                    }
+                    base_select.innerHTML = linesHTML
+                }
+            )
+        }
+    )
+}
+
+
+function updateQuote() {
+    let market = document.getElementById("market").value;
+    let base = document.getElementById("base").value;
+    let quote_select = document.getElementById("quote");
     if (base === '') {
-        price = 'Please select asset'
-        amountSpent = document.getElementById("amount_spent").value
-        amountAsset = 0
-        base = ''
 
-        displayPrice = document.getElementById("price");
-        displayAmount = document.getElementById("amount");
-        displayResult = document.getElementById("result");
-
-        displayPrice.innerHTML = price;
-        displayAmount.innerHTML = amountSpent + ' <small>EUR</small>';
-        displayResult.innerHTML = amountAsset + ' <small>' + base.toUpperCase() + '</small>';
-    }
-    else {
-        fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
+    } else {
+        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/').then(
             function(response){
                 response.json().then(
                     function (data){
-                        price = data['price']
-                        amountSpent = document.getElementById("amount_spent").value
-                        amountAsset = amountSpent/price
-
-                        displayPrice = document.getElementById("price");
-                        displayAmount = document.getElementById("amount");
-                        displayResult = document.getElementById("result");
-
-                        displayPrice.innerHTML = price + ' <small>EUR</small>';
-                        displayAmount.innerHTML = amountSpent + ' <small>EUR</small>';
-                        displayResult.innerHTML = amountAsset.toFixed(8) + ' <small>' + base.toUpperCase() + '</small>';
+                        let linesHTML = '';
+                        for (let line of data) {
+                            linesHTML += '<option value="' + line['quote'] + '">' + line['quote'].toUpperCase() + '</option>'
                         }
-                    )
-                }
+                        quote_select.innerHTML = linesHTML
+                    }
+                )
+            }
         )
     }
 }
@@ -268,3 +295,6 @@ function lineBuySell(divName) {
     chart.cursor.lineX.fill = am4core.color("#000");
     chart.cursor.lineX.fillOpacity = 0.1;
 }
+
+
+

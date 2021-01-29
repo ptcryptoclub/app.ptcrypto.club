@@ -154,14 +154,17 @@
                 <div class="pb-3 px-3">
                     <div class="form-row align-items-center">
                         <div class="col-auto my-1">
-                            {{form.base(class="form-control form-control-sm mr-sm-2 bg-dark text-light border border-secondary", onchange="buyReport()")}}
+                            {{form.market(class="form-control form-control-sm mr-sm-2 bg-dark text-light border border-secondary", onchange="updateBase()")}}
+                        </div>
+                        <div class="col-auto my-1">
+                            {{form.base(class="form-control form-control-sm mr-sm-2 bg-dark text-light border border-secondary", onchange="updateQuote()")}}
                         </div>
                         <div class="col-auto my-1">
                             {{form.quote(class="form-control form-control-sm mr-sm-2 bg-dark text-light border border-secondary", onchange="buyReport()")}}
                         </div>
-                        <div class="col-auto my-1">
-                            {{form.market(class="form-control form-control-sm mr-sm-2 bg-dark text-light border border-secondary", onchange="buyReport()")}}
-                        </div>
+                        <script>
+                            updateBase()
+                        </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">
                                 <div class="col-auto"><small>Total amount available:</small></div>
