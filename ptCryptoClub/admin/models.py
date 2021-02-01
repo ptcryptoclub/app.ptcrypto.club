@@ -65,3 +65,17 @@ class TransactionsPTCC(db.Model, UserMixin):
     asset_price = db.Column(db.Float, nullable=False)
     value = db.Column(db.Float, nullable=False)
     fee = db.Column(db.Float, nullable=False)
+
+
+class Portfolio(db.Model, UserMixin):
+    portfolio_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    start = db.Column(db.Integer, default=1_000)
+    wallet = db.Column(db.Float, default=1_000)
+
+
+class PortfolioAssets(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    asset = db.Column(db.String(255), nullable=False)
+    amount = db.Column(db.Float, default=0)

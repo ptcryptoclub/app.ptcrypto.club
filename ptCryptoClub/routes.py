@@ -11,11 +11,12 @@ import werkzeug
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, TRANSACTION_SUCCESS_STATUSES
-from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC
+from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
-    get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_ptcc_transactions
+    get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
+    get_available_assets, calculate_total_value
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
-from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm
+from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm
 from ptCryptoClub.admin.auto_email import Email
 
 
@@ -27,7 +28,7 @@ def before_request():
 
 @app.template_filter()
 def numberFormat(value):
-    return f"{value : ,}"
+    return f"{round(value, 8) : ,}"
 
 
 @app.context_processor
@@ -232,6 +233,20 @@ def activate_account():
                     user.active = True
                     if user.date_active is None:
                         user.date_active = datetime.utcnow()
+                    db.session.commit()
+                    # noinspection PyArgumentList
+                    new_portfolio = Portfolio(
+                        user_id=user.id
+                    )
+                    db.session.add(new_portfolio)
+                    for market in get_all_markets():
+                        for pair in get_pairs_for_portfolio_dropdown(market)[1:]:
+                            # noinspection PyArgumentList
+                            new_portfolio_assets = PortfolioAssets(
+                                user_id=user.id,
+                                asset=pair['base']
+                            )
+                            db.session.add(new_portfolio_assets)
                     db.session.commit()
                     flash(f'Your account has been activated.', 'success')
                     return redirect(url_for('login'))
@@ -484,17 +499,27 @@ def portfolio():
         markets_choices.append(
             (market, market)
         )
-    form = BuyAssetForm()
-    form.market.choices = markets_choices
+    form_buy = BuyAssetForm()
+    form_buy.market.choices = markets_choices
+    form_sell = SellAssetForm()
+    form_sell.market_sell.choices = markets_choices
 
-    buy_transactions = get_ptcc_transactions(user_ID=current_user.id, type_='buy', limit=None)
+    buy_transactions = get_ptcc_transactions(user_ID=current_user.id, type_='buy', limit=5)
+    sell_transactions = get_ptcc_transactions(user_ID=current_user.id, type_='sell', limit=5)
+
+    available_assets = get_available_assets(current_user.id)
+    total_portfolio = calculate_total_value(current_user.id)
     return render_template(
         "portfolio-home.html",
         title="Account",
-        form=form,
+        form_buy=form_buy,
+        form_sell=form_sell,
         available_funds=get_available_amount(current_user.id),
+        available_assets=available_assets,
         default_transaction_fee=default_transaction_fee,
-        buy_transactions=buy_transactions
+        buy_transactions=buy_transactions,
+        sell_transactions=sell_transactions,
+        total_portfolio=total_portfolio
     )
 
 
@@ -535,7 +560,7 @@ def portfolio_buy():
             # noinspection PyArgumentList
             new_transaction = TransactionsPTCC(
                 user_id=current_user.id,
-                type='buy',
+                type="buy",
                 market=market,
                 base=base,
                 quote=quote,
@@ -546,7 +571,81 @@ def portfolio_buy():
             )
             db.session.add(new_transaction)
             db.session.commit()
+            user_portfolio = Portfolio().query.filter_by(user_id=current_user.id).first()
+            user_portfolio_assets = PortfolioAssets().query.filter_by(user_id=current_user.id)
+            for asset_line in user_portfolio_assets:
+                if asset_line.asset == base:
+                    asset_line.amount += asset_amount
+                    break
+            user_portfolio.wallet -= amount
+            db.session.commit()
             flash(f"Congratulations, you bought {asset_amount}{base.upper()}", "success")
+            return redirect(url_for('portfolio'))
+    else:
+        flash("Error, please try again.", "danger")
+        return redirect(url_for('portfolio'))
+
+
+@app.route("/account/portfolio/sell/", methods=["POST"])
+@login_required
+def portfolio_sell():
+    form = SellAssetForm()
+    try:
+        market = str(form.market_sell.data)
+        base = str(form.base_sell.data)
+        quote = str(form.quote_sell.data)
+        amount_to_be_sold = float(form.amount_spent_sell.data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'portfolio sell',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        flash("Something went wrong, please try again later.", "danger")
+        return redirect(url_for('portfolio'))
+    if market not in get_all_markets():
+        market = None
+    validate = False
+    for item in get_all_pairs(market):
+        if market == item['market'] and base == item['base'] and quote == item['quote']:
+            validate = True
+            break
+    if validate:
+        if amount_to_be_sold > get_available_amount_sell(base=base, user_id=current_user.id):
+            flash("You don't have enough assets.", "warning")
+            return redirect(url_for('portfolio'))
+        else:
+            asset_price = get_last_price(base=base, quote=quote, market=market)['price']
+            amount = round(asset_price * amount_to_be_sold, 8)
+            fee = round(amount * default_transaction_fee, 8)
+            amount_credit = amount - fee
+            print(asset_price)
+            print(amount)
+            print(fee)
+            print(amount_credit)
+
+            # noinspection PyArgumentList
+            new_transaction = TransactionsPTCC(
+                user_id=current_user.id,
+                type="sell",
+                market=market,
+                base=base,
+                quote=quote,
+                asset_amount=amount_to_be_sold,
+                asset_price=asset_price,
+                value=amount,
+                fee=fee
+            )
+            db.session.add(new_transaction)
+            db.session.commit()
+            update_portfolio_asset = PortfolioAssets.query.filter_by(user_id=current_user.id, asset=base).first()
+            update_portfolio_asset.amount -= amount_to_be_sold
+            update_portfolio = Portfolio.query.filter_by(user_id=current_user.id).first()
+            update_portfolio.wallet += amount_credit
+            db.session.commit()
+            flash(f"Congratulations, your transaction has been completed.", "success")
             return redirect(url_for('portfolio'))
     else:
         flash("Form didn't validate", "danger")

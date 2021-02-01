@@ -1,6 +1,6 @@
 from ptCryptoClub.admin.config import CryptoData
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import ErrorLogs, TransactionsPTCC
+from ptCryptoClub.admin.models import ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -191,9 +191,27 @@ def get_quotes_for_portfolio_dropdown(market, base):
     return to_return
 
 
-def get_available_amount(user_ID):
-    amount = 1_000
-    return amount
+def get_available_amount(user_id):
+    amount = Portfolio.query.filter_by(user_id=user_id).first()
+    return round(amount.wallet, 2)
+
+
+def get_available_amount_sell(base, user_id):
+    line = PortfolioAssets.query.filter_by(user_id=user_id, asset=base).first()
+    return line.amount
+
+
+def get_available_assets(user_id):
+    port = PortfolioAssets.query.filter_by(user_id=user_id)
+    assets = []
+    for line in port:
+        assets.append(
+            {
+                'base': line.asset,
+                'amount': round(line.amount, 8)
+            }
+        )
+    return assets
 
 
 def get_ptcc_transactions(user_ID, type_, limit):
@@ -210,11 +228,28 @@ def get_ptcc_transactions(user_ID, type_, limit):
                 'market': transaction.market,
                 'base': transaction.base,
                 'quote': transaction.quote,
-                'value': transaction.value,
-                'fee': transaction.fee,
-                'asset_price': transaction.asset_price,
-                'asset_amount': transaction.asset_amount,
+                'value': round(transaction.value, 8),
+                'fee': round(transaction.fee, 8),
+                'asset_price': round(transaction.asset_price, 8),
+                'asset_amount': round(transaction.asset_amount, 8),
             }
         )
-    print(to_return)
     return to_return
+
+
+def calculate_total_value(user_id, market='kraken', quote='eur'):
+    wallet_value = Portfolio.query.filter_by(user_id=user_id).first()
+    assets = PortfolioAssets.query.filter_by(user_id=user_id)
+    assets_value = 0
+    for asset in assets:
+        last_price = get_last_price(market=market, base=asset.asset, quote=quote)['price']
+        assets_value += last_price * asset.amount
+    total = wallet_value.wallet + assets_value
+    percentage = round(((total - wallet_value.start) / wallet_value.start)*100, 1)
+    return {
+        'value': round(total, 2),
+        'wallet': round(wallet_value.wallet, 2),
+        'assets': round(assets_value, 2),
+        'percentage': percentage,
+        'quote': quote
+    }

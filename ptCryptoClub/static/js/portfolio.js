@@ -19,14 +19,53 @@ function buyReport() {
                     displayFee = document.getElementById("fee");
                     displayResult = document.getElementById("result");
 
-                    displayPrice.innerHTML = price + ' <small>' + quote.toUpperCase() + '</small>';
-                    displayAmount.innerHTML = amountSpent + ' <small>' + quote.toUpperCase() + '</small>';
-                    displayFee.innerHTML = amountFee + ' <small>' + quote.toUpperCase() + '</small>';
-                    displayResult.innerHTML = amountAsset.toFixed(8) + ' <small>' + base.toUpperCase() + '</small>';
+                    displayPrice.innerHTML = numberFormat(price) + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayAmount.innerHTML = numberFormat(amountSpent) + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayFee.innerHTML = numberFormat(amountFee) + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayResult.innerHTML = numberFormat(amountAsset.toFixed(8)) + ' <small>' + base.toUpperCase() + '</small>';
                 }
             )
         }
     )
+}
+
+
+function sellReport() {
+    let market = document.getElementById("market_sell").value;
+    let base = document.getElementById("base_sell").value;
+    let quote = document.getElementById("quote_sell").value;
+    let fee = document.getElementById("chargedFee").value;
+    let amount_available = document.getElementById("sellAmountAvailable");
+    let amount_available_value = document.getElementById("hidden-"+ base +"-value").value;
+
+    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
+        function(response2){
+            response2.json().then(
+                function (data2){
+                    price = data2['price']
+                    amount_available.innerHTML = amount_available_value + '<small>' + base.toUpperCase() + '</small>'
+                    amountSell = document.getElementById("amount_spent_sell").value
+                    price_without_feee = (amountSell * price).toFixed(8)
+                    amountFee = (price_without_feee * fee).toFixed(8)
+                    price_with_fee = (price_without_feee - amountFee).toFixed(8)
+
+                    displayPrice = document.getElementById("price_sell");
+                    displayAmount = document.getElementById("amount_sell");
+                    displayPriceWithoutFee = document.getElementById("price_without_fee")
+                    displayFee = document.getElementById("fee_sell");
+                    displayResult = document.getElementById("result_sell");
+
+                    displayPrice.innerHTML = data2['price'] + '<small>' + base.toUpperCase() + '</small>'
+                    displayAmount.innerHTML = amountSell
+                    displayPriceWithoutFee.innerHTML = price_without_feee
+                    displayFee.innerHTML = amountFee
+                    displayResult.innerHTML = price_with_fee
+
+                }
+            )
+        }
+    )
+
 }
 
 
@@ -42,6 +81,25 @@ function updateBase() {
                         linesHTML += '<option value="' + line['base'] + '">' + line['base'].toUpperCase() + '</option>'
                     }
                     base_select.innerHTML = linesHTML
+                }
+            )
+        }
+    )
+}
+
+
+function updateBaseSell() {
+    let market = document.getElementById("market_sell").value;
+    let base_select_sell = document.getElementById("base_sell");
+    fetch('/api/account/portfolio/dropdowns/base/' + market + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    let linesHTML = '';
+                    for (let line of data) {
+                        linesHTML += '<option value="' + line['base'] + '">' + line['base'].toUpperCase() + '</option>'
+                    }
+                    base_select_sell.innerHTML = linesHTML
                 }
             )
         }
@@ -73,17 +131,41 @@ function updateQuote() {
 }
 
 
-function pieWalletAssets(divName) {
+function updateQuoteSell() {
+    let market = document.getElementById("market_sell").value;
+    let base = document.getElementById("base_sell").value;
+    let quote_select = document.getElementById("quote_sell");
+    if (base === '') {
+
+    } else {
+        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/').then(
+            function(response){
+                response.json().then(
+                    function (data){
+                        let linesHTML = '';
+                        for (let line of data) {
+                            linesHTML += '<option value="' + line['quote'] + '">' + line['quote'].toUpperCase() + '</option>'
+                        }
+                        quote_select.innerHTML = linesHTML
+                    }
+                )
+            }
+        )
+    }
+}
+
+
+function pieWalletAssets(divName, portfolioData) {
     // Create chart instance
     var chart = am4core.create(divName, am4charts.PieChart);
 
     // Add data
     chart.data = [ {
       "type": "Wallet",
-      "value": 501.9
+      "value": portfolioData['wallet']
     }, {
       "type": "Assets",
-      "value": 301.9
+      "value": portfolioData['assets']
     }];
 
     // Set inner radius
@@ -104,26 +186,20 @@ function pieWalletAssets(divName) {
 }
 
 
-function pieAssets(divName) {
+function pieAssets(divName, assetsData) {
     // Create chart instance
     var chart = am4core.create(divName, am4charts.PieChart);
 
     // Add data
-    chart.data = [ {
-      "type": "BTC",
-      "value": 10
-    }, {
-      "type": "ETH",
-      "value": 30
-    }];
+    chart.data = assetsData;
 
     // Set inner radius
     chart.innerRadius = am4core.percent(50);
 
     // Add and configure Series
     var pieSeries = chart.series.push(new am4charts.PieSeries());
-    pieSeries.dataFields.value = "value";
-    pieSeries.dataFields.category = "type";
+    pieSeries.dataFields.value = "amount";
+    pieSeries.dataFields.category = "base";
     pieSeries.slices.template.stroke = am4core.color("#fff");
     pieSeries.slices.template.strokeWidth = 2;
     pieSeries.slices.template.strokeOpacity = 1;

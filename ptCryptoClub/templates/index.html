@@ -84,7 +84,7 @@
             </a>
         </div>
         <script>
-            var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 2000 );
+            var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 5000 );
 
         </script>
         {% endfor %}
@@ -116,7 +116,7 @@
         {% endfor %}
         </tbody>
         <script>
-            var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 5000 );
+            var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 20000 );
 
         </script>
     </table>
