@@ -4,20 +4,24 @@ function buyReport() {
     let market = document.getElementById("market").value;
     let base = document.getElementById("base").value;
     let quote = document.getElementById("quote").value;
+    let fee = document.getElementById("chargedFee").value;
     fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
         function(response){
             response.json().then(
                 function (data){
                     price = data['price']
                     amountSpent = document.getElementById("amount_spent").value
-                    amountAsset = amountSpent/price
+                    amountFee = (amountSpent * fee).toFixed(2)
+                    amountAsset = (amountSpent - amountFee)/price
 
                     displayPrice = document.getElementById("price");
                     displayAmount = document.getElementById("amount");
+                    displayFee = document.getElementById("fee");
                     displayResult = document.getElementById("result");
 
                     displayPrice.innerHTML = price + ' <small>' + quote.toUpperCase() + '</small>';
                     displayAmount.innerHTML = amountSpent + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayFee.innerHTML = amountFee + ' <small>' + quote.toUpperCase() + '</small>';
                     displayResult.innerHTML = amountAsset.toFixed(8) + ' <small>' + base.toUpperCase() + '</small>';
                 }
             )

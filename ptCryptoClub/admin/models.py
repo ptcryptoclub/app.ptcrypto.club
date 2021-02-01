@@ -40,21 +40,6 @@ class ErrorLogs(db.Model, UserMixin):
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
-class LivePairs(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    base = db.Column(db.String(255), nullable=False)
-    quote = db.Column(db.String(255), nullable=False)
-    market = db.Column(db.String(255), nullable=False)
-    price_rate = db.Column(db.Integer, nullable=False)
-    trade_rate = db.Column(db.Integer, nullable=False)
-    ohlc_periods = db.Column(db.Integer, nullable=False)
-    order_book_rate = db.Column(db.Integer, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    last_update = db.Column(db.DateTime, nullable=False)
-    in_use = db.Column(db.Boolean, nullable=False)
-    added_by = db.Column(db.Integer, nullable=False)
-
-
 class UpdateAuthorizationDetails(db.Model, UserMixin):
     pin_id = db.Column(db.Integer, primary_key=True)
     pin_hash = db.Column(db.String(255), nullable=False)
@@ -71,12 +56,12 @@ class UpdateAuthorizationDetails(db.Model, UserMixin):
 class TransactionsPTCC(db.Model, UserMixin):
     trans_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    type = db.Column(db.String(255))
+    type = db.Column(db.String(255), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    market = db.Column(db.String(255))
-    base = db.Column(db.String(255))
-    quote = db.Column(db.String(255))
-    asset_amount = db.Column(db.Float)
-    asset_price = db.Column(db.Float)
-    value = db.Column(db.Float)
-    fee = db.Column(db.Float)
+    market = db.Column(db.String(255), nullable=False)
+    base = db.Column(db.String(255), nullable=False)
+    quote = db.Column(db.String(255), nullable=False)
+    asset_amount = db.Column(db.Float, nullable=False)
+    asset_price = db.Column(db.Float, nullable=False)
+    value = db.Column(db.Float, nullable=False)
+    fee = db.Column(db.Float, nullable=False)

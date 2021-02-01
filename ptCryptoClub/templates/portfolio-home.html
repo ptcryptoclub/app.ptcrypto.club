@@ -52,7 +52,7 @@
         <div class="col">
             <div class="row no-gutters align-items-center justify-content-end text-light">
                 <div class="col-auto"><span class="material-icons p-1">account_balance_wallet</span></div>
-                <div class="col-auto">1,000.00 <small>EUR</small></div>
+                <div class="col-auto">{{available_funds | numberFormat}} <small>EUR</small></div>
             </div>
         </div>
     </div>
@@ -83,24 +83,32 @@
         </script>
     </div>
     <div class="row p-2 mt-3 border-top border-bottom border-secondary">
-        <div class="col-md-6 py-2">
+        <div class="col-md-12 py-2">
             <table class="table table-sm table-borderless table-hover small">
                 <thead>
                 <tr class="text-light">
                     <th>Date</th>
                     <th>Type</th>
+                    <th>Market</th>
+                    <th>Amount</th>
+                    <th>Fee</th>
                     <th>Asset</th>
-                    <th>Price</th>
+                    <th>Asset price</th>
+                    <th>Asset amount</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for i in range(5) %}
+                {% for transaction in buy_transactions %}
                 <tr class="text-success">
-                    <td>2021-01-01</td>
-                    <td>Buy</td>
-                    <td>BTC</td>
-                    <td>500.00 <small>EUR</small></td>
+                    <td>{{transaction['date']}}</td>
+                    <td>{{transaction['type']}}</td>
+                    <td>{{transaction['market']}}</td>
+                    <td>{{transaction['value']}} <small>{{transaction['quote'].upper()}}</small></td>
+                    <td>{{transaction['fee']}} <small>{{transaction['quote'].upper()}}</small></td>
+                    <td>{{transaction['base'].upper()}}</td>
+                    <td>{{transaction['asset_price']}} <small>{{transaction['quote'].upper()}}</small></td>
+                    <td>{{transaction['asset_amount']}} <small>{{transaction['base'].upper()}}</small></td>
                     <td><a href="#" class="text-decoration-none text-success"><span
                             class="material-icons" style="font-size:20px">text_snippet</span></a></td>
                 </tr>
@@ -108,7 +116,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-md-6 py-2">
+        <div class="col-md-12 py-2">
             <table class="table table-sm table-borderless table-hover small">
                 <thead>
                 <tr class="text-light">
@@ -172,29 +180,34 @@
                             <div class="row no-gutters align-items-center justify-content-end">
                                 <div class="col-auto"><span class="material-icons p-1">account_balance_wallet</span>
                                 </div>
-                                <div class="col-auto">1,000.00 <small>EUR</small></div>
+                                <div class="col-auto">{{available_funds | numberFormat}} <small>EUR</small></div>
                             </div>
                         </div>
                     </div>
                     <div class="form-row align-items-center">
                         <div class="col-auto my-1">
                             {{ form.amount_spent(class="form-control form-control-sm text-light bg-dark", type="number",
-                                placeholder="Amount to be spent", oninput="buyReport()", step="0.01", min="0", max="1000")
+                                placeholder="Amount to be spent", oninput="buyReport()", step="0.01", min="0", max=available_funds)
                             }}
                         </div>
                     </div>
                 </div>
                 <div class="p-3">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-auto">
                             <div class="text-muted"><small>Current price</small></div>
                             <div class="text-success" id="price"></div>
                         </div>
-                        <div class="col">
+                        <div class="col-auto">
                             <div class="text-muted"><small>Amount</small></div>
                             <div class="text-success" id="amount"></div>
                         </div>
-                        <div class="col">
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Fee {{default_transaction_fee * 100}}%</small></div>
+                            <input id="chargedFee" type="number" value="{{default_transaction_fee}}" hidden readonly>
+                            <div class="text-danger" id="fee"></div>
+                        </div>
+                        <div class="col-auto">
                             <div class="text-muted"><small>Asset amount</small></div>
                             <div class="text-success" id="result"></div>
                         </div>

@@ -1,6 +1,6 @@
 from ptCryptoClub.admin.config import CryptoData
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import ErrorLogs
+from ptCryptoClub.admin.models import ErrorLogs, TransactionsPTCC
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -188,4 +188,33 @@ def get_quotes_for_portfolio_dropdown(market, base):
                 'quote': quote
             }
         )
+    return to_return
+
+
+def get_available_amount(user_ID):
+    amount = 1_000
+    return amount
+
+
+def get_ptcc_transactions(user_ID, type_, limit):
+    if limit is None:
+        transactions = TransactionsPTCC.query.filter_by(user_id=user_ID, type=type_).order_by(TransactionsPTCC.date_created.desc())
+    else:
+        transactions = TransactionsPTCC.query.filter_by(user_id=user_ID, type=type_).order_by(TransactionsPTCC.date_created.desc()).limit(limit)
+    to_return = []
+    for transaction in transactions:
+        to_return.append(
+            {
+                'date': str(transaction.date_created)[:19],
+                'type': transaction.type,
+                'market': transaction.market,
+                'base': transaction.base,
+                'quote': transaction.quote,
+                'value': transaction.value,
+                'fee': transaction.fee,
+                'asset_price': transaction.asset_price,
+                'asset_amount': transaction.asset_amount,
+            }
+        )
+    print(to_return)
     return to_return

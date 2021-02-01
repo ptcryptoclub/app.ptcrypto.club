@@ -10,10 +10,10 @@ import werkzeug
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-    candle_options, default_candle, QRCode, TRANSACTION_SUCCESS_STATUSES
-from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs
+    candle_options, default_candle, QRCode, default_transaction_fee, TRANSACTION_SUCCESS_STATUSES
+from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
-    get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown
+    get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_ptcc_transactions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm
 from ptCryptoClub.admin.auto_email import Email
@@ -486,10 +486,15 @@ def portfolio():
         )
     form = BuyAssetForm()
     form.market.choices = markets_choices
+
+    buy_transactions = get_ptcc_transactions(user_ID=current_user.id, type_='buy', limit=None)
     return render_template(
         "portfolio-home.html",
         title="Account",
-        form=form
+        form=form,
+        available_funds=get_available_amount(current_user.id),
+        default_transaction_fee=default_transaction_fee,
+        buy_transactions=buy_transactions
     )
 
 
@@ -520,8 +525,29 @@ def portfolio_buy():
             validate = True
             break
     if validate:
-        flash("Congratulations, you bought an asset!!!!", "success")
-        return redirect(url_for('portfolio'))
+        if amount > get_available_amount(current_user.id):
+            flash("You don't have enough funds in your wallet.", "warning")
+            return redirect(url_for('portfolio'))
+        else:
+            asset_price = get_last_price(base=base, quote=quote, market=market)['price']
+            fee = round(amount * default_transaction_fee, 2)
+            asset_amount = round((amount - fee) / asset_price, 8)
+            # noinspection PyArgumentList
+            new_transaction = TransactionsPTCC(
+                user_id=current_user.id,
+                type='buy',
+                market=market,
+                base=base,
+                quote=quote,
+                asset_amount=asset_amount,
+                asset_price=asset_price,
+                value=amount,
+                fee=fee
+            )
+            db.session.add(new_transaction)
+            db.session.commit()
+            flash(f"Congratulations, you bought {asset_amount}{base.upper()}", "success")
+            return redirect(url_for('portfolio'))
     else:
         flash("Form didn't validate", "danger")
         return redirect(url_for('portfolio'))
