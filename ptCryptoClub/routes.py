@@ -5,12 +5,11 @@ from datetime import datetime, timedelta
 import random
 import pyotp
 import os
-import werkzeug
 
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-    candle_options, default_candle, QRCode, default_transaction_fee, TRANSACTION_SUCCESS_STATUSES
+    candle_options, default_candle, QRCode, default_transaction_fee
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
@@ -621,11 +620,6 @@ def portfolio_sell():
             amount = round(asset_price * amount_to_be_sold, 8)
             fee = round(amount * default_transaction_fee, 8)
             amount_credit = amount - fee
-            print(asset_price)
-            print(amount)
-            print(fee)
-            print(amount_credit)
-
             # noinspection PyArgumentList
             new_transaction = TransactionsPTCC(
                 user_id=current_user.id,
