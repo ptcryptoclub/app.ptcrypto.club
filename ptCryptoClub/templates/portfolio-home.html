@@ -30,6 +30,7 @@
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <script src="{{url_for('static', filename='js/line.js')}}"></script>
 <script src="{{url_for('static', filename='js/portfolio.js')}}"></script>
+<script src="{{url_for('static', filename='js/ohlc_port.js')}}"></script>
 
 <div class="container mt-3">
     <div class="row align-items-center py-2">
@@ -78,11 +79,19 @@
                 <div class="col-auto mr-2 text-warning"><h5>{{total_portfolio['percentage']}}%</h5></div>
                 {% endif %}
             </div>
-            <small class="text-light">Assets:</small>
-            <div>
-                {% for asset in available_assets %}
-                <div class="text-light">{{asset['base'].upper()}}: {{asset['amount'] | numberFormat}}</div>
-                {% endfor %}
+
+            <div class="row no-gutters">
+                <div class="col-auto p-1">
+                    <small class="text-light">Assets:</small>
+                    {% for asset in available_assets %}
+                    <H5 class="text-light">{{asset['base'].upper()}}: {{asset['amount'] | numberFormat}}</H5>
+                    {% endfor %}
+                </div>
+                <div class="col-auto ml-3 p-1">
+                    <small class="text-light">Wallet:</small>
+                    <H5 class="text-light">EUR: {{available_funds | numberFormat}}</H5>
+                    <img src="{{url_for('static', filename='crypto_icons/btc.png')}}" alt="BTC">
+                </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
@@ -234,11 +243,18 @@
             transactions</a></small></div>
     </div>
     <div class="my-4">
-        <div id="lineBS" style="height: 200px;"></div>
-        <script>
-            lineBuySell(lineBS)
-
-        </script>
+        <div class="row no-gutters">
+            <div class="col-md-6">
+                <div class="text-center text-light"><small>BTCEUR kraken 60s</small></div>
+                <div id="chartBTC" style="height: 350px;"></div>
+                <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, 60, 20)</script>
+            </div>
+            <div class="col-md-6">
+                <div class="text-center text-light"><small>ETHEUR kraken 60s</small></div>
+                <div id="chartETH" style="height: 350px;"></div>
+                <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, 60, 20)</script>
+            </div>
+        </div>
     </div>
 </div>
 <!-- BuyModal -->

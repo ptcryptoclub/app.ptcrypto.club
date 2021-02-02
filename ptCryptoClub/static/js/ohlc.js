@@ -5,7 +5,7 @@ function numberFormat(x) {
     return parts.join(".");
 }
 
-function ohlc_chart() {
+function ohlc_chart(chartDiv) {
 
     var market = document.getElementById("market");
     var base = document.getElementById("base");
@@ -19,7 +19,7 @@ function ohlc_chart() {
     // am4core.useTheme(am4themes_animated);
     // Themes end
 
-    var chart = am4core.create("ohlc-chart", am4charts.XYChart);
+    var chart = am4core.create(chartDiv, am4charts.XYChart);
     chart.padding(15, 15, 15, 15);
 
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
