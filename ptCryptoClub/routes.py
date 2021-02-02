@@ -102,7 +102,7 @@ def login():
                                 status=True)
                 db.session.add(log)
                 db.session.commit()
-                return redirect(url_for('home'))
+                return redirect(url_for('account_user'))
             else:
                 # noinspection PyArgumentList
                 log = LoginUser(user_ID=user.id,
@@ -197,7 +197,7 @@ def qr_activation(ID):
             user.qrcode_img = None
             db.session.commit()
             flash(f'Your account has been create. Please check your email to activate your account.', 'success')
-            return redirect(url_for('market', market="kraken"))
+            return redirect(url_for('home', market="kraken"))
         else:
             flash(f'The passcode you provided is not correct. Please try again.', 'danger')
             return render_template(
