@@ -50,15 +50,9 @@
                 </div>
             </a>
         </div>
-        <div class="col">
-            <div class="row no-gutters align-items-center justify-content-end text-light">
-                <div class="col-auto"><span class="material-icons p-1">account_balance_wallet</span></div>
-                <div class="col-auto">{{available_funds | numberFormat}} <small>EUR</small></div>
-            </div>
-        </div>
     </div>
     <div class="row align-items-center p-2">
-        <div class="col-lg-6 border-top border-bottom border-secondary py-5">
+        <div class="col-md-9 border-top border-secondary py-5">
             <small class="text-light">Current value:</small>
             <div class="row no-gutters">
                 <div class="col-auto"><H1 class="display-4 text-light">{{total_portfolio['value'] | numberFormat}}</H1>
@@ -84,35 +78,38 @@
                 <div class="col-auto p-1">
                     <small class="text-light">Assets:</small>
                     {% for asset in available_assets %}
-                    <H5 class="text-light">{{asset['base'].upper()}}: {{asset['amount'] | numberFormat}}</H5>
+                    <div class="row align-items-center no-gutters mb-2">
+                        <div class="col-auto">
+                            <img src="{{url_for('static', filename='crypto_icons/color/'+ asset['base'] +'.png')}}"
+                                 alt="{{asset['base']}}" style="width:20px;height:20px;"  title="{{asset['base'].upper()}}">
+                        </div>
+                        <div class="col-auto ml-3 text-light">
+                            {{asset['amount'] | numberFormat}}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
-                <div class="col-auto ml-3 p-1">
+                <div class="col-auto ml-5 p-1">
                     <small class="text-light">Wallet:</small>
-                    <H5 class="text-light">EUR: {{available_funds | numberFormat}}</H5>
-                    <img src="{{url_for('static', filename='crypto_icons/btc.png')}}" alt="BTC">
+                    <div class="row align-items-center no-gutters mb-2">
+                        <div class="col-auto">
+                            <img src="{{url_for('static', filename='crypto_icons/color/eur.png')}}"
+                                 alt="EUR" style="width:20px;height:20px;" title="EUR">
+                        </div>
+                        <div class="col-auto ml-3 text-light">
+                            {{available_funds | numberFormat}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
+        <div class="col-md-3">
             <p class="p-2 text-center text-light">Wallet vs Assets</p>
             <div id="pieWA" style="height: 200px;"></div>
         </div>
         <script>
             let portfolio_data = {{total_portfolio | safe}}
             pieWalletAssets(pieWA, portfolio_data)
-
-
-        </script>
-        <div class="col-sm-6 col-lg-3">
-            <p class="p-2 text-center text-light">Assets <small>(count)</small></p>
-            <div id="pA" style="height: 200px;"></div>
-        </div>
-        <script>
-            let assetsAvailable = {{available_assets | safe}}
-            pieAssets(pA, assetsAvailable)
-
-
         </script>
     </div>
     <div class="row p-2 mt-3 border-top border-bottom border-secondary">

@@ -70,8 +70,8 @@ class TransactionsPTCC(db.Model, UserMixin):
 class Portfolio(db.Model, UserMixin):
     portfolio_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    start = db.Column(db.Integer, default=1_000)
-    wallet = db.Column(db.Float, default=1_000)
+    start = db.Column(db.Integer, default=10_000)
+    wallet = db.Column(db.Float, default=10_000)
 
 
 class PortfolioAssets(db.Model, UserMixin):
