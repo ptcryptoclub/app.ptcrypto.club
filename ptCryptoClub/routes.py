@@ -574,11 +574,11 @@ def portfolio_buy():
             user_portfolio_assets = PortfolioAssets().query.filter_by(user_id=current_user.id)
             for asset_line in user_portfolio_assets:
                 if asset_line.asset == base:
-                    asset_line.amount += asset_amount
+                    asset_line.amount = round((asset_line.amount + asset_amount), 8)
                     break
-            user_portfolio.wallet -= amount
+            user_portfolio.wallet = round((user_portfolio.wallet - amount), 8)
             db.session.commit()
-            flash(f"Congratulations, you bought {asset_amount}{base.upper()}", "success")
+            flash(f"Your transaction has been completed.", "success")
             return redirect(url_for('portfolio'))
     else:
         flash("Error, please try again.", "danger")
@@ -612,7 +612,7 @@ def portfolio_sell():
             validate = True
             break
     if validate:
-        if amount_to_be_sold > get_available_amount_sell(base=base, user_id=current_user.id):
+        if amount_to_be_sold > round(get_available_amount_sell(base=base, user_id=current_user.id), 8):
             flash("You don't have enough assets.", "warning")
             return redirect(url_for('portfolio'))
         else:
@@ -635,11 +635,11 @@ def portfolio_sell():
             db.session.add(new_transaction)
             db.session.commit()
             update_portfolio_asset = PortfolioAssets.query.filter_by(user_id=current_user.id, asset=base).first()
-            update_portfolio_asset.amount -= amount_to_be_sold
+            update_portfolio_asset.amount = round((update_portfolio_asset.amount - amount_to_be_sold), 8)
             update_portfolio = Portfolio.query.filter_by(user_id=current_user.id).first()
-            update_portfolio.wallet += amount_credit
+            update_portfolio.wallet = round((update_portfolio.wallet + amount_credit), 8)
             db.session.commit()
-            flash(f"Congratulations, your transaction has been completed.", "success")
+            flash(f"Your transaction has been completed.", "success")
             return redirect(url_for('portfolio'))
     else:
         flash("Form didn't validate", "danger")
