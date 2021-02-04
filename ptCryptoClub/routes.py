@@ -13,7 +13,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
-    get_available_assets, calculate_total_value
+    get_available_assets, calculate_total_value, SecureApi
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm
 from ptCryptoClub.admin.auto_email import Email

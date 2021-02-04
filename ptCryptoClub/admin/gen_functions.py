@@ -1,6 +1,6 @@
 from ptCryptoClub.admin.config import CryptoData
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
+from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -253,3 +253,22 @@ def calculate_total_value(user_id, market='kraken', quote='eur'):
         'percentage': percentage,
         'quote': quote
     }
+
+
+class SecureApi:
+    def __init__(self):
+        pass
+
+    def validate(self, api_secret):
+        user = User.query.filter_by(api_secret=api_secret).first()
+        if user is not None:
+            return True
+        else:
+            return False
+
+    def get_api_secret(self, user_id):
+        if user_id is None:
+            api_secret = User.query.filter_by(username="notUser").first().api_secret
+        else:
+            api_secret = User.query.filter_by(id=user_id).first().api_secret
+        return api_secret
