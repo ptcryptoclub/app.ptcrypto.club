@@ -1,4 +1,31 @@
 
+function updatePortfolio(userID) {
+    let apiSecret = document.getElementById("APISecret").value;
+    let allDiv = document.getElementById("updateAll")
+    let divHTML = ''
+    fetch('/api/account/portfolio/update-all/' + userID + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    totalValue = data['value'];
+                    quote = data['quote'];
+                    percentage = data['percentage'];
+                    divHTML += '<div class="col-auto"><H1 class="display-4 text-light">'+ numberFormat(totalValue) +'</H1></div><div class="col-auto"><small class="text-light">'+ quote.toUpperCase() +'</small></div>'
+                    if (percentage > 0) {
+                        divHTML +='<div class="col-auto"><span class="material-icons text-success" style="font-size:48px">north</span></div><div class="col-auto mr-2 text-success"><h5>'+ percentage +'%</h5></div>'
+                    } else if (percentage < 0) {
+                        divHTML +='<div class="col-auto"><span class="material-icons text-danger" style="font-size:48px">south</span></div><div class="col-auto mr-2 text-danger"><h5>'+ percentage +'%</h5></div>'
+                    }
+                    else {
+                        divHTML +='<div class="col-auto"><span class="material-icons text-warning" style="font-size:48px">unfold_less</span></div><div class="col-auto mr-2 text-warning"><h5>'+ percentage +'%</h5></div>'
+                    }
+                    allDiv.innerHTML = divHTML
+                }
+            )
+        }
+    )
+}
+
 
 function buyReport() {
     let market = document.getElementById("market").value;
