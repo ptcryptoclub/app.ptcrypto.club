@@ -9,7 +9,7 @@ import os
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-    candle_options, default_candle, QRCode, default_transaction_fee
+    candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
@@ -207,7 +207,7 @@ def qr_activation(ID):
         totp = pyotp.TOTP(secret)
         given_code = form.pin.data
         if totp.verify(given_code):
-            os.remove(f'/home/heldercepeda/PycharmProjects/production/appPtCryptoClub/ptCryptoClub/static/qrcodes/{user.qrcode_img}.png')
+            os.remove(qr_code_folder + user.qrcode_img + '.png')
             user.active_qr = True
             Email().activation_email(email=user.email, hash=user.hash, username=user.username)
             user.qrcode_img = None
