@@ -32,10 +32,15 @@ def numberFormat(value):
 
 @app.context_processor
 def send_my_func():
+    if current_user.is_authenticated:
+        api_secret = SecureApi().get_api_secret(user_id=current_user.id)
+    else:
+        api_secret = SecureApi().get_api_secret(user_id=None)
     return {
         "admins_emails": admins_emails,
         "all_markets": get_all_markets(),
-        "default_candle": default_candle
+        "default_candle": default_candle,
+        "api_secret": api_secret
     }
 
 
@@ -54,6 +59,7 @@ def home():
             tables.append(
                 table_latest_transactions(base=pair['base'], quote=pair['quote'], market=pair['market'], number_of_trans=number_of_trans)
             )
+
     return render_template(
         "index.html",
         title="Home",
