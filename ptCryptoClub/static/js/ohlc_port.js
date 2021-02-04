@@ -7,6 +7,8 @@ function numberFormat(x) {
 
 function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_rate) {
 
+    let apiSecret = document.getElementById("APISecret").value;
+
     // Themes begin
     am4core.useTheme(am4themes_dark);
     // am4core.useTheme(am4themes_animated);
@@ -18,7 +20,7 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
 
-    chart.dataSource.url = '/api/charts/ohlc/' + market + '/' + base + '/' + quote + '/' + datapoints + '/' + candle + '/';
+    chart.dataSource.url = '/api/charts/ohlc/' + market + '/' + base + '/' + quote + '/' + datapoints + '/' + candle + '/'  + apiSecret + '/';
     chart.dataSource.load();
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();

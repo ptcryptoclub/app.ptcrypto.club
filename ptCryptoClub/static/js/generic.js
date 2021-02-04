@@ -23,6 +23,7 @@ function numberFormat(to_format) {
     return parts.join(".");
 }
 
+// NOT IN USE //
 function smallChart(divID, base, quote, market, delta) {
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -72,8 +73,9 @@ function cardUpdate(base, quote, market, delta) {
     let lowID = document.getElementById("low-"+ market +"-"+ base +"-"+ quote);
     let volumeID = document.getElementById("volume-"+ market +"-"+ base +"-"+ quote);
     let volumeQuoteID = document.getElementById("volumeQuote-"+ market +"-"+ base +"-"+ quote);
+    let apiSecret = document.getElementById("APISecret").value;
 
-    fetch('/api/home/cards/'+ base +'/'+ quote +'/'+ market +'/'+ delta +'/').then(
+    fetch('/api/home/cards/'+ base +'/'+ quote +'/'+ market +'/'+ delta +'/'+ apiSecret +'/').then(
         function(response){
             response.json().then(
                 function (data) {
@@ -106,7 +108,9 @@ function cardUpdate(base, quote, market, delta) {
 function tableUpdate(base, quote, market, number_of_trans, elementId) {
 
     let tableId = document.getElementById(elementId);
-    fetch('/api/home/latest-transactions/'+ base +'/'+ quote +'/'+ market +'/'+ number_of_trans +'/').then(function(response) {
+    let apiSecret = document.getElementById("APISecret").value;
+
+    fetch('/api/home/latest-transactions/'+ base +'/'+ quote +'/'+ market +'/'+ number_of_trans +'/'+ apiSecret +'/').then(function(response) {
         response.json().then(function(data) {
             let linesHTML = '';
             for (let line of data) {

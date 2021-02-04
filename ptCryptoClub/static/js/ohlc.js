@@ -13,6 +13,7 @@ function ohlc_chart(chartDiv) {
     var datapoints = document.getElementById("datapoints");
     var candle = document.getElementById("candle");
     var candle_rate = document.getElementById("candle_rate");
+    let apiSecret = document.getElementById("APISecret").value;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -25,7 +26,7 @@ function ohlc_chart(chartDiv) {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
 
-    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + datapoints.innerHTML + '/' + candle.innerHTML + '/';
+    chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + datapoints.innerHTML + '/' + candle.innerHTML + '/' + apiSecret + '/';
     chart.dataSource.load();
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
@@ -148,6 +149,7 @@ function ohlc_chart(chartDiv) {
 
 }
 
+// NOT IN USE //
 function latest_transactions() {
     let latestTransactions = document.getElementById('latest-transactions')
     fetch('/api/charts/ohlc/latest/' + document.getElementById("market").value + '/' + document.getElementById("pair").value + '/').then(function (response) {
@@ -161,6 +163,7 @@ function latest_transactions() {
     })
 }
 
+// NOT IN USE //
 function getNewPrice() {
     fetch('/api/charts/ohlc/last-price/' + document.getElementById("market").value + '/' + document.getElementById("pair").value + '/').then(function (response) {
         response.json().then(function (data) {
@@ -169,6 +172,7 @@ function getNewPrice() {
     })
 }
 
+// NOT IN USE //
 function getNewAsks() {
     let asks = document.getElementById('asks')
     fetch('/api/charts/ohlc/new-asks/' + document.getElementById("market").value + '/' + document.getElementById("pair").value + '/').then(function (response) {
@@ -182,6 +186,7 @@ function getNewAsks() {
     })
 }
 
+// NOT IN USE //
 function getNewBids() {
     let bids = document.getElementById('bids')
     fetch('/api/charts/ohlc/new-bids/' + document.getElementById("market").value + '/' + document.getElementById("pair").value + '/').then(function (response) {
@@ -195,6 +200,7 @@ function getNewBids() {
     })
 }
 
+// NOT IN USE //
 function orderBook() {
     // Themes begin
     am4core.useTheme(am4themes_dark);

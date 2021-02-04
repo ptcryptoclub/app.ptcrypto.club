@@ -69,18 +69,28 @@ def home():
     )
 
 
-@app.route("/api/home/cards/<base>/<quote>/<market>/<delta>/")
-def api_home_cards(base, quote, market, delta):
-    return jsonify(
-        card_generic(base=base, quote=quote, market=market, delta=delta)
-    )
+@app.route("/api/home/cards/<base>/<quote>/<market>/<delta>/<api_secret>/")
+def api_home_cards(base, quote, market, delta, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            card_generic(base=base, quote=quote, market=market, delta=delta)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
-@app.route("/api/home/latest-transactions/<base>/<quote>/<market>/<number_of_trans>/")
-def api_home_latest_transactions(base, quote, market, number_of_trans):
-    return jsonify(
-        table_latest_transactions(base=base, quote=quote, market=market, number_of_trans=number_of_trans)
-    )
+@app.route("/api/home/latest-transactions/<base>/<quote>/<market>/<number_of_trans>/<api_secret>/")
+def api_home_latest_transactions(base, quote, market, number_of_trans, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            table_latest_transactions(base=base, quote=quote, market=market, number_of_trans=number_of_trans)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
 @app.route("/login/", methods=["GET", "POST"])
@@ -446,18 +456,28 @@ def chart_line(market, base, quote):
     )
 
 
-@app.route("/api/line-chart/info/<market>/<base>/<quote>/<delta>/")
-def api_charts_line_info(market, base, quote, delta):
-    return jsonify(
-        card_generic(base, quote, market, delta)
-    )
+@app.route("/api/line-chart/info/<market>/<base>/<quote>/<delta>/<api_secret>/")
+def api_charts_line_info(market, base, quote, delta, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            card_generic(base, quote, market, delta)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
-@app.route("/api/charts/line/<market>/<base>/<quote>/<last_x_hours>/")
-def api_charts_line_data(market, base, quote, last_x_hours):
-    return jsonify(
-        line_chart_data(base, quote, market, last_x_hours)
-    )
+@app.route("/api/charts/line/<market>/<base>/<quote>/<last_x_hours>/<api_secret>/")
+def api_charts_line_data(market, base, quote, last_x_hours, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            line_chart_data(base, quote, market, last_x_hours)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
 @app.route("/charts/ohlc/<market>/<base>/<quote>/<candle>")
@@ -488,11 +508,16 @@ def chart_ohlc(market, base, quote, candle):
     )
 
 
-@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<datapoints>/<candle>/")
-def api_charts_ohlc_data(market, base, quote, datapoints, candle):
-    return jsonify(
-        ohlc_chart_data(base, quote, market, datapoints, candle)
-    )
+@app.route("/api/charts/ohlc/<market>/<base>/<quote>/<datapoints>/<candle>/<api_secret>/")
+def api_charts_ohlc_data(market, base, quote, datapoints, candle, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            ohlc_chart_data(base, quote, market, datapoints, candle)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
 @app.route("/account/portfolio/", methods=["GET", "POST"])
@@ -652,22 +677,37 @@ def portfolio_sell():
         return redirect(url_for('portfolio'))
 
 
-@app.route("/api/account/portfolio/price/<market>/<base>/<quote>/")
-def api_account_portfolio_price(market, base, quote):
-    return jsonify(
-        get_last_price(base=base, quote=quote, market=market)
-    )
+@app.route("/api/account/portfolio/price/<market>/<base>/<quote>/<api_secret>/")
+def api_account_portfolio_price(market, base, quote, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_last_price(base=base, quote=quote, market=market)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
-@app.route("/api/account/portfolio/dropdowns/base/<market>/")
-def api_account_portfolio_dropdown_base(market):
-    return jsonify(
-        get_pairs_for_portfolio_dropdown(market)
-    )
+@app.route("/api/account/portfolio/dropdowns/base/<market>/<api_secret>/")
+def api_account_portfolio_dropdown_base(market, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_pairs_for_portfolio_dropdown(market)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
-@app.route("/api/account/portfolio/dropdowns/quote/<market>/<base>/")
-def api_account_portfolio_dropdown_quote(market, base):
-    return jsonify(
-        get_quotes_for_portfolio_dropdown(market=market, base=base)
-    )
+@app.route("/api/account/portfolio/dropdowns/quote/<market>/<base>/<api_secret>/")
+def api_account_portfolio_dropdown_quote(market, base, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_quotes_for_portfolio_dropdown(market=market, base=base)
+        )
+    else:
+        return jsonify(
+            {}
+        )

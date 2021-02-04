@@ -17,8 +17,9 @@ function update_values () {
     let low = document.getElementById("low");
     let volume = document.getElementById("volume");
     let volumeQuote = document.getElementById("volumequote");
+    let apiSecret = document.getElementById("APISecret").value;
 
-    fetch('/api/line-chart/info/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + delta.innerHTML + '/').then(
+    fetch('/api/line-chart/info/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + delta.innerHTML + '/' + apiSecret + '/').then(
         function(response){
             response.json().then(
                 function (data) {
@@ -54,7 +55,7 @@ function lineChart() {
     let base = document.getElementById("base");
     let quote = document.getElementById("quote");
     let last_x_hours = document.getElementById("last_x_hours");
-    
+    let apiSecret = document.getElementById("APISecret").value;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -67,7 +68,7 @@ function lineChart() {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     // Load external data
-    chart.dataSource.url = "/api/charts/line/" + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + last_x_hours.innerHTML + '/';
+    chart.dataSource.url = "/api/charts/line/" + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + last_x_hours.innerHTML + '/' + apiSecret + '/';
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
     chart.dataSource.reloadFrequency = 20 * 1000;

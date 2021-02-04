@@ -5,7 +5,8 @@ function buyReport() {
     let base = document.getElementById("base").value;
     let quote = document.getElementById("quote").value;
     let fee = document.getElementById("chargedFee").value;
-    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/' + apiSecret + '/').then(
         function(response){
             response.json().then(
                 function (data){
@@ -37,8 +38,8 @@ function sellReport() {
     let fee = document.getElementById("chargedFee").value;
     let amount_available = document.getElementById("sellAmountAvailable");
     let amount_available_value = document.getElementById("hidden-"+ base +"-value").value;
-
-    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/').then(
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/' + apiSecret + '/').then(
         function(response2){
             response2.json().then(
                 function (data2){
@@ -72,7 +73,8 @@ function sellReport() {
 function updateBase() {
     let market = document.getElementById("market").value;
     let base_select = document.getElementById("base");
-    fetch('/api/account/portfolio/dropdowns/base/' + market + '/').then(
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/dropdowns/base/' + market + '/' + apiSecret + '/').then(
         function(response){
             response.json().then(
                 function (data){
@@ -91,7 +93,8 @@ function updateBase() {
 function updateBaseSell() {
     let market = document.getElementById("market_sell").value;
     let base_select_sell = document.getElementById("base_sell");
-    fetch('/api/account/portfolio/dropdowns/base/' + market + '/').then(
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/dropdowns/base/' + market + '/' + apiSecret + '/').then(
         function(response){
             response.json().then(
                 function (data){
@@ -111,10 +114,11 @@ function updateQuote() {
     let market = document.getElementById("market").value;
     let base = document.getElementById("base").value;
     let quote_select = document.getElementById("quote");
+    let apiSecret = document.getElementById("APISecret").value;
     if (base === '') {
 
     } else {
-        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/').then(
+        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/' + apiSecret + '/').then(
             function(response){
                 response.json().then(
                     function (data){
@@ -135,10 +139,11 @@ function updateQuoteSell() {
     let market = document.getElementById("market_sell").value;
     let base = document.getElementById("base_sell").value;
     let quote_select = document.getElementById("quote_sell");
+    let apiSecret = document.getElementById("APISecret").value;
     if (base === '') {
 
     } else {
-        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/').then(
+        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/' + apiSecret + '/').then(
             function(response){
                 response.json().then(
                     function (data){
