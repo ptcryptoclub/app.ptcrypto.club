@@ -259,8 +259,11 @@ class SecureApi:
     def __init__(self):
         pass
 
-    def validate(self, api_secret):
-        user = User.query.filter_by(api_secret=api_secret).first()
+    def validate(self, api_secret, user_id=None):
+        if user_id is None:
+            user = User.query.filter_by(api_secret=api_secret).first()
+        else:
+            user = User.query.filter_by(api_secret=api_secret, id=user_id).first()
         if user is not None:
             return True
         else:

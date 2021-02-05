@@ -715,7 +715,7 @@ def api_account_portfolio_dropdown_quote(market, base, api_secret):
 
 @app.route("/api/account/portfolio/update-all/<user_id>/<api_secret>/")
 def api_account_portfolio_update_all(user_id, api_secret):
-    if SecureApi().validate(api_secret=api_secret):
+    if SecureApi().validate(api_secret=api_secret, user_id=user_id):
         return jsonify(
             calculate_total_value(user_id=user_id)
         )
