@@ -175,14 +175,188 @@
         </tbody>
         <script>
             var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 20000 );
-
-
-
-
-
-
         </script>
     </table>
     {% endfor %}
+</div>
+
+<!-- BuyModal -->
+<div class="modal fade" id="buyAsset" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="sellAssetLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-light border border-light" style="background-color: #000000;">
+            <h3 class="pt-3 px-3 text-center text-success">Buy asset</h3>
+            <form action="{{url_for('portfolio_buy')}}" method="POST">
+                {{ form_buy.hidden_tag() }}
+                <div class="pb-3 px-3">
+                    <div class="form-row align-items-center">
+                        <div class="col-auto my-1">
+                            {{form_buy.market(class="form-control form-control-sm mr-sm-2 bg-dark text-light border
+                            border-secondary", onchange="updateBase()")}}
+                        </div>
+                        <div class="col-auto my-1">
+                            {{form_buy.base(class="form-control form-control-sm mr-sm-2 bg-dark text-light border
+                            border-secondary", onchange="updateQuote()")}}
+                        </div>
+                        <div class="col-auto my-1">
+                            {{form_buy.quote(class="form-control form-control-sm mr-sm-2 bg-dark text-light border
+                            border-secondary", onchange="buyReport()")}}
+                        </div>
+                        <script>
+                            updateBase()
+                        </script>
+                        <div class="col my-1">
+                            <div class="row no-gutters align-items-center justify-content-end">
+                                <div class="col-auto"><small>Total amount available:</small></div>
+                            </div>
+                            <div class="row no-gutters align-items-center justify-content-end">
+                                <div class="col-auto"><span class="material-icons p-1">account_balance_wallet</span>
+                                </div>
+                                <div class="col-auto">{{available_funds | numberFormat}} <small>EUR</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center">
+                        <div class="col-auto my-1">
+                            {{ form_buy.amount_spent(class="form-control form-control-sm text-light bg-dark",
+                            type="number",
+                            placeholder="Amount to be spent", oninput="buyReport()", step="0.01", min="0",
+                            max=available_funds)
+                            }}
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Current price</small></div>
+                            <div class="text-success" id="price"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Amount</small></div>
+                            <div class="text-success" id="amount"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Fee {{default_transaction_fee * 100}}%</small></div>
+                            <input id="chargedFee" type="number" value="{{default_transaction_fee}}" hidden readonly>
+                            <div class="text-danger" id="fee"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Asset amount</small></div>
+                            <div class="text-success" id="result"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <i class="text-info"><q><small>Please note that price may change while the transaction is
+                            completed, all amounts shown are just representative.</small></q></i>
+                    </div>
+                </div>
+                <div class="py-3 px-5 text-right">
+                    <div class="row">
+                        <div class="col-8">
+                            {{ form_buy.submit(class="btn btn-block btn-sm btn-outline-success") }}
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-block btn-sm btn-outline-danger" data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- SellModal -->
+<div class="modal fade" id="sellAsset" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="sellAssetLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-light border border-light" style="background-color: #000000;">
+            <h3 class="pt-3 px-3 text-center text-danger">Sell asset</h3>
+            <form action="{{url_for('portfolio_sell')}}" method="POST">
+                {{ form_sell.hidden_tag() }}
+                {% for sell_asset in available_assets %}
+                <input id="hidden-{{sell_asset['base']}}-value" type="number" value="{{sell_asset['amount']}}" hidden>
+                {% endfor %}
+                <div class="pb-3 px-3">
+                    <div class="form-row align-items-center">
+                        <div class="col-auto my-1">
+                            {{form_sell.market_sell(class="form-control form-control-sm mr-sm-2 bg-dark text-light
+                            border border-secondary", onchange="updateBaseSell()")}}
+                        </div>
+                        <div class="col-auto my-1">
+                            {{form_sell.base_sell(class="form-control form-control-sm mr-sm-2 bg-dark text-light border
+                            border-secondary", onchange="updateQuoteSell()")}}
+                        </div>
+                        <div class="col-auto my-1">
+                            {{form_sell.quote_sell(class="form-control form-control-sm mr-sm-2 bg-dark text-light border
+                            border-secondary", onchange="sellReport()")}}
+                        </div>
+                        <script>
+                            updateBaseSell()
+                        </script>
+                        <div class="col my-1">
+                            <div class="row no-gutters align-items-center justify-content-end">
+                                <div class="col-auto"><small>Total amount available:</small></div>
+                            </div>
+                            <div class="row no-gutters align-items-center justify-content-end">
+                                <div id="sellAmountAvailable" class="col-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center">
+                        <div class="col-auto my-1">
+                            {{ form_sell.amount_spent_sell(class="form-control form-control-sm text-light bg-dark",
+                            type="number",
+                            placeholder="Amount to be sold", oninput="sellReport()", step="0.00000001", min="0")
+                            }}
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Current price</small></div>
+                            <div class="text-danger" id="price_sell"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Amount</small></div>
+                            <div class="text-danger" id="amount_sell"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Price</small></div>
+                            <div class="text-danger" id="price_without_fee"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Fee {{default_transaction_fee * 100}}%</small></div>
+                            <input id="chargedFee_sell" type="number" value="{{default_transaction_fee}}" hidden
+                                   readonly>
+                            <div class="text-warning" id="fee_sell"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-muted"><small>Credit amount</small></div>
+                            <div class="text-danger" id="result_sell"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <i class="text-info"><q><small>Please note that price may change while the transaction is
+                            completed, all amounts shown are just representative.</small></q></i>
+                    </div>
+                </div>
+                <div class="py-3 px-5 text-right">
+                    <div class="row">
+                        <div class="col-8">
+                            {{ form_sell.submit_sell(class="btn btn-block btn-sm btn-outline-success") }}
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-block btn-sm btn-outline-danger" data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -61,15 +61,36 @@ def home():
             )
     if current_user.is_authenticated:
         total_portfolio = calculate_total_value(current_user.id)
+        all_markets = get_all_markets()
+        markets_choices = []
+        for market in all_markets:
+            markets_choices.append(
+                (market, market)
+            )
+        form_buy = BuyAssetForm()
+        form_buy.market.choices = markets_choices
+        form_sell = SellAssetForm()
+        form_sell.market_sell.choices = markets_choices
+        available_funds = get_available_amount(current_user.id)
+        available_assets = get_available_assets(current_user.id)
     else:
         total_portfolio = {}
+        form_buy = None
+        form_sell = None
+        available_funds = 0
+        available_assets = []
     return render_template(
         "index.html",
         title="Home",
         cards=cards,
         tables=tables,
         number_of_trans=number_of_trans,
-        total_portfolio=total_portfolio
+        total_portfolio=total_portfolio,
+        form_buy=form_buy,
+        form_sell=form_sell,
+        available_funds=available_funds,
+        default_transaction_fee=default_transaction_fee,
+        available_assets=available_assets
     )
 
 
