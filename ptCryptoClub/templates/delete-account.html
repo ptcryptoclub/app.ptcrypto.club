@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+<style>
+    body, html {
+        height: 100%;
+    }
+
+
+
+
+
+</style>
+{% endblock %}
+
+
+{% block info_line %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid mt-4 h-75">
+    <div class="row align-items-center justify-content-center mx-1 px-2 h-100">
+        <div class="col-xl-5 col-lg-6 col-md-7 col-sm-9 justify-content-center p-4 rounded border border-danger">
+            <div class="text-light"><H1>Delete account</H1></div>
+            <div class="row mt-5">
+                <div class="col">
+                    <p class="text-danger"><i>This action cannot be undone. All your data will be deleted and cannot be
+                        recovered.</i></p>
+                </div>
+            </div>
+            <div class="mt-3"></div>
+            <form class="border-top border-secondary" action="{{url_for('delete_account')}}" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-6 my-3">
+                        {% if form.pin.errors %}
+                        {{ form.pin(class="form-control bg-dark text-light is-invalid", autocomplete="off", value="") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.pin.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off",
+                        placeholder="MFA*", value="", maxlength="6") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.submit_3(class="btn btn-outline-danger btn-block text-light px-5") }}
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

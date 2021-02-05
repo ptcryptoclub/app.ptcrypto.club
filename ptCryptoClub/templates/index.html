@@ -179,7 +179,7 @@
     </table>
     {% endfor %}
 </div>
-
+{% if current_user.is_authenticated %}
 <!-- BuyModal -->
 <div class="modal fade" id="buyAsset" data-backdrop="static" data-keyboard="false" tabindex="-1"
      aria-labelledby="sellAssetLabel" aria-hidden="true">
@@ -359,4 +359,5 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}

@@ -748,3 +748,35 @@ def api_account_portfolio_update_all(user_id, api_secret):
         return jsonify(
             {}
         )
+
+
+@app.route("/delete-account/", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    form = AuthorizationForm()
+    totp = pyotp.TOTP(current_user.qrcode_secret)
+    if form.validate_on_submit():
+        if totp.verify(form.pin.data):
+            # logout_user()
+            # User.query.filter_by(id=current_user.id).delete()
+            # LoginUser.query.filter_by(user_ID=current_user.id).delete()
+            # UpdateAuthorizationDetails.query.filter_by(user_id=current_user.id).delete()
+            # TransactionsPTCC.query.filter_by(user_id=current_user.id).delete()
+            # Portfolio.query.filter_by(user_id=current_user.id).delete()
+            # PortfolioAssets.query.filter_by(user_id=current_user.id).delete()
+            flash("Not available yet, please try again later.", "info")
+            return redirect(url_for('account_user'))
+        else:
+            flash("MFA code was incorrect, please try again.", "danger")
+            return redirect(url_for('delete_account'))
+    return render_template(
+        "delete-account.html",
+        form=form,
+        title="Delete account"
+    )
+
+
+@app.route("/my-data/")
+@login_required
+def my_data():
+    return redirect(url_for('account_user'))

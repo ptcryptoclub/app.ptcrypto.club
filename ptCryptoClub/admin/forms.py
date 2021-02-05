@@ -34,6 +34,7 @@ class AuthorizationForm(FlaskForm):
     pin = StringField('Pin', validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField('Confirm MFA')
     submit_2 = SubmitField('Update')
+    submit_3 = SubmitField('Confirm MFA and delete my account')
 
 
 class UpdateDetailsForm(FlaskForm):
