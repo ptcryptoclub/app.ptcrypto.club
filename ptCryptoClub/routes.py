@@ -59,13 +59,17 @@ def home():
             tables.append(
                 table_latest_transactions(base=pair['base'], quote=pair['quote'], market=pair['market'], number_of_trans=number_of_trans)
             )
-
+    if current_user.is_authenticated:
+        total_portfolio = calculate_total_value(current_user.id)
+    else:
+        total_portfolio = {}
     return render_template(
         "index.html",
         title="Home",
         cards=cards,
         tables=tables,
-        number_of_trans=number_of_trans
+        number_of_trans=number_of_trans,
+        total_portfolio=total_portfolio
     )
 
 

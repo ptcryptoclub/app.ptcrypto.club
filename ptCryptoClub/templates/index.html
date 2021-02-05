@@ -11,14 +11,13 @@
 <script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<script src="{{url_for('static', filename='js/portfolio.js')}}"></script>
 <div class="container mt-4">
-    <div class="row justify-content-end mr-2">
-        <H6 class="mb-2"><a href="#" class="text-light text-decoration-none">Watch list</a></H6>
-    </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
         {% for card in cards %}
         <div class="col-xl-4 col-lg-4 col-sm-6 mb-2">
-            <a href="{{url_for('chart_line', market=card['market'], base=card['base'], quote=card['quote'])}}" class="text-decoration-none">
+            <a href="{{url_for('chart_line', market=card['market'], base=card['base'], quote=card['quote'])}}"
+               class="text-decoration-none">
                 {% if card["change"] < 0 %}
                 {% set color = "danger" %}
                 {% elif card["change"] == 0 %}
@@ -69,7 +68,8 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong></div>
+                            <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
+                            </div>
                             <div class="row justify-content-end mr-2 text-muted small"
                                  id="volume-{{card['market']}}-{{card['base']}}-{{card['quote']}}">{{card["volume"] |
                                 numberFormat}} {{card['base'].upper()}}
@@ -89,6 +89,64 @@
         </script>
         {% endfor %}
     </div>
+    {% if current_user.is_authenticated %}
+    <hr class="border-secondary">
+    <div class="row justify-content-end mr-2 mb-3">
+        <H6><a href="{{url_for('portfolio')}}" class="text-light text-decoration-none">My portfolio</a></H6>
+    </div>
+    <div class="row">
+        <div class="col-md-auto">
+            <div class="row mb-3">
+                <div class="col-auto">
+                    <a href="#buyAsset" class="text-decoration-none text-success" data-toggle="modal">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto"><span class="material-icons p-1">add_circle</span></div>
+                            <div class="col-auto">Buy asset</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="#sellAsset" class="text-decoration-none text-danger" data-toggle="modal">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto"><span class="material-icons p-1">remove_circle</span></div>
+                            <div class="col-auto">Sell asset</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="row justify-content-end mr-3">
+                <div id="updateAll" class="row no-gutters">
+                    <div class="col-auto"><H1 class="display-4 text-light">{{total_portfolio['value'] |
+                        numberFormat}}</H1>
+                    </div>
+                    <div class="col-auto"><small class="text-light">{{total_portfolio['quote'].upper()}}</small></div>
+                    {% if total_portfolio['percentage'] > 0 %}
+                    <div class="col-auto"><span class="material-icons text-success" style="font-size:48px">north</span>
+                    </div>
+                    <div class="col-auto mr-2 text-success"><h5>{{total_portfolio['percentage']}}%</h5></div>
+                    {% elif total_portfolio['percentage'] < 0 %}
+                    <div class="col-auto"><span class="material-icons text-danger" style="font-size:48px">south</span>
+                    </div>
+                    <div class="col-auto mr-2 text-danger"><h5>{{total_portfolio['percentage']}}%</h5></div>
+                    {% else %}
+                    <div class="col-auto"><span class="material-icons text-warning"
+                                                style="font-size:48px">unfold_less</span>
+                    </div>
+                    <div class="col-auto mr-2 text-warning"><h5>{{total_portfolio['percentage']}}%</h5></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <script>
+                function auxRunUpdates () {
+                    updatePortfolio({{current_user.id}})
+                }
+                var runPortfolioUpdate=setInterval(auxRunUpdates,30*1000);
+            </script>
+    </div>
+    {% endif %}
     <hr class="border-secondary">
     <div class="row justify-content-end mr-2">
         <H6><a href="#" class="text-light text-decoration-none">Lastest transactions</a></H6>
@@ -117,6 +175,11 @@
         </tbody>
         <script>
             var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 20000 );
+
+
+
+
+
 
         </script>
     </table>
