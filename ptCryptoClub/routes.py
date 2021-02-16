@@ -750,7 +750,7 @@ def api_account_portfolio_update_all(user_id, api_secret):
         )
 
 
-@app.route("/delete-account/", methods=["GET", "POST"])
+@app.route("/account/delete-account/", methods=["GET", "POST"])
 @login_required
 def delete_account():
     form = AuthorizationForm()
@@ -777,7 +777,7 @@ def delete_account():
     )
 
 
-@app.route("/my-data/")
+@app.route("/account/my-data/")
 @login_required
 def my_data():
     user_info = User.query.filter_by(id=current_user.id).first()
