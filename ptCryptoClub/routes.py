@@ -143,7 +143,7 @@ def login():
                                 status=True)
                 db.session.add(log)
                 db.session.commit()
-                return redirect(url_for('account_user'))
+                return redirect(url_for('portfolio'))
             else:
                 # noinspection PyArgumentList
                 log = LoginUser(user_ID=user.id,
@@ -757,15 +757,16 @@ def delete_account():
     totp = pyotp.TOTP(current_user.qrcode_secret)
     if form.validate_on_submit():
         if totp.verify(form.pin.data):
-            # logout_user()
-            # User.query.filter_by(id=current_user.id).delete()
-            # LoginUser.query.filter_by(user_ID=current_user.id).delete()
-            # UpdateAuthorizationDetails.query.filter_by(user_id=current_user.id).delete()
-            # TransactionsPTCC.query.filter_by(user_id=current_user.id).delete()
-            # Portfolio.query.filter_by(user_id=current_user.id).delete()
-            # PortfolioAssets.query.filter_by(user_id=current_user.id).delete()
-            flash("Not available yet, please try again later.", "info")
-            return redirect(url_for('account_user'))
+            User.query.filter_by(id=current_user.id).delete()
+            LoginUser.query.filter_by(user_ID=current_user.id).delete()
+            UpdateAuthorizationDetails.query.filter_by(user_id=current_user.id).delete()
+            TransactionsPTCC.query.filter_by(user_id=current_user.id).delete()
+            Portfolio.query.filter_by(user_id=current_user.id).delete()
+            PortfolioAssets.query.filter_by(user_id=current_user.id).delete()
+            db.session.commit()
+            logout_user()
+            flash("Your account has been deleted.", "info")
+            return redirect(url_for('home'))
         else:
             flash("MFA code was incorrect, please try again.", "danger")
             return redirect(url_for('delete_account'))
