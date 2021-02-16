@@ -121,3 +121,9 @@ function tableUpdate(base, quote, market, number_of_trans, elementId) {
     })
 }
 
+
+function printpage() {
+    //Print the page content
+    window.print()
+}
+

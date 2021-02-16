@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-3">
+    <div class="mb-5">
+        <H4 class="text-light">My data</H4>
+        <p class="text-muted">This is all data that we hold in our database about you. Please keep this information safe.</p>
+    </div>
+    <div class="mt-2 mb-5">
+        <button id="printpagebutton1" type="button" class="btn btn-sm btn-outline-secondary btn-block"
+                onclick="printpage()">Print all</button>
+    </div>
+    <H6 class="text-muted text-right border-bottom border-secondary">User information</H6>
+    <table class="table table-borderless table-sm small text-muted">
+        <thead>
+        <tr class="text-light">
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Register</th>
+            <th scope="col">Active</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{user_info.username}}</td>
+            <td>{{user_info.email}}</td>
+            <td>{{user_info.date.__str__()[:19]}}</td>
+            <td>{{user_info.date_active.__str__()[:19]}}</td>
+        </tr>
+
+        </tbody>
+    </table>
+    <H6 class="text-muted text-right border-bottom border-secondary my-4">Login information</H6>
+    <table class="table table-borderless table-sm small text-muted">
+        <thead>
+        <tr class="text-light">
+            <th scope="col" class="text-left">Date</th>
+            <th scope="col" class="text-center">IP Address</th>
+            <th scope="col" class="text-center">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for line in login_info %}
+        <tr>
+            <td class="text-left">{{line['date']}}</td>
+            <td class="text-center">{{line['IP']}}</td>
+            <td class="text-center">{{line['status']}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <H6 class="text-muted text-right border-bottom border-secondary my-4">Portfolio transactions</H6>
+    <table class="table table-borderless table-sm small text-muted">
+        <thead>
+        <tr class="text-light">
+            <th scope="col" class="text-left">Date</th>
+            <th scope="col" class="text-center">Type</th>
+            <th scope="col" class="text-center">Market</th>
+            <th scope="col" class="text-center">Base</th>
+            <th scope="col" class="text-center">Quote</th>
+            <th scope="col" class="text-right">Amount</th>
+            <th scope="col" class="text-right">Price</th>
+            <th scope="col" class="text-right">Value</th>
+            <th scope="col" class="text-right">Fee</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in transactions_user %}
+        <tr>
+            <td class="text-left">{{transaction.date_created.__str__()[:19]}}</td>
+            <td class="text-center">{{transaction.type}}</td>
+            <td class="text-center">{{transaction.market}}</td>
+            <td class="text-center">{{transaction.base.upper()}}</td>
+            <td class="text-center">{{transaction.quote.upper()}}</td>
+            <td class="text-right">{{transaction.asset_amount}}</td>
+            <td class="text-right">{{transaction.asset_price}}</td>
+            <td class="text-right">{{transaction.value}}</td>
+            <td class="text-right">{{transaction.fee}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <H6 class="text-muted text-right border-bottom border-secondary my-4">Details update</H6>
+    <table class="table table-borderless table-sm small text-muted">
+        <thead>
+        <tr class="text-light">
+            <th scope="col" class="text-left">Date</th>
+            <th scope="col" class="text-left">Old username</th>
+            <th scope="col" class="text-left">New username</th>
+            <th scope="col" class="text-left">Old email</th>
+            <th scope="col" class="text-left">New email</th>
+            <th scope="col" class="text-left">Used</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for line in update_info %}
+        <tr>
+            <td class="text-left">{{line.date_created.__str__()[:19]}}</td>
+            <td class="text-left">{{line.old_username}}</td>
+            <td class="text-left">{{line.new_username}}</td>
+            <td class="text-left">{{line.old_email}}</td>
+            <td class="text-left">{{line.new_email}}</td>
+            <td class="text-left">{{line.used}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="my-5">
+        <button id="printpagebutton2" type="button" class="btn btn-sm btn-outline-secondary btn-block"
+                onclick="printpage()">Print all</button>
+    </div>
+</div>
+
+
+{% endblock %}

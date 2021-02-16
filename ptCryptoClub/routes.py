@@ -780,4 +780,24 @@ def delete_account():
 @app.route("/my-data/")
 @login_required
 def my_data():
-    return redirect(url_for('account_user'))
+    user_info = User.query.filter_by(id=current_user.id).first()
+    login_user = LoginUser.query.filter_by(user_ID=current_user.id).order_by(LoginUser.date.desc())
+    login_info = []
+    for line in login_user:
+        login_info.append(
+            {
+                "date": str(line.date)[:19],
+                "IP": line.ipAddress,
+                "status": line.status
+            }
+        )
+    transactions_user = TransactionsPTCC.query.filter_by(user_id=current_user.id).order_by(TransactionsPTCC.date_created.desc())
+    update_info = UpdateAuthorizationDetails.query.filter_by(user_id=current_user.id).order_by(UpdateAuthorizationDetails.date_created.desc())
+    return render_template(
+        "data.html",
+        title="My data",
+        user_info=user_info,
+        login_info=login_info,
+        transactions_user=transactions_user,
+        update_info=update_info
+    )
