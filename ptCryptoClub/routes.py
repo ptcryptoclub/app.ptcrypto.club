@@ -801,3 +801,21 @@ def my_data():
         transactions_user=transactions_user,
         update_info=update_info
     )
+
+
+@app.route("/account/portfolio/transactions/buy")
+def all_transactions_buy():
+    return render_template(
+        "portfolio-all-transactions-buy.html",
+        title="Account",
+        buy_transactions=get_ptcc_transactions(user_ID=current_user.id, type_='buy', limit=None)
+    )
+
+
+@app.route("/account/portfolio/transactions/sell")
+def all_transactions_sell():
+    return render_template(
+        "portfolio-all-transactions-sell.html",
+        title="Account",
+        sell_transactions=get_ptcc_transactions(user_ID=current_user.id, type_='sell', limit=None)
+    )

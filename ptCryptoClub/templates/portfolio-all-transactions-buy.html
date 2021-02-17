@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-light text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="#" class="text-muted text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-3">
+    <div class="mb-5">
+        <H4 class="text-light">Transactions</H4>
+    </div>
+    <div class="row align-items-center">
+        <div class="col">
+            <a class="btn btn-sm btn-success btn-block" href="{{url_for('all_transactions_buy')}}" role="button">Buy</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-sm btn-outline-danger btn-block" href="{{url_for('all_transactions_sell')}}" role="button">Sell</a>
+        </div>
+    </div>
+    <div class="row p-2 mt-3">
+        <div class="col py-2">
+            {% if buy_transactions.__len__() == 0 %}
+            <table class="table table-sm table-borderless table-hover small">
+                <thead>
+                <tr class="text-light">
+                    <th>Date</th>
+                    <th class="d-none d-sm-none d-md-table-cell">Type</th>
+                    <th>Asset</th>
+                    <th class="d-none d-sm-none d-md-table-cell">Market</th>
+                    <th class="d-none d-sm-table-cell">Asset price</th>
+                    <th>Gross amount</th>
+                    <th class="d-none d-sm-none d-md-table-cell">Fee</th>
+                    <th>Amount</th>
+                    <th>Asset amount</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div><i>No transaction to show.</i></div>
+            {% else %}
+            <table class="table table-sm table-borderless table-hover small">
+                <thead>
+                <tr class="text-light">
+                    <th>Date</th>
+                    <th class="d-none d-sm-none d-md-table-cell">Type</th>
+                    <th>Asset</th>
+                    <th class="d-none d-sm-none d-md-table-cell">Market</th>
+                    <th class="d-none d-sm-table-cell">Asset price</th>
+                    <th>Gross amount</th>
+                    <th class="d-none d-sm-none d-md-table-cell">Fee</th>
+                    <th>Amount</th>
+                    <th>Asset amount</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for transaction in buy_transactions %}
+                <tr class="text-success">
+                    <td>{{transaction['date']}}</td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{transaction['type']}}</td>
+                    <td>{{transaction['base'].upper()}}</td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{transaction['market']}}</td>
+                    <td class="d-none d-sm-table-cell">{{transaction['asset_price'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                    </td>
+                    <td>{{transaction['value'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small></td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{transaction['fee'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                    </td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{(transaction['value'] - transaction['fee']) |
+                        numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                    </td>
+                    <td>{{transaction['asset_amount'] | numberFormat}} <small>{{transaction['base'].upper()}}</small>
+                    </td>
+                    <td><a href="#" class="text-decoration-none text-success"><span
+                            class="material-icons" style="font-size:20px">text_snippet</span></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
