@@ -2,6 +2,26 @@
 
 
 {% block info_line %}
+<div class="container">
+    <div class="row justify-content-end align-items-center small">
+        <div class="col-auto text-light">
+            <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    {% if delta == 60 %}
+                    <small>01 hour</small>
+                    {% else %}
+                    <small>24 hours</small>
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
+                    <a class="dropdown-item text-light small" href="{{url_for('home', delta=60)}}"><small>01 hour</small></a>
+                    <a class="dropdown-item text-light small" href="{{url_for('home', delta=1440)}}"><small>24 hours</small></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 
@@ -12,7 +32,7 @@
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <script src="{{url_for('static', filename='js/portfolio.js')}}"></script>
-<div class="container mt-4">
+<div class="container">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
         {% for card in cards %}
         <div class="col-xl-4 col-lg-4 col-sm-6 mb-2">
@@ -57,7 +77,13 @@
                     </div>
                     <div class="row">
                         <div class="col-auto">
-                            <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
+                            <div class="row-fluid text-muted text-center">
+                                {% if delta == 60 %}
+                                <small>Last hour</small>
+                                {% else %}
+                                <small>Last 24h</small>
+                                {% endif %}
+                            </div>
                             <div class="row-fluid text-muted small"
                                  id="high-{{card['market']}}-{{card['base']}}-{{card['quote']}}"><strong>High: </strong>{{card["high"]
                                 | numberFormat}}
@@ -85,6 +111,7 @@
         </div>
         <script>
             var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 5000 );
+
 
         </script>
         {% endfor %}
@@ -144,7 +171,8 @@
                     updatePortfolio({{current_user.id}})
                 }
                 var runPortfolioUpdate=setInterval(auxRunUpdates,30*1000);
-            </script>
+
+        </script>
     </div>
     {% endif %}
     <hr class="border-secondary">
@@ -175,6 +203,7 @@
         </tbody>
         <script>
             var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 20000 );
+
         </script>
     </table>
     {% endfor %}
@@ -204,6 +233,7 @@
                         </div>
                         <script>
                             updateBase()
+
                         </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">
@@ -294,6 +324,7 @@
                         </div>
                         <script>
                             updateBaseSell()
+
                         </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">

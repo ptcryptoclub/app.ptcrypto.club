@@ -46,11 +46,17 @@ def send_my_func():
 
 @app.route("/")
 def home():
+    delta = request.args.get('delta')
+    if delta is None:
+        delta = default_delta
+    elif delta not in ['60', '1440']:
+        delta = default_delta
+    delta = int(delta)
     cards = []
     markets = get_all_markets()
     for market in markets:
         for pair in get_all_pairs(market):
-            dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
+            dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=delta)
             cards.append(dict_)
     tables = []
     number_of_trans = default_latest_transactions
@@ -90,7 +96,8 @@ def home():
         form_sell=form_sell,
         available_funds=available_funds,
         default_transaction_fee=default_transaction_fee,
-        available_assets=available_assets
+        available_assets=available_assets,
+        delta=delta
     )
 
 
