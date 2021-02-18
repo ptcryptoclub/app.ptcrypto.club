@@ -145,8 +145,8 @@
         <div class="col-md">
             <div class="row justify-content-end mr-3">
                 <div id="updateAll" class="row no-gutters">
-                    <div class="col-auto"><H1 class="display-4 text-light">{{total_portfolio['value'] |
-                        numberFormat}}</H1>
+                    <div class="col-auto"><H1 class="display-4 text-light"><small>{{total_portfolio['value'] |
+                        numberFormat}}</small></H1>
                     </div>
                     <div class="col-auto"><small class="text-light">{{total_portfolio['quote'].upper()}}</small></div>
                     {% if total_portfolio['percentage'] > 0 %}

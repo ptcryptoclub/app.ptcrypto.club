@@ -10,7 +10,7 @@ function updatePortfolio(userID) {
                     totalValue = data['value'];
                     quote = data['quote'];
                     percentage = data['percentage'];
-                    divHTML += '<div class="col-auto"><H1 class="display-4 text-light">'+ numberFormat(totalValue) +'</H1></div><div class="col-auto"><small class="text-light">'+ quote.toUpperCase() +'</small></div>'
+                    divHTML += '<div class="col-auto"><H1 class="display-4 text-light"><small>'+ numberFormat(totalValue) +'</small></H1></div><div class="col-auto"><small class="text-light">'+ quote.toUpperCase() +'</small></div>'
                     if (percentage > 0) {
                         divHTML +='<div class="col-auto"><span class="material-icons text-success" style="font-size:48px">north</span></div><div class="col-auto mr-2 text-success"><h5>'+ percentage +'%</h5></div>'
                     } else if (percentage < 0) {
