@@ -9,11 +9,11 @@ import os
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-    candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder
+    candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
-    get_available_assets, calculate_total_value, SecureApi
+    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm
 from ptCryptoClub.admin.auto_email import Email
@@ -581,7 +581,8 @@ def portfolio():
         default_transaction_fee=default_transaction_fee,
         buy_transactions=buy_transactions,
         sell_transactions=sell_transactions,
-        total_portfolio=total_portfolio
+        total_portfolio=total_portfolio,
+        number_days_buy_sell=default_number_days_buy_sell
     )
 
 
@@ -750,6 +751,18 @@ def api_account_portfolio_update_all(user_id, api_secret):
     if SecureApi().validate(api_secret=api_secret, user_id=user_id):
         return jsonify(
             calculate_total_value(user_id=user_id)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/account/portfolio/line-chart/<user_ID>/<days>/<api_secret>/")
+def api_account_portfolio_buy_sell_line_chart(user_ID, days, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            buy_sell_line_data(user_ID=user_ID, days=days)
         )
     else:
         return jsonify(

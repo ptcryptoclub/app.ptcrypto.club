@@ -116,8 +116,15 @@
             pieWalletAssets(pieWA, portfolio_data)
         </script>
     </div>
-    <div class="row p-2 mt-3 border-top border-bottom border-secondary">
-        <div class="col-md-12 py-2">
+    <div class="border-top border-bottom border-secondary">
+        <div class="text-center mt-2 text-light">
+            <small>Total amount per day <small>(last {{number_days_buy_sell}} days)</small></small>
+        </div>
+        <div id="buy-sell-chart" style="height: 150px;"></div>
+        <script>
+            lineBuySell("buy-sell-chart", {{current_user.id}}, {{number_days_buy_sell}})
+        </script>
+        <div class="py-2 mt-2">
             {% if buy_transactions.__len__() == 0 %}
             <table class="table table-sm table-borderless table-hover small">
                 <thead>
@@ -131,7 +138,6 @@
                     <th class="d-none d-sm-none d-md-table-cell">Fee</th>
                     <th>Amount</th>
                     <th>Asset amount</th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -151,7 +157,6 @@
                     <th class="d-none d-sm-none d-md-table-cell">Fee</th>
                     <th>Amount</th>
                     <th>Asset amount</th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -166,20 +171,18 @@
                     <td>{{transaction['value'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small></td>
                     <td class="d-none d-sm-none d-md-table-cell">{{transaction['fee'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
                     </td>
-                    <td class="d-none d-sm-none d-md-table-cell">{{(transaction['value'] - transaction['fee']) |
+                    <td>{{(transaction['value'] - transaction['fee']) |
                         numberFormat}} <small>{{transaction['quote'].upper()}}</small>
                     </td>
                     <td>{{transaction['asset_amount'] | numberFormat}} <small>{{transaction['base'].upper()}}</small>
                     </td>
-                    <td><a href="#" class="text-decoration-none text-success"><span
-                            class="material-icons" style="font-size:20px">text_snippet</span></a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
             {% endif %}
         </div>
-        <div class="col-md-12 py-2">
+        <div class="py-2">
             {% if sell_transactions.__len__() == 0 %}
             <table class="table table-sm table-borderless table-hover small">
                 <thead>
@@ -193,7 +196,6 @@
                     <th>Gross amount</th>
                     <th class="d-none d-sm-none d-md-table-cell">Fee</th>
                     <th>Amount</th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -213,7 +215,6 @@
                     <th>Gross amount</th>
                     <th class="d-none d-sm-none d-md-table-cell">Fee</th>
                     <th>Amount</th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -232,15 +233,13 @@
                     </td>
                     <td>{{(transaction['value'] - transaction['fee']).__round__(2) | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
                     </td>
-                    <td><a href="#" class="text-decoration-none text-danger"><span
-                            class="material-icons" style="font-size:20px">text_snippet</span></a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
             {% endif %}
         </div>
-        <div class="col text-right"><small><a href="{{url_for('all_transactions_buy')}}" class="text-decoration-none text-info">See all
+        <div class="text-right"><small><a href="{{url_for('all_transactions_buy')}}" class="text-decoration-none text-info">See all
             transactions</a></small></div>
     </div>
     <div class="my-4">

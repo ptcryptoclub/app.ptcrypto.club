@@ -38,6 +38,7 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     dateAxis.renderer.maxLabelPosition = 0.99;
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
+    dateAxis.renderer.fontSize = "0.8em";
 
     dateAxis.start = 0.60;
     dateAxis.end = 1;

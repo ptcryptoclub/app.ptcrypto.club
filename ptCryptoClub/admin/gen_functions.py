@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 
 engine_live_data = create_engine(CryptoData.string)
+engine_web_app = None
 
 
 def get_all_markets():
@@ -275,3 +276,53 @@ class SecureApi:
         else:
             api_secret = User.query.filter_by(id=user_id).first().api_secret
         return api_secret
+
+
+def buy_sell_line_data(user_ID, days):
+    query = f"""
+    select 	"type",
+            to_timestamp(floor((extract('epoch' from date_created) / 86400 )) * 86400) AT TIME ZONE 'UTC' as "date",
+            sum(value) as total
+        from "transactionsPTCC" tp 
+        where user_id = {user_ID} 
+            and date_created >= (select to_timestamp(floor((extract('epoch' from now() - interval '{days} day') / {days} )) * {days}) AT TIME ZONE 'UTC') 
+        group by "date", "type"
+    """
+    try:
+        data = db.engine.execute(query)
+    except Exception as e:
+        data = []
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='generic functions buy sell line data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_df = [row for row in data]
+    df = pd.DataFrame(to_df, columns=["type", "date", "total"])
+    to_return = []
+    for i in df.loc[df.type == "buy"].index:
+        to_return.append(
+            {
+                "date": df['date'][i],
+                "total_buy": round(float(df['total'][i]), 2)
+            }
+        )
+    for i in df.loc[df.type == "sell"].index:
+        control = True
+        for j in to_return:
+            if j['date'] == df['date'][i]:
+                j['total_sell'] = round(float(df['total'][i]), 2)
+                control = False
+        if control:
+            to_return.append(
+                {
+                    "date": df['date'][i],
+                    "total_sell": round(float(df['total'][i]), 2)
+                }
+            )
+    to_return.sort(key=lambda item: item['date'], reverse=False)
+    for item in to_return:
+        item['date'] = str(item['date'])
+    return to_return

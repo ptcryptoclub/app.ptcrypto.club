@@ -263,7 +263,9 @@ function pieAssets(divName, assetsData) {
 }
 
 // NOT IN USE //
-function lineBuySell(divName) {
+function lineBuySell(divName, user_ID, numberDays) {
+    let apiSecret = document.getElementById("APISecret").value;
+
     // Themes begin
     am4core.useTheme(am4themes_dark);
     am4core.useTheme(am4themes_animated);
@@ -271,90 +273,14 @@ function lineBuySell(divName) {
 
     // Create chart instance
     var chart = am4core.create(divName, am4charts.XYChart);
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     chart.colors.step = 2;
     chart.maskBullets = false;
 
     // Add data
-    chart.data = [{
-        "date": "2012-01-01",
-        "buy": 227,
-        "sell": 135,
-        "total_buy": 408,
-        "total_sell": 263
-    }, {
-        "date": "2012-01-02",
-        "buy": 371,
-        "sell": 345,
-        "total_buy": 482,
-        "total_sell": 356
-    }, {
-        "date": "2012-01-03",
-        "buy": 433,
-        "sell": 102,
-        "total_buy": 562,
-        "total_sell": 974
-    }, {
-        "date": "2012-01-04",
-        "buy": 345,
-        "sell": 520,
-        "total_buy": 379,
-        "total_sell": 20
-    }, {
-        "date": "2012-01-05",
-        "buy": 480,
-        "sell": 100,
-        "total_buy": 501,
-        "total_sell": 152
-    }, {
-        "date": "2012-01-06",
-        "buy": 386,
-        "sell": 268,
-        "total_buy": 443,
-        "total_sell": 369
-    }, {
-        "date": "2012-01-07",
-        "buy": 348,
-        "sell": 674,
-        "total_buy": 405,
-        "total_sell": 120
-    }, {
-        "date": "2012-01-08",
-        "buy": 238,
-        "sell": 65,
-        "total_buy": 309,
-        "total_sell": 300
-    }, {
-        "date": "2012-01-09",
-        "buy": 218,
-        "sell": 230,
-        "total_buy": 287,
-        "total_sell": 523
-    }, {
-        "date": "2012-01-10",
-        "buy": 349,
-        "sell": 30,
-        "total_buy": 485,
-        "total_sell": 106
-    }, {
-        "date": "2012-01-11",
-        "buy": 603,
-        "sell": 279,
-        "total_buy": 890,
-        "total_sell": 523
-    }, {
-        "date": "2012-01-12",
-        "buy": 534,
-        "sell": 230,
-        "total_buy": 810,
-        "total_sell": 179
-    }, {
-        "date": "2012-01-13",
-        "buy": 425,
-        "sell": 56,
-        "total_buy": 670,
-        "total_sell": 863
-    }];
+    chart.dataSource.url = '/api/account/portfolio/line-chart/'+ user_ID +'/'+ numberDays +'/'+ apiSecret +'/';
+    chart.dataSource.load();
 
     // Create axes
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -362,6 +288,7 @@ function lineBuySell(divName) {
     dateAxis.renderer.minGridDistance = 50;
     dateAxis.renderer.grid.template.disabled = true;
     dateAxis.renderer.fullWidthTooltip = true;
+    dateAxis.renderer.fontSize = "0.8em"
 
     var totalAxis = chart.yAxes.push(new am4charts.ValueAxis());
     //totalAxis.title.text = "Total amount";
@@ -375,10 +302,11 @@ function lineBuySell(divName) {
     totalBuySeries.dataFields.valueY = "total_buy";
     totalBuySeries.dataFields.dateX = "date";
     totalBuySeries.yAxis = totalAxis;
-    totalBuySeries.name = "Duration";
+    totalBuySeries.name = "Buy";
+    totalBuySeries.strokeOpacity = 0;
     totalBuySeries.strokeWidth = 2;
     totalBuySeries.propertyFields.strokeDasharray = "dashLength";
-    totalBuySeries.tooltipText = "{valueY} EUR";
+    totalBuySeries.tooltipText = "Buy: {valueY} EUR";
     totalBuySeries.showOnInit = true;
     totalBuySeries.fill = am4core.color("green");
     totalBuySeries.stroke = am4core.color("green");
@@ -387,10 +315,11 @@ function lineBuySell(divName) {
     totalSellSeries.dataFields.valueY = "total_sell";
     totalSellSeries.dataFields.dateX = "date";
     totalSellSeries.yAxis = totalAxis;
-    totalSellSeries.name = "Duration";
+    totalSellSeries.name = "Sell";
+    totalSellSeries.strokeOpacity = 0;
     totalSellSeries.strokeWidth = 2;
     totalSellSeries.propertyFields.strokeDasharray = "dashLength";
-    totalSellSeries.tooltipText = "{valueY} EUR";
+    totalSellSeries.tooltipText = "Sell: {valueY} EUR";
     totalSellSeries.showOnInit = true;
     totalSellSeries.fill = am4core.color("red");
     totalSellSeries.stroke = am4core.color("red");
@@ -399,10 +328,10 @@ function lineBuySell(divName) {
     var durationRectangle = durationBullet.createChild(am4core.Rectangle);
     durationBullet.horizontalCenter = "middle";
     durationBullet.verticalCenter = "middle";
-    durationBullet.width = 7;
-    durationBullet.height = 7;
-    durationRectangle.width = 7;
-    durationRectangle.height = 7;
+    durationBullet.width = 12;
+    durationBullet.height = 12;
+    durationRectangle.width = 12;
+    durationRectangle.height = 12;
 
     var durationState = durationBullet.states.create("hover");
     durationState.properties.scale = 1.2;
@@ -411,13 +340,14 @@ function lineBuySell(divName) {
     var durationRectangle = totalSellBullet.createChild(am4core.Rectangle);
     totalSellBullet.horizontalCenter = "middle";
     totalSellBullet.verticalCenter = "middle";
-    totalSellBullet.width = 7;
-    totalSellBullet.height = 7;
-    durationRectangle.width = 7;
-    durationRectangle.height = 7;
+    totalSellBullet.width = 12;
+    totalSellBullet.height = 12;
+    durationRectangle.width = 12;
+    durationRectangle.height = 12;
 
     var totalSellState = totalSellBullet.states.create("hover");
-    durationState.properties.scale = 1.2;
+    totalSellState.properties.scale = 1.2;
+
 
     // Add cursor
     chart.cursor = new am4charts.XYCursor();

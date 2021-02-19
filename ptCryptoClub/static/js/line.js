@@ -92,7 +92,7 @@ function lineChart() {
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
     dateAxis.renderer.grid.template.disabled = true;
-
+    dateAxis.renderer.fontSize = "0.8em";
 
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());

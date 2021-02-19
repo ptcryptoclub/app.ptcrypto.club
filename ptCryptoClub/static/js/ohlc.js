@@ -48,6 +48,7 @@ function ohlc_chart(chartDiv) {
     dateAxis.renderer.maxLabelPosition = 0.99;
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
+    dateAxis.renderer.fontSize = "0.8em"
     ///dateAxis.groupData = true;
 
 
