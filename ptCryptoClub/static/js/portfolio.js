@@ -288,7 +288,7 @@ function lineBuySell(divName, user_ID, numberDays) {
     dateAxis.renderer.minGridDistance = 50;
     dateAxis.renderer.grid.template.disabled = true;
     dateAxis.renderer.fullWidthTooltip = true;
-    dateAxis.renderer.fontSize = "0.8em"
+    dateAxis.renderer.fontSize = "0.8em";
 
     var totalAxis = chart.yAxes.push(new am4charts.ValueAxis());
     //totalAxis.title.text = "Total amount";

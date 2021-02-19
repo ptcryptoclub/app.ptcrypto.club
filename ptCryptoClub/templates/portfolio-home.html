@@ -120,7 +120,7 @@
         <div class="text-center mt-2 text-light">
             <small>Total amount per day <small>(last {{number_days_buy_sell}} days)</small></small>
         </div>
-        <div id="buy-sell-chart" style="height: 150px;"></div>
+        <div id="buy-sell-chart" style="height: 200px; width: 100%;"></div>
         <script>
             lineBuySell("buy-sell-chart", {{current_user.id}}, {{number_days_buy_sell}})
         </script>

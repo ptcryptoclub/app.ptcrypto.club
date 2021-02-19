@@ -97,7 +97,8 @@ def home():
         available_funds=available_funds,
         default_transaction_fee=default_transaction_fee,
         available_assets=available_assets,
-        delta=delta
+        delta=delta,
+        number_days_buy_sell=default_number_days_buy_sell
     )
 
 
