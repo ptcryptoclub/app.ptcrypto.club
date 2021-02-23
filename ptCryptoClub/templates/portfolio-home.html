@@ -55,7 +55,8 @@
         <div class="col-lg-7 border-top border-secondary py-5">
             <small class="text-light">Current value:</small>
             <div id="updateAll" class="row no-gutters">
-                <div class="col-auto"><H1 class="display-4 text-light"><small>{{total_portfolio['value'] | numberFormat}}</small></H1>
+                <div class="col-auto"><H1 class="display-4 text-light"><small>{{total_portfolio['value'] |
+                    numberFormat}}</small></H1>
                 </div>
                 <div class="col-auto"><small class="text-light">{{total_portfolio['quote'].upper()}}</small></div>
                 {% if total_portfolio['percentage'] > 0 %}
@@ -78,6 +79,7 @@
                     updatePortfolio({{current_user.id}})
                 }
                 var runPortfolioUpdate=setInterval(auxRunUpdates,30*1000);
+
             </script>
             <div class="row no-gutters">
                 <div class="col-auto p-1">
@@ -86,7 +88,8 @@
                     <div class="row align-items-center no-gutters mb-2">
                         <div class="col-auto">
                             <img src="{{url_for('static', filename='crypto_icons/color/'+ asset['base'] +'.png')}}"
-                                 alt="{{asset['base']}}" style="width:20px;height:20px;"  title="{{asset['base'].upper()}}">
+                                 alt="{{asset['base']}}" style="width:20px;height:20px;"
+                                 title="{{asset['base'].upper()}}">
                         </div>
                         <div class="col-auto ml-3 text-light">
                             {{asset['amount'] | numberFormat}}
@@ -114,6 +117,7 @@
         <script>
             let portfolio_data = {{total_portfolio | safe}}
             pieWalletAssets(pieWA, portfolio_data)
+
         </script>
     </div>
     <div class="border-top border-bottom border-secondary">
@@ -123,6 +127,7 @@
         <div id="buy-sell-chart" style="height: 200px; width: 100%;"></div>
         <script>
             lineBuySell("buy-sell-chart", {{current_user.id}}, {{number_days_buy_sell}})
+
         </script>
         <div class="mt-2">
             {% if buy_transactions.__len__() == 0 %}
@@ -228,8 +233,10 @@
                     </td>
                     <td>{{transaction['asset_amount'] | numberFormat}} <small>{{transaction['base'].upper()}}</small>
                     </td>
-                    <td>{{transaction['value'].__round__(2) | numberFormat}} <small>{{transaction['quote'].upper()}}</small></td>
-                    <td class="d-none d-sm-none d-md-table-cell">{{transaction['fee'].__round__(2) | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                    <td>{{transaction['value'].__round__(2) | numberFormat}}
+                        <small>{{transaction['quote'].upper()}}</small></td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{transaction['fee'].__round__(2) | numberFormat}}
+                        <small>{{transaction['quote'].upper()}}</small>
                     </td>
                     <td>{{(transaction['value'] - transaction['fee']).__round__(2) | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
                     </td>
@@ -239,18 +246,33 @@
             </table>
             {% endif %}
         </div>
-        <div class="text-right"><small><a href="{{url_for('all_transactions_buy')}}" class="text-decoration-none text-info">See all
+        <div class="text-right"><small><a href="{{url_for('all_transactions_buy')}}"
+                                          class="text-decoration-none text-info">See all
             transactions</a></small></div>
     </div>
     <div class="my-4">
         <div class="row no-gutters">
             <div class="col-md-6">
-                <div class="text-center text-light"><small>BTCEUR kraken 60s</small></div>
+                <div class="row">
+                    <div class="col text-center text-light"><small>BTCEUR kraken 60s</small></div>
+                    <div class="col-auto">
+                        <a class="p-3 text-muted" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=60)}}">
+                            <span class="material-icons">insert_chart</span>
+                        </a>
+                    </div>
+                </div>
                 <div id="chartBTC" style="height: 350px;"></div>
                 <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, 60, 20)</script>
             </div>
             <div class="col-md-6">
-                <div class="text-center text-light"><small>ETHEUR kraken 60s</small></div>
+                <div class="row">
+                    <div class="col text-center text-light"><small>ETHEUR kraken 60s</small></div>
+                    <div class="col-auto">
+                        <a class="p-3 text-muted" href="{{url_for('chart_ohlc', market='kraken', base='eth', quote='eur', candle=60)}}">
+                            <span class="material-icons">insert_chart</span>
+                        </a>
+                    </div>
+                </div>
                 <div id="chartETH" style="height: 350px;"></div>
                 <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, 60, 20)</script>
             </div>
@@ -281,6 +303,7 @@
                         </div>
                         <script>
                             updateBase()
+
                         </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">
@@ -371,6 +394,7 @@
                         </div>
                         <script>
                             updateBaseSell()
+
                         </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">

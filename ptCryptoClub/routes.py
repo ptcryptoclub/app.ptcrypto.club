@@ -14,7 +14,7 @@ from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetail
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data
-from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data
+from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm
 from ptCryptoClub.admin.auto_email import Email
 
@@ -546,6 +546,46 @@ def api_charts_ohlc_data(market, base, quote, datapoints, candle, api_secret):
     if SecureApi().validate(api_secret=api_secret):
         return jsonify(
             ohlc_chart_data(base, quote, market, datapoints, candle)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/charts/vtp/<market>/<base>/<quote>/<candle>/")
+def chart_vtp(market, base, quote, candle):
+    try:
+        candle = int(candle)
+    except Exception as e:
+        print(e)
+        candle = 60
+    if candle == 20:
+        candle_in_use_display = "20 sec"
+    elif candle == 60:
+        candle_in_use_display = "1 min"
+    elif candle == 300:
+        candle_in_use_display = "5 min"
+    else:
+        return redirect(url_for('chart_vtp', market='kraken', base='btc', quote='eur', candle=default_candle))
+    return render_template(
+        "charts-vtp.html",
+        title="Charts",
+        market=market,
+        base=base,
+        quote=quote,
+        datapoints=default_datapoints,
+        candles=candle_options,
+        candle_in_use=candle,
+        candle_in_use_display=candle_in_use_display
+    )
+
+
+@app.route("/api/charts/vtp/<market>/<base>/<quote>/<datapoints>/<candle>/<api_secret>/")
+def api_charts_vtp_data(market, base, quote, datapoints, candle, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            vtp_chart_data(base, quote, market, datapoints, candle)
         )
     else:
         return jsonify(

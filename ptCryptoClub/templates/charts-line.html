@@ -7,10 +7,15 @@
         <div class="col">
             <div class="row justify-content-start">
                 <div class="col-auto"><small><a href="{{url_for('chart_line', market=market, base=base, quote=quote)}}"
-                                                class="text-decoration-none text-light">Line chart</a></small></div>
+                                                class="text-decoration-none text-light">Line chart</a></small>
+                </div>
                 <div class="col-auto"><small><a
                         href="{{url_for('chart_ohlc', market=market, base=base, quote=quote, candle=default_candle)}}"
                         class="text-decoration-none text-muted">Ohlc chart</a></small>
+                </div>
+                <div class="col-auto"><small><a
+                        href="{{url_for('chart_vtp', market=market, base=base, quote=quote, candle=default_candle)}}"
+                        class="text-decoration-none text-muted">Vtp chart</a></small>
                 </div>
             </div>
         </div>

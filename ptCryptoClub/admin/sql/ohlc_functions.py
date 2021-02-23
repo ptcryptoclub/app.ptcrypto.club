@@ -87,3 +87,49 @@ def line_chart_data(base, quote, market, last_x_hours):
             }
         )
     return to_return
+
+
+def vtp_chart_data(base, quote, market, datapoints, candle):
+    query = f"""
+    select t.*
+        from (
+        
+            select 	closetime,
+                    "nTrans",
+                    "maxVolume",
+                    volume - "maxVolume" volume,
+                    "maxVolumePrice",
+                    closeprice
+                from ohlc_{str(candle)}s os
+                where base = '{base}' and "quote" = '{quote}' and market = '{market}'
+                order by closetime desc
+                limit {str(datapoints)}
+        ) as t
+        order by t.closetime asc
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(
+            columns=["closetime", "nTrans", "maxVolume", "volume", "maxVolumePrice", "closeprice"]
+        )
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='ohlc functions 20s data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "closetime": str(data.closetime[i])[:19],
+                "nTrans": int(data.nTrans[i]),
+                "maxVolume": float(data.maxVolume[i]),
+                "volume": float(data.volume[i]),
+                "maxVolumePrice": float(data.maxVolumePrice[i]),
+                "closeprice": float(data.closeprice[i])
+            }
+        )
+    return to_return

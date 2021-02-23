@@ -15,11 +15,11 @@
                 </div>
                 <div class="col-auto"><small><a
                         href="{{url_for('chart_ohlc', market=market, base=base, quote=quote, candle=default_candle)}}"
-                        class="text-decoration-none text-light">Ohlc chart</a></small>
+                        class="text-decoration-none text-muted">Ohlc chart</a></small>
                 </div>
                 <div class="col-auto"><small><a
                         href="{{url_for('chart_vtp', market=market, base=base, quote=quote, candle=default_candle)}}"
-                        class="text-decoration-none text-muted">Vtp chart</a></small>
+                        class="text-decoration-none text-light">Vtp chart</a></small>
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
 
 
 {% block content %}
-<script src="{{url_for('static', filename='js/ohlc.js')}}"></script>
+<script src="{{url_for('static', filename='js/vtp.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
@@ -63,17 +63,24 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
                     {% for candle in candles %}
-                    <a class="dropdown-item text-light small" href="{{url_for('chart_ohlc', market=market, base=base, quote=quote, candle=candle['value'])}}">{{candle['display']}}</a>
+                    <a class="dropdown-item text-light small" href="{{url_for('chart_vtp', market=market, base=base, quote=quote, candle=candle['value'])}}">{{candle['display']}}</a>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
+    <div>
+        <H5 class="text-light">Volume Transactions Price (VTP)</H5>
+        <small class="text-muted">
+            The following chart holds information about total number of transactions <q><i>Transactions</i></q>, highest single transaction on volume <q><i>HighestVolume</i></q>,
+            remaining volume <q><i>RemVolume</i></q>, price for highest single transaction <q><i>PriceHV</i></q> and close price <q><i>ClosePrice</i></q> for a given candle.
+        </small>
+    </div>
     <div class="row no-gutters">
         <div class="col-xl col-lg py-2">
-            <div id="ohlc-chart" style="height: 700px;"></div>
+            <div id="vtp-chart" style="height: 700px;"></div>
             <script>
-                ohlc_chart('ohlc-chart')
+                vtp_chart('vtp-chart')
             </script>
         </div>
     </div>

@@ -91,7 +91,6 @@ function lineChart() {
     dateAxis.renderer.maxLabelPosition = 0.99;
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
-    dateAxis.renderer.grid.template.disabled = true;
     dateAxis.renderer.fontSize = "0.8em";
 
 

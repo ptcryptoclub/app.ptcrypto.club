@@ -91,6 +91,7 @@
                     <div class="dropdown-menu bg-dark" aria-labelledby="chartsDropdown">
                         <a class="dropdown-item text-light" href="{{url_for('chart_line', market='kraken', base='btc', quote='eur')}}">Line</a>
                         <a class="dropdown-item text-light" href="{{url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle)}}">Ohlc</a>
+                        <a class="dropdown-item text-light" href="{{url_for('chart_vtp', market='kraken', base='btc', quote='eur', candle=default_candle)}}">Vtp</a>
                     </div>
                 </li>
             </ul>

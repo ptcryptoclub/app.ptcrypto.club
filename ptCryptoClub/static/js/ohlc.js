@@ -46,7 +46,6 @@ function ohlc_chart(chartDiv) {
     dateAxis.renderer.ticks.template.strokeOpacity = 0.2;
     dateAxis.renderer.minLabelPosition = 0.01;
     dateAxis.renderer.maxLabelPosition = 0.99;
-    dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
     dateAxis.renderer.fontSize = "0.8em"
     ///dateAxis.groupData = true;
@@ -74,6 +73,7 @@ function ohlc_chart(chartDiv) {
 
     valueAxis.renderer.maxLabelPosition = 0.95;
     valueAxis.renderer.fontSize = "0.8em";
+    valueAxis.renderer.grid.template.disabled = true;
 
     var series = chart.series.push(new am4charts.CandlestickSeries());
     series.dataFields.dateX = "closetime";
@@ -105,11 +105,11 @@ function ohlc_chart(chartDiv) {
 
     // moving average exp YELLOW
 
-    var series_ma = chart.series.push(new am4charts.LineSeries());
-    series_ma.dataFields.valueY = "moving_exp";
-    series_ma.dataFields.dateX = "closetime";
-    series_ma.strokeWidth = 1;
-    series_ma.stroke = am4core.color("#ffc400");
+    var series_me = chart.series.push(new am4charts.LineSeries());
+    series_me.dataFields.valueY = "moving_exp";
+    series_me.dataFields.dateX = "closetime";
+    series_me.strokeWidth = 1;
+    series_me.stroke = am4core.color("#ffc400");
 
     /////////////
 
@@ -128,8 +128,7 @@ function ohlc_chart(chartDiv) {
     valueAxis2.renderer.maxLabelPosition = 0.95;
     valueAxis2.renderer.fontSize = "0.8em";
 
-    valueAxis2.renderer.gridContainer.background.fill = am4core.color("#000000");
-    valueAxis2.renderer.gridContainer.background.fillOpacity = 0.05;
+    valueAxis2.renderer.grid.template.disabled = true;
 
     var series2 = chart.series.push(new am4charts.ColumnSeries());
     series2.dataFields.dateX = "closetime";

@@ -20,7 +20,7 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = "info"
 login_manager.session_protection = 'strong'
 login_manager.refresh_view = 'login'
-login_manager.needs_refresh_message = u"Session timedout, please re-login"
+login_manager.needs_refresh_message = u"Session timed out, please re-login"
 login_manager.needs_refresh_message_category = "info"
 
 from ptCryptoClub import routes
