@@ -17,6 +17,7 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm
 from ptCryptoClub.admin.auto_email import Email
+from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables
 
 
 @app.before_request
@@ -459,6 +460,20 @@ def mfa_authorization(user_id, pin_hash):
             )
         else:
             return redirect(url_for('account_user'))
+
+
+@app.route("/account/admin/")
+@login_required
+def account_admin():
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        return render_template(
+            "account-admin.html",
+            title="Account",
+            table_data=admin_main_tables(),
+            table_data_archive=admin_archive_tables()
+        )
 
 
 @app.route("/market/<market>/")

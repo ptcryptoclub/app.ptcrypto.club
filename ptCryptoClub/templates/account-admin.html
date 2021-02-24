@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-muted text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="{{url_for('account_admin')}}"
+                                                class="text-light text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <div class="py-3">
+                <H5 class="py-1 border-bottom border-info text-light">Main tables</H5>
+                <small>
+                    <i class="text-muted">
+                        Information about main tables in database.
+                    </i>
+                </small>
+                <table class="table table-borderless table-sm small mt-2">
+                    <thead class="text-light">
+                    <tr>
+                        <th scope="col">Table</th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Min date</th>
+                        <th scope="col">Max date</th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-muted">
+                    <tr>
+                        <td>Transactions</td>
+                        <td>{{table_data['trans_count'] | numberFormat}}</td>
+                        <td>{{table_data['trans_min']}}</td>
+                        <td>{{table_data['trans_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>20s ohlc</td>
+                        <td>{{table_data['20s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data['20s_ohlc_min']}}</td>
+                        <td>{{table_data['20s_ohlc_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>60s ohlc</td>
+                        <td>{{table_data['60s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data['60s_ohlc_min']}}</td>
+                        <td>{{table_data['60s_ohlc_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>300s ohlc</td>
+                        <td>{{table_data['300s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data['300s_ohlc_min']}}</td>
+                        <td>{{table_data['300s_ohlc_max']}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <div class="py-3">
+                <H5 class="py-1 border-bottom border-info text-light">Archive tables</H5>
+                <small>
+                    <i class="text-muted">
+                        Information about archive tables in database.
+                    </i>
+                </small>
+                <table class="table table-borderless table-sm small mt-2">
+                    <thead class="text-light">
+                    <tr>
+                        <th scope="col">Table</th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Min date</th>
+                        <th scope="col">Max date</th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-muted">
+                    <tr>
+                        <td>Transactions</td>
+                        <td>{{table_data_archive['trans_count'] | numberFormat}}</td>
+                        <td>{{table_data_archive['trans_min']}}</td>
+                        <td>{{table_data_archive['trans_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>20s ohlc</td>
+                        <td>{{table_data_archive['20s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data_archive['20s_ohlc_min']}}</td>
+                        <td>{{table_data_archive['20s_ohlc_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>60s ohlc</td>
+                        <td>{{table_data_archive['60s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data_archive['60s_ohlc_min']}}</td>
+                        <td>{{table_data_archive['60s_ohlc_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>300s ohlc</td>
+                        <td>{{table_data_archive['300s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data_archive['300s_ohlc_min']}}</td>
+                        <td>{{table_data_archive['300s_ohlc_max']}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
