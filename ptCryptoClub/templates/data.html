@@ -87,7 +87,7 @@
         {% endfor %}
         </tbody>
     </table>
-    <H6 class="text-muted text-right border-bottom border-secondary my-4">Details update</H6>
+    <H6 class="text-muted text-right border-bottom border-secondary my-4">Update details</H6>
     <table class="table table-borderless table-sm small text-muted">
         <thead>
         <tr class="text-light">
@@ -107,6 +107,23 @@
             <td class="text-left">{{line.new_username}}</td>
             <td class="text-left">{{line.old_email}}</td>
             <td class="text-left">{{line.new_email}}</td>
+            <td class="text-left">{{line.used}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <H6 class="text-muted text-right border-bottom border-secondary my-4">Update password details</H6>
+    <table class="table table-borderless table-sm small text-muted">
+        <thead>
+        <tr class="text-light">
+            <th scope="col" class="text-left">Date requested</th>
+            <th scope="col" class="text-left">Used</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for line in update_info_password %}
+        <tr>
+            <td class="text-left">{{line.date_created.__str__()[:19]}}</td>
             <td class="text-left">{{line.used}}</td>
         </tr>
         {% endfor %}

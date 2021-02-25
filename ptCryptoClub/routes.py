@@ -1007,13 +1007,15 @@ def my_data():
         )
     transactions_user = TransactionsPTCC.query.filter_by(user_id=current_user.id).order_by(TransactionsPTCC.date_created.desc())
     update_info = UpdateAuthorizationDetails.query.filter_by(user_id=current_user.id).order_by(UpdateAuthorizationDetails.date_created.desc())
+    update_info_password = ResetPasswordAuthorizations.query.filter_by(user_id=current_user.id).order_by(ResetPasswordAuthorizations.date_created.desc())
     return render_template(
         "data.html",
         title="My data",
         user_info=user_info,
         login_info=login_info,
         transactions_user=transactions_user,
-        update_info=update_info
+        update_info=update_info,
+        update_info_password=update_info_password
     )
 
 
