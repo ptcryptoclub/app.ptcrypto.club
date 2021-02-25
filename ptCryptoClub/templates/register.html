@@ -55,7 +55,7 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {% if form.password.errors %}
+                    {% if form.confirm_password.errors %}
                     {{ form.confirm_password(class="form-control bg-dark text-light is-invalid", placeholder="Re-Password*", autocomplete="off") }}
                     <div class="invalid-feedback">
                         {% for error in form.confirm_password.errors %}

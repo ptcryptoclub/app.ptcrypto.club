@@ -31,7 +31,16 @@
                     </div>
                     <small id="pinHelp" class="form-text text-info">If you didn't finished the MFA activation process please use "000000".</small>
                 </div>
-                {{ form.submit(class="btn btn-outline-dark text-light px-5") }}
+                <div class="row align-items-center mt-4">
+                    <div class="col-auto">
+                        {{ form.submit(class="btn btn-outline-dark text-light px-5") }}
+                    </div>
+                    <div class="col">
+                        <small id="passHelp" class="form-text">
+                            <a href="{{url_for('password_recovery_email')}}" class="text-decoration-none text-muted">Lost password?</a>
+                        </small>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

@@ -10,12 +10,14 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell
-from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
+from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
+    ResetPasswordAuthorizations
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
-    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data
+    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
-from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm
+from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
+    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables
 
@@ -305,6 +307,117 @@ def activate_account():
         else:
             flash(f'Your activation details are incorrect, please try again.', 'danger')
             return redirect(url_for('home'))
+
+
+@app.route("/recovery/password/email/", methods=["GET", "POST"])
+def password_recovery_email():
+    form = PasswordRecoveryEmailForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None:
+            # check for existing authorizations
+            old_auths = ResetPasswordAuthorizations.query.filter_by(user_id=user.id, valid=True)
+            if old_auths is not None:
+                for old_auth in old_auths:
+                    old_auth.valid = False
+                db.session.commit()
+            hash = hash_generator(random.randint(150, 200))
+            # noinspection PyArgumentList
+            authorization = ResetPasswordAuthorizations(
+                user_id=user.id,
+                hash=hash
+            )
+            db.session.add(authorization)
+            db.session.commit()
+            Email().password_recovery_email(email=user.email, hash=hash, username=user.username, user_id=user.id)
+            flash("Please check your email inbox. An email has been sent with instructions to recover your password.", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Email not found! Please enter the email address used to create your account.", "danger")
+            return redirect(url_for('password_recovery_email'))
+    else:
+        return render_template(
+            "password-recovery-email.html",
+            title="Password recovery",
+            form=form
+        )
+
+
+@app.route("/recovery/password/username/", methods=["GET", "POST"])
+def password_recovery_username():
+    form = PasswordRecoveryUsernameForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is not None:
+            # check for existing authorizations
+            old_auths = ResetPasswordAuthorizations.query.filter_by(user_id=user.id, valid=True)
+            if old_auths is not None:
+                for old_auth in old_auths:
+                    old_auth.valid = False
+                db.session.commit()
+            hash = hash_generator(random.randint(150, 200))
+            # noinspection PyArgumentList
+            authorization = ResetPasswordAuthorizations(
+                user_id=user.id,
+                hash=hash
+            )
+            db.session.add(authorization)
+            db.session.commit()
+            Email().password_recovery_email(email=user.email, hash=hash, username=user.username, user_id=user.id)
+            flash("Please check your email inbox. An email has been sent with instructions to recover your password.", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Username not found! Please enter your username.", "danger")
+            return redirect(url_for('password_recovery_username'))
+    else:
+        return render_template(
+            "password-recovery-username.html",
+            title="Password recovery",
+            form=form
+        )
+
+
+@app.route("/recovery/password/confirmation/<hash>/<user_id>/", methods=["GET", "POST"])
+def password_recovery_confirmation(hash, user_id):
+    form = PasswordRecoveryConfirmationForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(id=user_id).first()
+        if user is None:
+            flash("Details are incorrect, please try again.", "warning")
+            return redirect(url_for('home'))
+        else:
+            # check db for authorization
+            authorization = ResetPasswordAuthorizations.query.filter_by(
+                hash=hash,
+                user_id=user.id,
+                valid=True
+            ).first()
+            if authorization is None:
+                flash("Details are incorrect, please try again.", "warning")
+                return redirect(url_for('home'))
+            else:
+                delta = datetime.utcnow() - authorization.date_created
+                if delta.total_seconds() <= 300:
+                    hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+                    authorization.valid = False
+                    authorization.used = True
+                    user.password = hashed_password
+                    db.session.commit()
+                    flash("Your password has been updated.", "success")
+                    return redirect(url_for('login'))
+                else:
+                    authorization.valid = False
+                    db.session.commit()
+                    flash("Your request has expired, please try again.", "warning")
+                    return redirect(url_for('password_recovery_email'))
+    else:
+        return render_template(
+            "password-recovery-confirmation.html",
+            title="Password recovery",
+            form=form,
+            hash=hash,
+            user_id=user_id
+        )
 
 
 @app.route("/account/", methods=["GET", "POST"])

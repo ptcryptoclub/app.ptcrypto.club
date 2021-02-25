@@ -79,3 +79,12 @@ class PortfolioAssets(db.Model, UserMixin):
     user_id = db.Column(db.Integer, nullable=False)
     asset = db.Column(db.String(255), nullable=False)
     amount = db.Column(db.Float, default=0)
+
+
+class ResetPasswordAuthorizations(db.Model, UserMixin):
+    auth_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    hash = db.Column(db.String(255), nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    valid = db.Column(db.Boolean, nullable=False, default=True)
+    used = db.Column(db.Boolean, nullable=False, default=False)

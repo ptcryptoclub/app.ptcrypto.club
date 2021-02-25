@@ -5,6 +5,8 @@ from ptCryptoClub import db
 
 from sqlalchemy import create_engine
 import pandas as pd
+import random
+import string
 
 engine_live_data = create_engine(CryptoData.string)
 engine_web_app = None
@@ -326,3 +328,9 @@ def buy_sell_line_data(user_ID, days):
     for item in to_return:
         item['date'] = str(item['date'])
     return to_return
+
+
+def hash_generator(LENGTH):
+    base = string.digits + string.digits + string.ascii_letters
+    hash = "".join(random.choice(base) for _ in range(LENGTH))
+    return hash

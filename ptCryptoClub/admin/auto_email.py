@@ -90,3 +90,47 @@ class Email:
                     }
                 }
             )
+
+    def password_recovery_email(self, email, hash, username, user_id):
+        ses = boto3.client("ses",
+                           aws_access_key_id=EmailLogin().aws_access_key_id,
+                           aws_secret_access_key=EmailLogin().aws_secret_access_key,
+                           region_name=EmailLogin().region_name)
+        body = f"""
+            <!DOCTYPE html>
+            <body>
+                <br>
+                <H4>Hi {username}</H4>
+                <br>
+                <p>Please use the link below to recover your password.</p>
+                <br>
+                <H5><a href='https://app.ptcrypto.club/recovery/password/confirmation/{hash}/{user_id}/' target="_blank">Recover password</a></H5>
+                <small>This link will only be valid during the next 5 minutes.</small>
+                <br>
+                <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
+                <br>
+                <br>
+                <p>Kind regards</p>
+                <br>
+                <small><q><i>This email was generated automatically. Please do not reply to this email.</i></q></small>
+            </body>
+        </html>
+        """
+        ses.send_email(
+            Source="donotreply@ptcrypto.club",
+            Destination={
+                "ToAddresses": [f"{email}"]
+                },
+            Message={
+                "Subject": {
+                    "Data": "ptcrypto.club - Recover password",
+                    "Charset": "UTF-8"
+                    },
+                "Body": {
+                    "Html": {
+                        "Data": body,
+                        "Charset": "UTF-8"
+                        }
+                    }
+                }
+            )

@@ -67,3 +67,19 @@ class SellAssetForm(FlaskForm):
     market_sell = SelectField('market', validators=[DataRequired()])
     amount_spent_sell = StringField('Amount', validators=[DataRequired()])
     submit_sell = SubmitField('Sell asset')
+
+
+class PasswordRecoveryEmailForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Length(max=255)])
+    submit = SubmitField('Verify')
+
+
+class PasswordRecoveryUsernameForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(max=20)])
+    submit = SubmitField('Verify')
+
+
+class PasswordRecoveryConfirmationForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
+    confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password'), Length(min=8)])
+    submit = SubmitField('Reset password')
