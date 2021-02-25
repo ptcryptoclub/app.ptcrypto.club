@@ -11,7 +11,8 @@
                 <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-muted text-decoration-none">Portfolio</a></small>
                 </div>
                 {% if current_user.email in admins_emails %}
-                <div class="col-auto"><small><a href="{{url_for('account_admin')}}" class="text-muted text-decoration-none">Admin</a></small>
+                <div class="col-auto"><small><a href="{{url_for('account_admin')}}"
+                                                class="text-muted text-decoration-none">Admin</a></small>
                 </div>
                 {% endif %}
                 <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
@@ -89,10 +90,27 @@
                                     <small id="emailHelp" class="form-text text-info"><q>MFA will be requested to update
                                         your details. If you choose to update your email address, please note that an
                                         <u>email will be sent to your new email address</u> to reactivate your account
-                                        and you <u>will not be able to access your account</u> until you do so.</q></small>
+                                        and you <u>will not be able to access your account</u> until you do
+                                        so.</q></small>
                                 </div>
                                 {{ form.submit(class="btn btn-sm btn-outline-dark text-light px-5") }}
                             </form>
+                        </div>
+                        <div class="p-1 ml-3">
+                            <div>
+                                <small class="text-info">
+                                    If you need to change your password, please request it below.
+                                </small>
+                            </div>
+                            <div>
+                                <small class="text-info">
+                                    An automatic email will be sent to your registered email and
+                                        <u>you will be logout</u> from your current session.
+                                </small>
+                            </div>
+                            <a class="btn btn-sm btn-outline-dark text-light px-4 mt-2" href="{{url_for('password_recovery_request')}}" role="button">
+                                Change password
+                            </a>
                         </div>
                     </div>
                     <div class="text-light text-center mt-4 mb-1 pb-2">Last logins</div>
@@ -126,9 +144,11 @@
                 </div>
                 <div class="col-auto">
                     <div class="text-muted p-2"><small>account_name</small></div>
-                    <div class="text-muted p-2"><a href="{{url_for('my_data')}}" class="text-decoration-none"><small class="text-muted">View
+                    <div class="text-muted p-2"><a href="{{url_for('my_data')}}" class="text-decoration-none"><small
+                            class="text-muted">View
                         my data</small></a></div>
-                    <div class="text-muted p-2"><a href="{{url_for('delete_account')}}" class="text-decoration-none"><small class="text-danger">Delete
+                    <div class="text-muted p-2"><a href="{{url_for('delete_account')}}"
+                                                   class="text-decoration-none"><small class="text-danger">Delete
                         my account</small></a></div>
                 </div>
             </div>

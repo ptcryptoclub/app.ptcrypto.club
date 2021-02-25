@@ -311,6 +311,7 @@ def activate_account():
 
 @app.route("/recovery/password/email/", methods=["GET", "POST"])
 def password_recovery_email():
+    logout_user()
     form = PasswordRecoveryEmailForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -345,6 +346,7 @@ def password_recovery_email():
 
 @app.route("/recovery/password/username/", methods=["GET", "POST"])
 def password_recovery_username():
+    logout_user()
     form = PasswordRecoveryUsernameForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -379,6 +381,7 @@ def password_recovery_username():
 
 @app.route("/recovery/password/confirmation/<hash>/<user_id>/", methods=["GET", "POST"])
 def password_recovery_confirmation(hash, user_id):
+    logout_user()
     form = PasswordRecoveryConfirmationForm()
     if form.validate_on_submit():
         user = User.query.filter_by(id=user_id).first()
@@ -418,6 +421,28 @@ def password_recovery_confirmation(hash, user_id):
             hash=hash,
             user_id=user_id
         )
+
+
+@app.route("/recovery/password/request/")
+@login_required
+def password_recovery_request():
+    old_auths = ResetPasswordAuthorizations.query.filter_by(user_id=current_user.id, valid=True)
+    if old_auths is not None:
+        for old_auth in old_auths:
+            old_auth.valid = False
+        db.session.commit()
+    hash = hash_generator(random.randint(150, 200))
+    # noinspection PyArgumentList
+    authorization = ResetPasswordAuthorizations(
+        user_id=current_user.id,
+        hash=hash
+    )
+    db.session.add(authorization)
+    db.session.commit()
+    Email().password_recovery_email(email=current_user.email, hash=hash, username=current_user.username, user_id=current_user.id)
+    logout_user()
+    flash("Please check your email inbox. An email has been sent with instructions to change your password.", "info")
+    return redirect(url_for('home'))
 
 
 @app.route("/account/", methods=["GET", "POST"])
