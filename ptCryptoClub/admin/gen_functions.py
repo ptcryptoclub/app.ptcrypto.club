@@ -334,3 +334,38 @@ def hash_generator(LENGTH):
     base = string.digits + string.digits + string.ascii_letters
     hash = "".join(random.choice(base) for _ in range(LENGTH))
     return hash
+
+
+def get_data_live_chart(market, base, quote, data_points):
+    query = f"""
+    select *
+        from (
+            select  closetime,
+                    "nTrans"
+                from ohlc_20s os
+                where base = '{base}' and "quote" = '{quote}' and market = '{market}'
+                order by closetime desc
+                limit {data_points}
+        ) as t
+        order by closetime asc
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(columns=["closetime", "nTrans"])
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='generic functions get data live chart',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "closetime": str(data['closetime'][i])[:19],
+                "nTrans": int(data['nTrans'][i])
+            }
+        )
+    return to_return

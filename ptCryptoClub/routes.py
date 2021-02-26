@@ -14,7 +14,7 @@ from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetail
     ResetPasswordAuthorizations
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
-    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator
+    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
@@ -621,12 +621,24 @@ def market(market):
         dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
         cards.append(dict_)
     return render_template(
-        "market.html",
+        "market_2.html",
         title="Markets",
         market=market,
         cards=cards,
         num_pairs=len(cards)
     )
+
+
+@app.route("/api/market/chart/live/<market>/<base>/<quote>/<datapoints>/<api_secret>/")
+def api_market_chart_live(market, base, quote, datapoints, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_data_live_chart(market=market, base=base, quote=quote, data_points=datapoints)
+        )
+    else:
+        return jsonify(
+            {}
+        )
 
 
 @app.route("/charts/line/<market>/<base>/<quote>/")

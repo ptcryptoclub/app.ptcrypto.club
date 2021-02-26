@@ -1,145 +1,135 @@
 
-function liveChart() {
-    // Themes begin
-    am4core.useTheme(am4themes_dark);
-    am4core.useTheme(am4themes_animated);
-    // Themes end
 
-    // Create chart instance
-    var chart = am4core.create("live-chart", am4charts.XYChart);
-    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
-    chart.legend = new am4charts.Legend();
-    chart.legend.position = "top";
+function liveChart (divName, market, base, quote) {
 
-    // Add data
-    chart.dataSource.url = '/api/charts/live/last-price/' + document.getElementById("market").innerHTML + '/' + document.getElementById("pair").innerHTML + '/'
-    chart.dataSource.load();
-    chart.dataSource.parser = new am4core.JSONParser();
-    // chart.dataSource.keepCount = true;
-    chart.dataSource.incremental = true;
-    chart.dataSource.reloadFrequency = 5 * 1000;
-
-    // Create axes
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.renderer.grid.template.disabled = true;
-
-
-    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    valueAxis.tooltip.disabled = true;
-    valueAxis.renderer.grid.template.disabled = true;
-
-    // Create series
-    var series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.openValueY = "bid";
-    series.dataFields.valueY = "ask";
-    series.dataFields.dateX = "date";
-    series.strokeWidth = 2;
-    series.minBulletDistance = 10;
-    series.tooltipText = "Ask: {valueY}\nBid: {openValueY}";
-    series.tooltip.pointerOrientation = "vertical";
-    series.tooltip.background.cornerRadius = 20;
-    series.tooltip.background.fillOpacity = 0.5;
-    series.tooltip.label.padding(12, 12, 12, 12)
-    series.stroke = am4core.color("red")
-    series.name = 'asks'
-    series.tensionX = 0.8;
-
-
-    // Add cursor
-    chart.cursor = new am4charts.XYCursor();
-    chart.cursor.lineY.opacity = 0;
-    chart.cursor.xAxis = dateAxis;
-    chart.cursor.snapToSeries = series;
-
-    // Add bullet
-    var bullet = series.createChild(am4charts.CircleBullet);
-    bullet.circle.radius = 5;
-    bullet.fillOpacity = 1;
-    bullet.fill = am4core.color("red");
-    bullet.isMeasured = false;
-
-    series.events.on("validated", function () {
-        bullet.moveTo(series.dataItems.last.point);
-        bullet.validatePosition();
-    });
+    let apiSecret = document.getElementById("APISecret").value;
 
 
 
-    // Create series2
-    var series2 = chart.series.push(new am4charts.LineSeries());
-    series2.dataFields.valueY = "bid";
-    series2.dataFields.dateX = "date";
-    series2.strokeWidth = 2;
-    series2.minBulletDistance = 10;
-    series2.tooltipText = "{valueY}";
-    series2.tooltip.pointerOrientation = "vertical";
-    series2.tooltip.background.cornerRadius = 20;
-    series2.tooltip.background.fillOpacity = 0.5;
-    series2.tooltip.label.padding(12, 12, 12, 12)
-    series2.stroke = am4core.color("green")
-    series2.name = 'bids'
-    series2.tensionX = 0.8;
+        // Themes begin
+        am4core.useTheme(am4themes_dark);
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+        
+        var chart = am4core.create(divName, am4charts.XYChart);
+        chart.hiddenState.properties.opacity = 0;
+        
+        chart.padding(0, 0, 0, 0);
+        
+        chart.zoomOutButton.disabled = true;
+        chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+        
+        chart.dataSource.url = '/api/market/chart/live/'+ market +'/'+ base +'/'+ quote +'/100/'+ apiSecret +'/'
+        chart.dataSource.load();
+        chart.dataSource.parser = new am4core.JSONParser();
 
-
-    // Add bullet
-    var bullet2 = series2.createChild(am4charts.CircleBullet);
-    bullet2.circle.radius = 5;
-    bullet2.fillOpacity = 1;
-    bullet2.fill = am4core.color("green");
-    bullet2.isMeasured = false;
-
-    series2.events.on("validated", function () {
-        bullet2.moveTo(series2.dataItems.last.point);
-        bullet2.validatePosition();
-    });
-
-
-}
-
-function numberFormat(x) {
-    var parts = x.toString().split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return parts.join(".");
-}
-
-
-function update_values () {
-    let borderLine = document.getElementById("border-line");
-    let pair = document.getElementById("pair");
-    let market = document.getElementById("market");
-    let change = document.getElementById("change");
-    let price = document.getElementById("price");
-    let high = document.getElementById("high");
-    let low = document.getElementById("low");
-    let volume = document.getElementById("volume");
-    let volumeQuote = document.getElementById("volumeQuote");
-
-    fetch('/api/line-chart/info/' + market.innerHTML + '/' + pair.innerHTML).then(
-        function(response){
-            response.json().then(
-                function (data) {
-                    change.innerHTML = data['change'] + '%';
-                    if (data['change'] < 0) {
-                        borderLine.className = 'p-4 my-4 border border-danger rounded-lg'
-                        change.className = 'text-danger ml-3'
-                        price.className = 'text-right text-danger'
-                    } else if (data['change'] === 0) {
-                        borderLine.className = 'p-4 my-4 border border-warning rounded-lg'
-                        change.className = 'text-warning ml-3'
-                        price.className = 'text-right text-warning'
-                    } else {
-                        borderLine.className = 'p-4 my-4 border border-success rounded-lg'
-                        change.className = 'text-success ml-3'
-                        price.className = 'text-right text-success'
-                    }
-                    price.innerHTML = numberFormat(data['last']);
-                    high.innerHTML = '<strong>High: </strong>' + numberFormat(data['high']);
-                    low.innerHTML = '<strong>Low: </strong>' + numberFormat(data['low']);
-                    volume.innerHTML = numberFormat(data['volume']);
-                    volumeQuote.innerHTML = numberFormat(data['volumeQuote']);
-                    borderLine.hidden = false
+        chart.cursor = new am4charts.XYCursor();
+        chart.cursor.behavior = "none";
+        
+        var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+        dateAxis.renderer.grid.template.location = 0;
+        dateAxis.renderer.minGridDistance = 80;
+        dateAxis.dateFormats.setKey("hour", "h:mm:ss");
+        dateAxis.periodChangeDateFormats.setKey("second", "h:mm");
+        dateAxis.periodChangeDateFormats.setKey("minute", "h:mm");
+        dateAxis.periodChangeDateFormats.setKey("hour", "h:mm");
+        //dateAxis.renderer.inside = true;
+        dateAxis.renderer.axisFills.template.disabled = true;
+        dateAxis.renderer.ticks.template.disabled = true;
+        dateAxis.renderer.fontSize = "0.75em"
+        //dateAxis.cursorTooltipEnabled = false;
+        
+        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.tooltip.disabled = true;
+        valueAxis.interpolationDuration = 500;
+        valueAxis.rangeChangeDuration = 500;
+        valueAxis.renderer.inside = true;
+        valueAxis.renderer.minLabelPosition = 0.05;
+        valueAxis.renderer.maxLabelPosition = 0.95;
+        valueAxis.renderer.axisFills.template.disabled = true;
+        valueAxis.renderer.ticks.template.disabled = true;
+        valueAxis.renderer.fontSize = "0.75em"
+        
+        var series = chart.series.push(new am4charts.LineSeries());
+        series.dataFields.dateX = "closetime";
+        series.dataFields.valueY = "nTrans";
+        series.interpolationDuration = 500;
+        series.defaultState.transitionDuration = 0;
+        series.tensionX = 0.8;
+        series.tooltipText = "Transactions: {valueY.value}";
+        series.tooltip.getFillFromObject = false;
+        series.tooltip.label.propertyFields.fill = am4core.color("#67b7dc");
+        
+        chart.events.on("datavalidated", function () {
+            dateAxis.zoom({ start: 1 / 15, end: 1.2 }, false, true);
+        });
+        
+        dateAxis.interpolationDuration = 500;
+        dateAxis.rangeChangeDuration = 500;
+        
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                if (interval) {
+                    clearInterval(interval);
                 }
-            )
+            }
+            else {
+                startInterval();
+            }
+        }, false);
+        
+        // add data
+        var interval;
+        function startInterval() {
+            interval = setInterval(function() {
+                fetch('/api/market/chart/live/'+ market +'/'+ base +'/'+ quote +'/1/'+ apiSecret +'/').then(
+                    function(response){
+                        response.json().then(
+                            function (dataNew) {
+                                var toAdd = { closetime: dataNew[0]['closetime'], nTrans: dataNew[0]['nTrans'] }
+                                chart.addData(toAdd, 1);
+                            }
+                        )
+                    }
+                );
+            }, 20 * 1000);
         }
-    );
+        
+        startInterval();
+        
+        // all the below is optional, makes some fancy effects
+        // gradient fill of the series
+        series.fillOpacity = 1;
+        var gradient = new am4core.LinearGradient();
+        gradient.addColor(chart.colors.getIndex(0), 0.2);
+        gradient.addColor(chart.colors.getIndex(0), 0);
+        series.fill = gradient;
+        
+        // this makes date axis labels to fade out
+        dateAxis.renderer.labels.template.adapter.add("fillOpacity", function (fillOpacity, target) {
+            var dataItem = target.dataItem;
+            return dataItem.position;
+        })
+        
+        // need to set this, otherwise fillOpacity is not changed and not set
+        dateAxis.events.on("validated", function () {
+            am4core.iter.each(dateAxis.renderer.labels.iterator(), function (label) {
+                label.fillOpacity = label.fillOpacity;
+            })
+        })
+        
+
+        
+        // bullet at the front of the line
+        var bullet = series.createChild(am4charts.CircleBullet);
+        bullet.circle.radius = 5;
+        bullet.fillOpacity = 1;
+        bullet.fill = chart.colors.getIndex(0);
+        bullet.isMeasured = false;
+        
+        series.events.on("validated", function() {
+            bullet.moveTo(series.dataItems.last.point);
+            bullet.validatePosition();
+        });
+        
 }
