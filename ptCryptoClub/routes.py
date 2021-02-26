@@ -621,7 +621,7 @@ def market(market):
         dict_ = card_generic(base=pair['base'], quote=pair['quote'], market=pair['market'], delta=default_delta)
         cards.append(dict_)
     return render_template(
-        "market_2.html",
+        "market.html",
         title="Markets",
         market=market,
         cards=cards,

@@ -21,9 +21,10 @@
     <i class="text-muted small">All available pairs will appear in this page. At the moment we have {{num_pairs}} pairs
         available for this market, more to arrive in the future.</i>
     <div class="mb-4"></div>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
-        {% for card in cards %}
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+
+    {% for card in cards %}
+    <div class="row align-items-end py-4 mb-3">
+        <div class="col-xl-4 col-lg-5 col-md-7 col-sm-12 mb-2">
             <a href="{{url_for('chart_line', market=card['market'], base=card['base'], quote=card['quote'])}}"
                class="text-decoration-none">
                 {% if card["change"] < 0 %}
@@ -90,26 +91,18 @@
                 </div>
             </a>
         </div>
-        <script>
-            var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 5000 );
-
-        </script>
-        {% endfor %}
+        <div class="col-xl-8 col-lg-7 col-md-12 col-sm-12 mb-2">
+            <div class="text-center text-light small">Total transactions {{card['base'].upper()}}{{card['quote'].upper()}} <small><i>(20s)</i></small></div>
+            <div id="live_chart_{{card['market']}}_{{card['base']}}_{{card['quote']}}" style="height: 200px;"></div>
+            <script>
+                liveChart('live_chart_{{card['market']}}_{{card['base']}}_{{card['quote']}}', '{{card['market']}}', '{{card['base']}}', '{{card['quote']}}')
+            </script>
+        </div>
     </div>
-    <div>
-        <div id="live_chart_1" style="height: 200px;"></div>
-        <script>
-            liveChart_2('live_chart_1', 'kraken', 'btc', 'eur')
-
-        </script>
-    </div>
-    <div>
-        <div id="live_chart_2" style="height: 200px;"></div>
-        <script>
-            liveChart_2('live_chart_2', 'kraken', 'eth', 'eur')
-
-        </script>
-    </div>
+    <script>
+        var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 5000 );
+    </script>
+    {% endfor %}
 </div>
 
 {% endblock %}
