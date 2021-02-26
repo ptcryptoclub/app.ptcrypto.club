@@ -65,16 +65,16 @@ function liveChart (divName, market, base, quote) {
     dateAxis.interpolationDuration = 500;
     dateAxis.rangeChangeDuration = 500;
     
-    document.addEventListener("visibilitychange", function() {
-        if (document.hidden) {
-            if (interval) {
-                clearInterval(interval);
-            }
-        }
-        else {
-            startInterval();
-        }
-    }, false);
+    //document.addEventListener("visibilitychange", function() {
+    //    if (document.hidden) {
+    //        if (interval) {
+    //            clearInterval(interval);
+    //        }
+    //    }
+    //    else {
+    //        startInterval();
+    //    }
+    //}, false);
     
     // add data
     var interval;
