@@ -336,13 +336,13 @@ def hash_generator(LENGTH):
     return hash
 
 
-def get_data_live_chart(market, base, quote, data_points):
+def get_data_live_chart(market, base, quote, data_points, delta):
     query = f"""
     select *
         from (
             select  closetime,
                     "nTrans"
-                from ohlc_20s os
+                from ohlc_{delta}s os
                 where base = '{base}' and "quote" = '{quote}' and market = '{market}'
                 order by closetime desc
                 limit {data_points}

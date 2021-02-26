@@ -633,7 +633,7 @@ def market(market):
 def api_market_chart_live(market, base, quote, datapoints, api_secret):
     if SecureApi().validate(api_secret=api_secret):
         return jsonify(
-            get_data_live_chart(market=market, base=base, quote=quote, data_points=datapoints)
+            get_data_live_chart(market=market, base=base, quote=quote, data_points=datapoints, delta=20)
         )
     else:
         return jsonify(
