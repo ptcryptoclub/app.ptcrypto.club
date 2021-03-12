@@ -16,7 +16,15 @@ app.config['BT_PUBLIC_KEY'] = GenConfig.BT_PUBLIC_KEY
 app.config['BT_PRIVATE_KEY'] = GenConfig.BT_PRIVATE_KEY
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-cors = CORS(app, resources={r"/api/*": {"origins": "https://ptcrypto.club"}})
+cors = CORS(
+    app,
+    resources={
+        r"/api/*": {"origins": [
+            "https://ptcrypto.club",
+            "https://iam.ptcrypto.club"
+        ]}
+    }
+)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = "info"
