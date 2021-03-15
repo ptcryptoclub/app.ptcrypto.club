@@ -25,6 +25,7 @@ function ohlc_chart(chartDiv) {
 
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
+    chart.zoomOutButton.disabled = true;
 
     chart.dataSource.url = '/api/charts/ohlc/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + datapoints.innerHTML + '/' + candle.innerHTML + '/' + apiSecret + '/';
     chart.dataSource.load();

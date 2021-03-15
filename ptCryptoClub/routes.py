@@ -1031,7 +1031,7 @@ def my_data():
     )
 
 
-@app.route("/account/portfolio/transactions/buy")
+@app.route("/account/portfolio/transactions/buy/")
 def all_transactions_buy():
     return render_template(
         "portfolio-all-transactions-buy.html",
@@ -1040,10 +1040,18 @@ def all_transactions_buy():
     )
 
 
-@app.route("/account/portfolio/transactions/sell")
+@app.route("/account/portfolio/transactions/sell/")
 def all_transactions_sell():
     return render_template(
         "portfolio-all-transactions-sell.html",
         title="Account",
         sell_transactions=get_ptcc_transactions(user_ID=current_user.id, type_='sell', limit=None)
+    )
+
+
+@app.route("/test/")
+def test():
+    return render_template(
+        "charts-test.html",
+        title="Test"
     )

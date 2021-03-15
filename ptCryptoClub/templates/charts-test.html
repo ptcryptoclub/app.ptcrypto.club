@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+
+{% endblock %}
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('chart_line', market=market, base=base, quote=quote)}}"
+                                                class="text-decoration-none text-muted">Line chart</a></small>
+                </div>
+                <div class="col-auto"><small><a
+                        href="{{url_for('chart_ohlc', market=market, base=base, quote=quote, candle=default_candle)}}"
+                        class="text-decoration-none text-light">Ohlc chart</a></small>
+                </div>
+                <div class="col-auto"><small><a
+                        href="{{url_for('chart_vtp', market=market, base=base, quote=quote, candle=default_candle)}}"
+                        class="text-decoration-none text-muted">Vtp chart</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='js/test.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+
+<div class="container">
+    <div class="row no-gutters">
+        <div class="col-xl col-lg py-2">
+            <div id="test-chart" style="height: 700px;"></div>
+            <script>
+                testChart('test-chart', 'kraken', 'btc', 'eur')
+            </script>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

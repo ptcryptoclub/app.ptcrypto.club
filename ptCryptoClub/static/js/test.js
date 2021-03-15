@@ -1,32 +1,34 @@
 
-function numberFormat(x) {
-    var parts = x.toString().split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return parts.join(".");
-}
 
-function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_rate) {
+function testChart (divName) {
 
+    var market = "kraken";
+    var base = "btc";
+    var quote = "eur";
+    var datapoints = 200;
+    var candle = 20;
+    var candle_rate = 10;
     let apiSecret = document.getElementById("APISecret").value;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
-    // am4core.useTheme(am4themes_animated);
+    am4core.useTheme(am4themes_animated);
     // Themes end
-
-    var chart = am4core.create(chartDiv, am4charts.XYChart);
-    chart.padding(15, 15, 15, 15);
-
+    
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0;
+    
+    chart.padding(0, 0, 0, 0);
+    
+    //chart.zoomOutButton.disabled = true;
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     chart.leftAxesContainer.layout = "vertical";
-    chart.zoomOutButton.disabled = true;
-
-    chart.dataSource.url = '/api/charts/ohlc/' + market + '/' + base + '/' + quote + '/' + datapoints + '/' + candle + '/'  + apiSecret + '/';
+    
+    chart.dataSource.url = '/api/charts/ohlc/' + market + '/' + base + '/' + quote + '/' + datapoints + '/' + candle + '/' + apiSecret + '/';
     chart.dataSource.load();
     chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
-    chart.dataSource.updateCurrentData = true;
-    chart.dataSource.reloadFrequency = candle_rate * 1000;
+
 
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
@@ -37,21 +39,24 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     dateAxis.renderer.ticks.template.strokeOpacity = 0.2;
     dateAxis.renderer.minLabelPosition = 0.01;
     dateAxis.renderer.maxLabelPosition = 0.99;
-    dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
-    dateAxis.renderer.fontSize = "0.8em";
+    dateAxis.renderer.fontSize = "0.8em"
+    ///dateAxis.groupData = true;
 
-    dateAxis.start = 0.60;
+
+    dateAxis.start = 0.8;
     dateAxis.end = 1;
     dateAxis.keepSelection = true;
 
+
+    // dateAxis.minZoomCount = 120;
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.tooltip.disabled = true;
     valueAxis.zIndex = 1;
     valueAxis.renderer.baseGrid.disabled = true;
     // height of axis
-    valueAxis.height = am4core.percent(90);
+    valueAxis.height = am4core.percent(80);
 
     valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
     valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
@@ -61,6 +66,7 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
 
     valueAxis.renderer.maxLabelPosition = 0.95;
     valueAxis.renderer.fontSize = "0.8em";
+    valueAxis.renderer.grid.template.disabled = true;
 
     var series = chart.series.push(new am4charts.CandlestickSeries());
     series.dataFields.dateX = "closetime";
@@ -92,11 +98,11 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
 
     // moving average exp YELLOW
 
-    var series_ma = chart.series.push(new am4charts.LineSeries());
-    series_ma.dataFields.valueY = "moving_exp";
-    series_ma.dataFields.dateX = "closetime";
-    series_ma.strokeWidth = 1;
-    series_ma.stroke = am4core.color("#ffc400");
+    var series_me = chart.series.push(new am4charts.LineSeries());
+    series_me.dataFields.valueY = "moving_exp";
+    series_me.dataFields.dateX = "closetime";
+    series_me.strokeWidth = 1;
+    series_me.stroke = am4core.color("#ffc400");
 
     /////////////
 
@@ -104,7 +110,7 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     var valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis2.tooltip.disabled = true;
     // height of axis
-    valueAxis2.height = am4core.percent(10);
+    valueAxis2.height = am4core.percent(20);
     valueAxis2.zIndex = 3;
     // this makes gap between panels
     // valueAxis2.marginTop = 30;
@@ -115,8 +121,7 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     valueAxis2.renderer.maxLabelPosition = 0.95;
     valueAxis2.renderer.fontSize = "0.8em";
 
-    valueAxis2.renderer.gridContainer.background.fill = am4core.color("#000000");
-    valueAxis2.renderer.gridContainer.background.fillOpacity = 0.05;
+    valueAxis2.renderer.grid.template.disabled = true;
 
     var series2 = chart.series.push(new am4charts.ColumnSeries());
     series2.dataFields.dateX = "closetime";
@@ -135,4 +140,26 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     // Create scrollbars
     chart.scrollbarX = new am4core.Scrollbar();
 
+    
+    // add data
+    var interval;
+    function startInterval() {
+        interval = setInterval(function() {
+            fetch('/api/charts/ohlc/' + market + '/' + base + '/' + quote + '/1/' + candle + '/' + apiSecret + '/').then(
+                function(response){
+                    response.json().then(
+                        function (dataNew) {
+                            var toAdd = { closeprice: dataNew[0]['closeprice'], closetime: dataNew[0]['closetime'], highprice: dataNew[0]['highprice'], lowprice: dataNew[0]['lowprice'], moving_avg: dataNew[0]['moving_avg'], moving_exp: dataNew[0]['moving_exp'], openprice: dataNew[0]['openprice'], volume: dataNew[0]['volume'] }
+                            chart.addData(toAdd, 1);
+                        }
+                    )
+                }
+            );
+        }, candle_rate * 1000);
+    }
+    
+    startInterval();
+    
+    
+        
 }
