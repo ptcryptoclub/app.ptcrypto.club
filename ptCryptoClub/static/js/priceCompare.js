@@ -1,13 +1,8 @@
 
 
-function testChart (divName) {
+function priceCompareChart (divName, market, base1, base2, quote, data_points) {
 
     let apiSecret = document.getElementById("APISecret").value;
-    let market = 'kraken'
-    let base1 = 'btc'
-    let base2 = 'eth'
-    let quote = 'eur'
-    let data_points = 200
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -129,22 +124,7 @@ function testChart (divName) {
     startInterval();
     
     // all the below is optional, makes some fancy effects
-    
-    // this makes date axis labels to fade out
-    dateAxis.renderer.labels.template.adapter.add("fillOpacity", function (fillOpacity, target) {
-        var dataItem = target.dataItem;
-        return dataItem.position;
-    })
-    
-    // need to set this, otherwise fillOpacity is not changed and not set
-    dateAxis.events.on("validated", function () {
-        am4core.iter.each(dateAxis.renderer.labels.iterator(), function (label) {
-            label.fillOpacity = label.fillOpacity;
-        })
-    })
-    
-
-    
+        
     // bullet at the front of the line
     var bullet = series.createChild(am4charts.CircleBullet);
     bullet.circle.radius = 5;
