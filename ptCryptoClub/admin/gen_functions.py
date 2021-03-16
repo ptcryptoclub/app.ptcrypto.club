@@ -369,3 +369,50 @@ def get_data_live_chart(market, base, quote, data_points, delta):
             }
         )
     return to_return
+
+
+def get_price(market, base_1, base_2, quote, data_points):
+    query = f"""
+        select 	tb."date",
+                tb.price1,
+                tb2.price2
+            from (
+                select 	closetime as "date",
+                        closeprice as price1
+                    from public.ohlc_20s os
+                    where os.market = '{market}' and os.base = '{base_1}' and os."quote" = '{quote}'
+                    order by os.closetime desc
+                    limit {data_points}
+            ) as tb
+            join (
+                select 	closetime as "date",
+                        closeprice as price2
+                    from public.ohlc_20s os2
+                    where os2.market = '{market}' and os2.base = '{base_2}' and os2."quote" = '{quote}'
+                    order by os2.closetime desc
+                    limit {data_points}
+            ) as tb2
+                on tb."date" = tb2."date"
+            order by tb."date" asc;
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(columns=["date", "price1", "price2"])
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='generic functions get price',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "date": str(data["date"][i])[:19],
+                "price1": float(data["price1"][i]),
+                "price2": float(data["price2"][i])
+            }
+        )
+    return to_return
