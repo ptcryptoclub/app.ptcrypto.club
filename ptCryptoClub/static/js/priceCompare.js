@@ -24,6 +24,7 @@ function priceCompareChart (divName, market, base1, base2, quote, data_points) {
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.behavior = "none";
     chart.legend = new am4charts.Legend();
+    chart.legend.position = "top"
     
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;

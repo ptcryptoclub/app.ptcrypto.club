@@ -173,8 +173,6 @@
                     updatePortfolio({{current_user.id}})
                 }
                 var runPortfolioUpdate=setInterval(auxRunUpdates,30*1000);
-
-
         </script>
     </div>
     <div id="buy-sell-chart" style="height: 200px; width: 100%;"></div>
@@ -191,6 +189,9 @@
     <script>
         priceCompareChart('compareChart', 'kraken', 'btc', 'eth', 'eur', 250)
     </script>
+    <div class="m-0 text-right">
+        <i><small class="text-muted"><u>Please note</u>: two y-axis were used for easy comparison.</small></i>
+    </div>
 
     <hr class="border-secondary">
     <div class="row justify-content-end mr-2">
@@ -220,8 +221,6 @@
         </tbody>
         <script>
             var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 20000 );
-
-
         </script>
     </table>
     {% endfor %}

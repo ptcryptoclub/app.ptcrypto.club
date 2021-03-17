@@ -212,3 +212,43 @@ def admin_archive_tables():
         "300s_ohlc_max": data_300s['max_date'][0]
     }
     return to_return
+
+
+def admin_last_update():
+    query = """
+    select 	updated as updated,
+            base as base,
+            "quote" as "quote",
+            market as market
+        from lastupdate l;
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(
+            columns=["updated", "base", "quote", "market"]
+        )
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin functions admin last update',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        delta = int((pd.to_datetime(time.time(), unit="s") - data['updated'][i]).total_seconds())
+        if delta < 60:
+            all_good = True
+        else:
+            all_good = False
+        to_return.append(
+            {
+                "market": data.market[i],
+                "base": data.base[i],
+                "quote": data.quote[i],
+                "date": str(data['updated'][i])[:19],
+                "all_good": all_good
+            }
+        )
+    return to_return

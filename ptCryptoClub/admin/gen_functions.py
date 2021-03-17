@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData
+from ptCryptoClub.admin.config import CryptoData, admins_emails
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
 from ptCryptoClub import db
@@ -262,11 +262,21 @@ class SecureApi:
     def __init__(self):
         pass
 
-    def validate(self, api_secret, user_id=None):
-        if user_id is None:
+    def validate(self, api_secret, user_id=None, admin=None):
+        if admin is not None:
             user = User.query.filter_by(api_secret=api_secret).first()
+            if user is not None:
+                if user.email in admins_emails:
+                    return True
+                else:
+                    return False
+            else:
+                return False
         else:
-            user = User.query.filter_by(api_secret=api_secret, id=user_id).first()
+            if user_id is None:
+                user = User.query.filter_by(api_secret=api_secret).first()
+            else:
+                user = User.query.filter_by(api_secret=api_secret, id=user_id).first()
         if user is not None:
             return True
         else:
