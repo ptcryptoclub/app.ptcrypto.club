@@ -24,6 +24,13 @@ class User(db.Model, UserMixin):
     api_secret = db.Column(db.String(255), nullable=False)
 
 
+class ApiUsage(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.DateTime)
+    usage = db.Column(db.BigInteger, nullable=False, default=0)
+
+
 class LoginUser(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_ID = db.Column(db.Integer)

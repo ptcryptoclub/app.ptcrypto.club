@@ -1,12 +1,13 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets
+from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
 import pandas as pd
 import random
 import string
+from datetime import datetime
 
 engine_live_data = create_engine(CryptoData.string)
 engine_web_app = None
@@ -267,6 +268,7 @@ class SecureApi:
             user = User.query.filter_by(api_secret=api_secret).first()
             if user is not None:
                 if user.email in admins_emails:
+                    self.increment(user.id)
                     return True
                 else:
                     return False
@@ -278,6 +280,7 @@ class SecureApi:
             else:
                 user = User.query.filter_by(api_secret=api_secret, id=user_id).first()
         if user is not None:
+            self.increment(user.id)
             return True
         else:
             return False
@@ -288,6 +291,23 @@ class SecureApi:
         else:
             api_secret = User.query.filter_by(id=user_id).first().api_secret
         return api_secret
+
+    def increment(self, user_id):
+        date = hour_rounder(datetime.utcnow())
+        api_usage_line = ApiUsage.query.filter_by(user_id=user_id, date=date).first()
+        if api_usage_line is None:
+            # noinspection PyArgumentList
+            new_line = ApiUsage(
+                user_id=user_id,
+                date=date,
+                usage=1
+            )
+            db.session.add(new_line)
+            db.session.commit()
+        else:
+            api_usage_line.usage += 1
+            db.session.commit()
+        return None
 
 
 def buy_sell_line_data(user_ID, days):
@@ -426,3 +446,7 @@ def get_price(market, base_1, base_2, quote, data_points):
             }
         )
     return to_return
+
+
+def hour_rounder(t):
+    return t.replace(second=0, microsecond=0, minute=0)
