@@ -26,6 +26,10 @@
 
 {% block content %}
 <script src="{{url_for('static', filename='js/admin.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-6 mb-3">
@@ -122,7 +126,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-lg-4 mb-3">
             <H5 class="py-1 border-bottom border-info text-light">Live data</H5>
                 <small>
                     <i class="text-muted">
@@ -148,6 +152,18 @@
             <script>
                 adminLastUpdate()
                 var runLastUpdate=setInterval( function() { adminLastUpdate(); }, 4750 )
+            </script>
+        </div>
+        <div class="col-lg-8 mb-3">
+            <H5 class="py-1 border-bottom border-info text-light">API info</H5>
+                <small>
+                    <i class="text-muted">
+                        Total requests for the last 24 hours.
+                    </i>
+                </small>
+            <div id="apiUsage" style="height: 250px;"></div>
+            <script>
+                adminApiUsage('apiUsage')
             </script>
         </div>
     </div>

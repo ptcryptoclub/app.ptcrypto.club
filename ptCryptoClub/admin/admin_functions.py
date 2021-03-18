@@ -1,10 +1,11 @@
 from ptCryptoClub.admin.config import CryptoData
 from ptCryptoClub import db
-from ptCryptoClub.admin.models import ErrorLogs
+from ptCryptoClub.admin.models import ErrorLogs, ApiUsage
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 import pandas as pd
 import time
+from datetime import datetime, timedelta
 
 
 engine_live_data = create_engine(CryptoData.string)
@@ -249,6 +250,21 @@ def admin_last_update():
                 "quote": data.quote[i],
                 "date": str(data['updated'][i])[:19],
                 "all_good": all_good
+            }
+        )
+    return to_return
+
+
+def admin_api_usage_data():
+    t = datetime.utcnow() - timedelta(hours=24)
+    t = t.replace(second=0, microsecond=0, minute=0)
+    to_return = []
+    raw_data = db.session.query(func.sum(ApiUsage.usage), ApiUsage.date).filter(ApiUsage.date >= t).group_by(ApiUsage.date).all()
+    for i in raw_data:
+        to_return.append(
+            {
+                "date": str(i[1])[:19],
+                "usage": int(i[0])
             }
         )
     return to_return

@@ -19,7 +19,7 @@ from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_da
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
-from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update
+from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update, admin_api_usage_data
 
 
 @app.before_request
@@ -618,7 +618,6 @@ def account_admin():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
-
         return render_template(
             "account-admin.html",
             title="Account",
@@ -633,6 +632,18 @@ def api_admin_live_data(api_secret):
     if SecureApi().validate(api_secret=api_secret, admin=True):
         return jsonify(
             admin_last_update()
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/admin/api-usage/<api_secret>/")
+def api_admin_api_usage(api_secret):
+    if True:# SecureApi().validate(api_secret=api_secret, admin=True):
+        return jsonify(
+            admin_api_usage_data()
         )
     else:
         return jsonify(
