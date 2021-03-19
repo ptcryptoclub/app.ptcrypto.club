@@ -39,6 +39,7 @@ function adminApiUsage(divName){
     // Add data
     chart.dataSource.url = '/api/admin/api-usage/' + apiSecret + '/';
     chart.dataSource.load();
+    chart.dataSource.keepCount = true;
     chart.dataSource.parser = new am4core.JSONParser();
     chart.dataSource.updateCurrentData = true;
     chart.dataSource.reloadFrequency = 60 * 1000;
