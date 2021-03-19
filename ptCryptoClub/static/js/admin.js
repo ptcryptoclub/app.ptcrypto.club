@@ -47,7 +47,7 @@ function adminApiUsage(divName){
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.fontSize = "0.7em";
     dateAxis.renderer.grid.template.disabled = true;
-    dateAxis.tooltip.disabled = true;
+    //dateAxis.tooltip.disabled = true;
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.renderer.fontSize = "0.7em";

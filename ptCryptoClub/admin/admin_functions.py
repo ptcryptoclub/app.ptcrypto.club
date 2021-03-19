@@ -259,7 +259,7 @@ def admin_api_usage_data():
     t = datetime.utcnow() - timedelta(hours=24)
     t = t.replace(second=0, microsecond=0, minute=0)
     to_return = []
-    raw_data = db.session.query(func.sum(ApiUsage.usage), ApiUsage.date).filter(ApiUsage.date >= t).group_by(ApiUsage.date).all()
+    raw_data = db.session.query(func.sum(ApiUsage.usage), ApiUsage.date).filter(ApiUsage.date >= t).order_by(ApiUsage.date).group_by(ApiUsage.date).all()
     for i in raw_data:
         to_return.append(
             {
