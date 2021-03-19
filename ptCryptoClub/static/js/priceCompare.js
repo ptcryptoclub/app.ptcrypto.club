@@ -78,7 +78,7 @@ function priceCompareChart (divName, market, base1, base2, quote, data_points) {
     series.stroke = am4core.color("#f7931a");
     series.tensionX = 0.8;
     series.tooltipText = base1.toUpperCase() + ": {valueY.value}";
-    series.name = base1.toUpperCase()
+    series.name = base1.toUpperCase() + quote.toUpperCase()
 
     var series2 = chart.series.push(new am4charts.LineSeries());
     series2.dataFields.dateX = "date";
@@ -90,7 +90,7 @@ function priceCompareChart (divName, market, base1, base2, quote, data_points) {
     series2.tensionX = 0.8;
     series2.tooltipText = base2.toUpperCase() + ": {valueY.value}";
     series2.yAxis = valueAxis2;
-    series2.name = base2.toUpperCase()
+    series2.name = base2.toUpperCase() + quote.toUpperCase()
 
 
     //valueAxis.renderer.labels.template.fill = series.stroke;
