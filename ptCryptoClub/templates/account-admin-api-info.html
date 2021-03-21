@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-muted text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="{{url_for('account_admin')}}"
+                                                class="text-muted text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='js/admin.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<div class="container mt-3">
+    <div class="row justify-content-end mr-2 mb-3">
+        <H6 class="text-light text-decoration-none">Api info - Details</H6>
+    </div>
+    <div class="row my-3">
+        <div id="total" class="col-md p-2">
+        </div>
+        <div id="30days" class="col-md p-2">
+        </div>
+        <div id="7days" class="col-md p-2">
+        </div>
+        <div id="24h" class="col-md p-2">
+        </div>
+    </div>
+    <script>
+        adminApiUsageDetails()
+        var runApiUsageDetails=setInterval( function() { adminApiUsageDetails(); }, 30000 )
+    </script>
+    <div id="apiUsage" style="height: 250px;"></div>
+    <script>
+        adminApiUsage('apiUsage')
+    </script>
+</div>
+
+
+{% endblock %}

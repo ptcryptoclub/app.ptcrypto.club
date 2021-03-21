@@ -34,7 +34,12 @@
     <div class="row">
         <div class="col-lg-6 mb-3">
             <div class="py-3">
-                <H5 class="py-1 border-bottom border-info text-light">Main tables</H5>
+                <div class="row border-bottom border-info">
+                    <div class="col-auto">
+                        <H5 class="text-light">Main tables</H5>
+                    </div>
+                    <div class="col-auto"></div>
+                </div>
                 <small>
                     <i class="text-muted">
                         Information about main tables in database.
@@ -80,7 +85,12 @@
         </div>
         <div class="col-lg-6 mb-3">
             <div class="py-3">
-                <H5 class="py-1 border-bottom border-info text-light">Archive tables</H5>
+                <div class="row border-bottom border-info">
+                    <div class="col-auto">
+                        <H5 class="text-light">Archive tables</H5>
+                    </div>
+                    <div class="col-auto"></div>
+                </div>
                 <small>
                     <i class="text-muted">
                         Information about archive tables in database.
@@ -127,12 +137,17 @@
     </div>
     <div class="row">
         <div class="col-lg-4 mb-3">
-            <H5 class="py-1 border-bottom border-info text-light">Live data</H5>
-                <small>
-                    <i class="text-muted">
-                        Information about live data.
-                    </i>
-                </small>
+            <div class="row border-bottom border-info">
+                <div class="col-auto">
+                    <H5 class="text-light">Live data</H5>
+                </div>
+                <div class="col-auto"></div>
+            </div>
+            <small>
+                <i class="text-muted">
+                    Information about live data.
+                </i>
+            </small>
             <table class="table table-borderless table-sm small mt-2">
                 <thead class="text-light">
                 <tr>
@@ -155,12 +170,19 @@
             </script>
         </div>
         <div class="col-lg-8 mb-3">
-            <H5 class="py-1 border-bottom border-info text-light">API info</H5>
-                <small>
-                    <i class="text-muted">
-                        Total requests for the last 24 hours.
-                    </i>
-                </small>
+            <div class="row border-bottom border-info">
+                <div class="col-auto">
+                    <H5 class="text-light">API info</H5>
+                </div>
+                <div class="col-auto">
+                    <a class="text-muted" href="{{url_for('account_admin_api_info')}}"><span class="material-icons">info</span></a>
+                </div>
+            </div>
+            <small>
+                <i class="text-muted">
+                    Total requests for the last 24 hours.
+                </i>
+            </small>
             <div id="apiUsage" style="height: 250px;"></div>
             <script>
                 adminApiUsage('apiUsage')

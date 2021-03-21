@@ -1,6 +1,6 @@
 from ptCryptoClub.admin.config import CryptoData
 from ptCryptoClub import db
-from ptCryptoClub.admin.models import ErrorLogs, ApiUsage
+from ptCryptoClub.admin.models import ErrorLogs, ApiUsage, User
 
 from sqlalchemy import create_engine, func
 import pandas as pd
@@ -267,4 +267,38 @@ def admin_api_usage_data():
                 "usage": int(i[0])
             }
         )
+    return to_return
+
+
+def admin_api_details():
+    not_user = User.query.filter_by(username="notUser").first()
+    to_return = {
+        "total": db.session.query(func.sum(ApiUsage.usage)).scalar(),
+        "total_users": db.session.query(func.sum(ApiUsage.usage)).filter(ApiUsage.user_id != not_user.id).scalar(),
+        "total_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(ApiUsage.user_id == not_user.id).scalar(),
+        "last_month": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date > (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0)).scalar(),
+        "last_month_users": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date >= (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0),
+            ApiUsage.user_id != not_user.id).scalar(),
+        "last_month_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date >= (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0),
+            ApiUsage.user_id == not_user.id).scalar(),
+        "last_week": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date > (datetime.utcnow() - timedelta(days=7)).replace(second=0, microsecond=0, minute=0)).scalar(),
+        "last_week_users": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date >= (datetime.utcnow() - timedelta(days=7)).replace(second=0, microsecond=0, minute=0),
+            ApiUsage.user_id != not_user.id).scalar(),
+        "last_week_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date > (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0),
+            ApiUsage.user_id == not_user.id).scalar(),
+        "last_24h": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date >= (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0)).scalar(),
+        "last_24h_users": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date >= (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0),
+            ApiUsage.user_id != not_user.id).scalar(),
+        "last_24h_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(
+            ApiUsage.date >= (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0),
+            ApiUsage.user_id == not_user.id).scalar(),
+    }
     return to_return
