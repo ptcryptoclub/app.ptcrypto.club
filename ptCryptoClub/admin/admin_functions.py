@@ -271,34 +271,71 @@ def admin_api_usage_data():
 
 
 def admin_api_details():
-    not_user = User.query.filter_by(username="notUser").first()
-    to_return = {
-        "total": db.session.query(func.sum(ApiUsage.usage)).scalar(),
-        "total_users": db.session.query(func.sum(ApiUsage.usage)).filter(ApiUsage.user_id != not_user.id).scalar(),
-        "total_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(ApiUsage.user_id == not_user.id).scalar(),
-        "last_month": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date > (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0)).scalar(),
-        "last_month_users": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date >= (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0),
-            ApiUsage.user_id != not_user.id).scalar(),
-        "last_month_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date >= (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0),
-            ApiUsage.user_id == not_user.id).scalar(),
-        "last_week": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date > (datetime.utcnow() - timedelta(days=7)).replace(second=0, microsecond=0, minute=0)).scalar(),
-        "last_week_users": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date >= (datetime.utcnow() - timedelta(days=7)).replace(second=0, microsecond=0, minute=0),
-            ApiUsage.user_id != not_user.id).scalar(),
-        "last_week_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date > (datetime.utcnow() - timedelta(days=30)).replace(second=0, microsecond=0, minute=0),
-            ApiUsage.user_id == not_user.id).scalar(),
-        "last_24h": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date >= (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0)).scalar(),
-        "last_24h_users": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date >= (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0),
-            ApiUsage.user_id != not_user.id).scalar(),
-        "last_24h_n_users": db.session.query(func.sum(ApiUsage.usage)).filter(
-            ApiUsage.date >= (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0),
-            ApiUsage.user_id == not_user.id).scalar(),
-    }
+    try:
+        not_user = User.query.filter_by(username="notUser").first()
+        t = datetime.utcnow()
+        td30 = (t - timedelta(days=30)).replace(second=0, microsecond=0, minute=0)
+        td7 = (t - timedelta(days=7)).replace(second=0, microsecond=0, minute=0)
+        th24 = (t - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0)
+        base = db.session.query(func.sum(ApiUsage.usage))
+        to_return = {
+            "total": int(
+                base.scalar()
+            ),
+            "total_users": int(
+                base.filter(ApiUsage.user_id != not_user.id).scalar()
+            ),
+            "total_n_users": int(
+                base.filter(ApiUsage.user_id == not_user.id).scalar()
+            ),
+            "last_month": int(
+                base.filter(ApiUsage.date > td30).scalar()
+            ),
+            "last_month_users": int(
+                base.filter(ApiUsage.date >= td30, ApiUsage.user_id != not_user.id).scalar()
+            ),
+            "last_month_n_users": int(
+                base.filter(ApiUsage.date >= td30, ApiUsage.user_id == not_user.id).scalar()
+            ),
+            "last_week": int(
+                base.filter(ApiUsage.date > td7).scalar()
+            ),
+            "last_week_users": int(
+                base.filter(ApiUsage.date >= td7, ApiUsage.user_id != not_user.id).scalar()
+            ),
+            "last_week_n_users": int(
+                base.filter(ApiUsage.date > td7, ApiUsage.user_id == not_user.id).scalar()
+            ),
+            "last_24h": int(
+                base.filter(ApiUsage.date >= th24).scalar()
+            ),
+            "last_24h_users": int(
+                base.filter(ApiUsage.date >= th24, ApiUsage.user_id != not_user.id).scalar()
+            ),
+            "last_24h_n_users": int(
+                base.filter(ApiUsage.date >= th24, ApiUsage.user_id == not_user.id).scalar()
+            ),
+        }
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin functions admin api details',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        to_return = {
+            "total": "na",
+            "total_users": "-",
+            "total_n_users": "-",
+            "last_month": "na",
+            "last_month_users": "-",
+            "last_month_n_users": "-",
+            "last_week": "na",
+            "last_week_users": "-",
+            "last_week_n_users": "-",
+            "last_24h": "na",
+            "last_24h_users": "-",
+            "last_24h_n_users": "-",
+        }
     return to_return
