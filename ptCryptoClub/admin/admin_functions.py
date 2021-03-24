@@ -339,3 +339,34 @@ def admin_api_details():
             "last_24h_n_users": "-",
         }
     return to_return
+
+
+def admin_api_usage_top_5():
+    tm = (datetime.utcnow() - timedelta(hours=24)).replace(second=0, microsecond=0, minute=0)
+    data = db.session.query(func.sum(ApiUsage.usage), ApiUsage.user_id).filter(ApiUsage.date >= tm).group_by(ApiUsage.user_id).limit(5).all()
+    to_return = []
+    for t in data:
+        to_return.append(
+            {
+                'usage': t[0],
+                'user_id': t[1]
+            }
+        )
+    return to_return
+
+
+def admin_users_data_sample():
+    to_return = []
+    data = User.query.order_by(User.date.desc()).limit(5)
+    for user in data:
+        to_return.append(
+            {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'account_type': user.account_type,
+                'active': user.active,
+                'date': str(user.date)[:10]
+            }
+        )
+    return to_return

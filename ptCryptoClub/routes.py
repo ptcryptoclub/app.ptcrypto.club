@@ -19,7 +19,8 @@ from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_da
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
-from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update, admin_api_usage_data, admin_api_details
+from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
+    admin_users_data_sample, admin_api_usage_top_5
 
 
 @app.before_request
@@ -43,7 +44,8 @@ def send_my_func():
         "admins_emails": admins_emails,
         "all_markets": get_all_markets(),
         "default_candle": default_candle,
-        "api_secret": api_secret
+        "api_secret": api_secret,
+        "notUserId": User.query.filter_by(username="notUser").first().id
     }
 
 
@@ -623,7 +625,8 @@ def account_admin():
             title="Account",
             table_data=admin_main_tables(),
             table_data_archive=admin_archive_tables(),
-            last_update=admin_last_update()
+            last_update=admin_last_update(),
+            users_sample=admin_users_data_sample()
         )
 
 
@@ -635,8 +638,19 @@ def account_admin_api_info():
     else:
         return render_template(
             "account-admin-api-info.html",
-            title="Api info",
-            data=admin_api_details()
+            title="Api info"
+        )
+
+
+@app.route("/account/admin/users/")
+@login_required
+def account_admin_users():
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        return render_template(
+            "account-admin-users.html",
+            title="Api info"
         )
 
 
@@ -669,6 +683,18 @@ def api_admin_api_usage_details(api_secret):
     if SecureApi().validate(api_secret=api_secret, admin=True):
         return jsonify(
             admin_api_details()
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/admin/api-usage/top-5/<api_secret>/")
+def api_admin_api_usage_top_5(api_secret):
+    if SecureApi().validate(api_secret=api_secret, admin=True):
+        return jsonify(
+            admin_api_usage_top_5()
         )
     else:
         return jsonify(

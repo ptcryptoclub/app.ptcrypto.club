@@ -167,6 +167,7 @@
             <script>
                 adminLastUpdate()
                 var runLastUpdate=setInterval( function() { adminLastUpdate(); }, 4750 )
+
             </script>
         </div>
         <div class="col-lg-8 mb-3">
@@ -175,7 +176,8 @@
                     <H5 class="text-light">API info</H5>
                 </div>
                 <div class="col-auto">
-                    <a class="text-muted" href="{{url_for('account_admin_api_info')}}"><span class="material-icons">info</span></a>
+                    <a class="text-muted" href="{{url_for('account_admin_api_info')}}"><span
+                            class="material-icons">info</span></a>
                 </div>
             </div>
             <small>
@@ -186,7 +188,57 @@
             <div id="apiUsage" style="height: 250px;"></div>
             <script>
                 adminApiUsage('apiUsage')
+
             </script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <div class="row border-bottom border-info">
+                <div class="col-auto">
+                    <H5 class="text-light">Users</H5>
+                </div>
+                <div class="col-auto">
+                    <a class="text-muted" href="{{url_for('account_admin_users')}}"><span
+                            class="material-icons">info</span></a>
+                </div>
+            </div>
+            <small>
+                <i class="text-muted">
+                    Information about app users.
+                </i>
+            </small>
+        </div>
+        <div class="col-12 mb-3">
+            <table class="table table-borderless table-sm small mt-2">
+                <thead class="text-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Username</th>
+                    <th scope="col" class="d-none d-sm-none d-md-table-cell">Email</th>
+                    <th scope="col" class="text-center">Type</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users_sample %}
+                {% if notUserId == user.id %}
+                {% set notUserColor = "text-warning" %}
+                {% else %}
+                {% set notUserColor = "text-muted" %}
+                {% endif %}
+                <tr class="{{notUserColor}}">
+                    <td>{{user.id}}</td>
+                    <td>{{user.username}}</td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{user.email}}</td>
+                    <td class="text-center">{{user.account_type}}</td>
+                    <td>{{user.active}}</td>
+                    <td>{{user.date}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

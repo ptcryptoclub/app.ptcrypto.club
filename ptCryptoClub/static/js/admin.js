@@ -72,7 +72,7 @@ function adminApiUsage(divName){
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.snapToSeries = series;
     chart.cursor.behavior = "none";
-}
+};
 
 function adminApiUsageDetails(){
     let apiSecret = document.getElementById("APISecret").value;
@@ -93,3 +93,29 @@ function adminApiUsageDetails(){
         }
     );
 };
+
+function adminApiUsageTop5(){
+    let apiSecret = document.getElementById("APISecret").value;
+    let notUserId = document.getElementById("notUser").value;
+    let htmlTop5 = document.getElementById("top_5")
+    fetch('/api/admin/api-usage/top-5/'+ apiSecret +'/').then(
+        function(response){
+            response.json().then(
+                function (data) {
+                    let notUserClass = ''
+                    let linesHTML = '';
+                    for (let line of data) {
+                        if (line['user_id'] == notUserId) {
+                            notUserClass = 'text-warning'
+                        }
+                        else {
+                            notUserClass = 'text-muted'
+                        }
+                        linesHTML += '<tr class="'+ notUserClass +'"><td class="text-center">'+ numberFormat(line['user_id']) +'</td><td class="text-right">'+ numberFormat(line['usage']) +'</td></tr>'
+                    }
+                    htmlTop5.innerHTML = linesHTML
+                }
+            )
+        }
+    );
+}

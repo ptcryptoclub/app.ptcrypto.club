@@ -32,48 +32,45 @@
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <div class="container mt-3">
     <div class="row justify-content-end mr-2 mb-3">
-        <H6 class="text-light text-decoration-none">Api info - Details</H6>
+        <H6 class="text-light text-decoration-none">Users - Details</H6>
     </div>
-    <div class="row my-3">
-        <div id="total" class="col-md p-2">
-        </div>
-        <div id="30days" class="col-md p-2">
-        </div>
-        <div id="7days" class="col-md p-2">
-        </div>
-        <div id="24h" class="col-md p-2">
-        </div>
-    </div>
-    <script>
-        adminApiUsageDetails()
-        var runApiUsageDetails=setInterval( function() { adminApiUsageDetails(); }, 30000 )
-    </script>
-    <div id="apiUsage" class="mt-4 mb-5" style="height: 250px;"></div>
-    <script>
-        adminApiUsage('apiUsage')
-    </script>
-    <div class="row">
-        <div class="col-md-4">
-            <p class="text-light"><strong>Top 5 users (last 24h)</strong></p>
-            <table class="table table-borderless table-sm small mt-2">
-                <thead class="text-light">
-                <tr>
-                    <th scope="col" class="text-center">ID</th>
-                    <th scope="col" class="text-right">API requests</th>
-                </tr>
-                </thead>
-                <tbody id="top_5">
-                </tbody>
-            </table>
-            <script>
-                adminApiUsageTop5()
-                var runApiUsageDetailsTop5=setInterval( function() { adminApiUsageTop5(); }, 30000 )
-            </script>
-        </div>
-        <div class="col-md-8">
-
-        </div>
-    </div>
+    <table class="table table-borderless table-sm small mt-2">
+        <thead class="text-light">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Account type</th>
+            <th scope="col">Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in range(1, 6) %}
+        <tr class="text-muted">
+            <td>{{i}}</td>
+            <td>Username {{i}}</td>
+            <td>{{i+2}}</td>
+            <td>2021-03-0{{i+1}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item disabled">
+                <a class="page-link border border-dark bg-dark text-light" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link border border-dark bg-secondary text-light" href="#">1</a></li>
+            <li class="page-item"><a class="page-link border border-dark bg-dark text-light" href="#">2</a></li>
+            <li class="page-item"><a class="page-link border border-dark bg-dark text-light" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link border border-dark bg-dark text-light" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 
