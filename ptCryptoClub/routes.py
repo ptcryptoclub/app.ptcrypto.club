@@ -20,7 +20,7 @@ from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationF
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
-    admin_users_data_sample, admin_api_usage_top_5
+    admin_users_data_sample, admin_api_usage_top_5, admin_users_data
 
 
 @app.before_request
@@ -642,15 +642,19 @@ def account_admin_api_info():
         )
 
 
-@app.route("/account/admin/users/")
+@app.route("/account/admin/users/<page>/")
 @login_required
-def account_admin_users():
+def account_admin_users(page):
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
+        user_data, c_page, last_page = admin_users_data(page=page)
         return render_template(
             "account-admin-users.html",
-            title="Api info"
+            title="Api info",
+            user_data=user_data,
+            c_page=c_page,
+            last_page=last_page
         )
 
 

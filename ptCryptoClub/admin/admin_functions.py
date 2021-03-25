@@ -370,3 +370,37 @@ def admin_users_data_sample():
             }
         )
     return to_return
+
+
+def admin_users_data(page):
+    per_page = 5
+    total_users = User.query.count()
+    if total_users % per_page == 0:
+        last_page = total_users // per_page
+    else:
+        last_page = (total_users // per_page) + 1
+    try:
+        page = int(page)
+        if page <= 0:
+            page = 1
+    except Exception as e:
+        page = 1
+        print(e)  # an error log will not be created
+    if page > last_page:
+        page = last_page
+    start = (page - 1) * per_page
+    end = start + per_page
+    to_return = []
+    data = User.query.order_by(User.id.asc()).slice(start, end)
+    for user in data:
+        to_return.append(
+            {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'account_type': user.account_type,
+                'active': user.active,
+                'date': str(user.date)[:10]
+            }
+        )
+    return to_return, page, last_page
