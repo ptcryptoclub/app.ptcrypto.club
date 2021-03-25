@@ -289,7 +289,7 @@ def admin_api_details():
                 base.filter(ApiUsage.user_id == not_user.id).scalar()
             ),
             "last_month": int(
-                base.filter(ApiUsage.date > td30).scalar()
+                base.filter(ApiUsage.date >= td30).scalar()
             ),
             "last_month_users": int(
                 base.filter(ApiUsage.date >= td30, ApiUsage.user_id != not_user.id).scalar()
@@ -298,13 +298,13 @@ def admin_api_details():
                 base.filter(ApiUsage.date >= td30, ApiUsage.user_id == not_user.id).scalar()
             ),
             "last_week": int(
-                base.filter(ApiUsage.date > td7).scalar()
+                base.filter(ApiUsage.date >= td7).scalar()
             ),
             "last_week_users": int(
                 base.filter(ApiUsage.date >= td7, ApiUsage.user_id != not_user.id).scalar()
             ),
             "last_week_n_users": int(
-                base.filter(ApiUsage.date > td7, ApiUsage.user_id == not_user.id).scalar()
+                base.filter(ApiUsage.date >= td7, ApiUsage.user_id == not_user.id).scalar()
             ),
             "last_24h": int(
                 base.filter(ApiUsage.date >= th24).scalar()
@@ -348,8 +348,8 @@ def admin_api_usage_top_5():
     for t in data:
         to_return.append(
             {
-                'usage': t[0],
-                'user_id': t[1]
+                'usage': int(t[0]),
+                'user_id': int(t[1])
             }
         )
     return to_return
