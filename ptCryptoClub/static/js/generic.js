@@ -281,3 +281,63 @@ function cciGauge(divName, initValue, market_1, base_1, quote_1, market_2, base_
         })
     }, 60*1000);
 }
+
+
+function cciChart(divName, market_1, base_1, quote_1, market_2, base_2, quote_2){
+
+    let apiSecret = document.getElementById("APISecret").value;
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    // Create chart
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.paddingRight = 20;
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    chart.dataSource.url = '/api/home/cci/chart/'+ market_1 +'/'+ base_1 +'/'+ quote_1 +'/'+ market_2 +'/'+ base_2 +'/'+ quote_2 +'/100/'+ apiSecret +'/'
+    chart.dataSource.load();
+    chart.dataSource.parser = new am4core.JSONParser();
+
+
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.fontSize = "0.7em";
+    dateAxis.renderer.grid.template.disabled = true;
+    dateAxis.tooltip.disabled = true;
+
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.renderer.fontSize = "0.7em";
+    valueAxis.tooltip.disabled = true;
+    valueAxis.renderer.grid.template.disabled = true;
+
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "cci";
+    series.tooltipText = "{valueY.value}";
+    series.strokeWidth = 1.5;
+    series.fillOpacity = 0.2;
+
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.snapToSeries = series;
+
+
+    var interval;
+    function startInterval() {
+        interval = setInterval(function() {
+            fetch('/api/home/cci/chart/'+ market_1 +'/'+ base_1 +'/'+ quote_1 +'/'+ market_2 +'/'+ base_2 +'/'+ quote_2 +'/1/'+ apiSecret +'/').then(
+                function(response){
+                    response.json().then(
+                        function (dataNew) {
+                            var toAdd = { date: dataNew[0]['date'], cci: dataNew[0]['cci'] }
+                            chart.addData(toAdd, 1);
+                        }
+                    )
+                }
+            );
+        }, 15*60 * 1000);
+    }
+    
+    startInterval();
+
+}

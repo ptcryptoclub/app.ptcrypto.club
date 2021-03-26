@@ -8,6 +8,7 @@ import pandas as pd
 import random
 import string
 from datetime import datetime
+import time
 
 engine_live_data = create_engine(CryptoData.string)
 engine_web_app = None
@@ -452,29 +453,53 @@ def hour_rounder(t):
     return t.replace(second=0, microsecond=0, minute=0)
 
 
-def cci(market_1, base_1, quote_1, market_2, base_2, quote_2, delta: int):
-    query = f"""
-    select 	table_1."date" as "closedate",
-    		table_1.crypto_1,
-    		table_2.crypto_2
-    	from (
-    		select 	closetime as "date",
-    				closeprice as "crypto_1"
-    			from ohlc_20s os1
-    			where market = '{market_1}' and base = '{base_1}' and "quote" = '{quote_1}'
-    			order by os1.closetime desc
-    	) as table_1
-    	join (
-    		select 	closetime as "date",
-    				closeprice as "crypto_2"
-    			from ohlc_20s os1
-    			where market = '{market_2}' and base = '{base_2}' and "quote" = '{quote_2}'
-    			order by os1.closetime desc
-    	) as table_2
-    	on table_1."date" = table_2."date"
-    	where table_1."date" >= (now() - interval '{delta} minute')::timestamp
-    	order by table_1."date" asc;
-    """
+def cci(market_1, base_1, quote_1, market_2, base_2, quote_2, delta: int, starting_point=None):
+    if starting_point is None:
+        query = f"""
+            select 	table_1."date" as "closedate",
+            		table_1.crypto_1,
+            		table_2.crypto_2
+            	from (
+            		select 	closetime as "date",
+            				closeprice as "crypto_1"
+            			from ohlc_20s os1
+            			where market = '{market_1}' and base = '{base_1}' and "quote" = '{quote_1}'
+            			order by os1.closetime desc
+            	) as table_1
+            	join (
+            		select 	closetime as "date",
+            				closeprice as "crypto_2"
+            			from ohlc_20s os1
+            			where market = '{market_2}' and base = '{base_2}' and "quote" = '{quote_2}'
+            			order by os1.closetime desc
+            	) as table_2
+            	on table_1."date" = table_2."date"
+            	where table_1."date" >= (now() - interval '{delta} minute')::timestamp
+            	order by table_1."date" asc;
+            """
+    else:
+        query = f"""
+        select 	table_1."date" as "closedate",
+                table_1.crypto_1,
+                table_2.crypto_2
+            from (
+                select 	closetime as "date",
+                        closeprice as "crypto_1"
+                    from ohlc_20s os1
+                    where market = '{market_1}' and base = '{base_1}' and "quote" = '{quote_1}'
+                    order by os1.closetime desc
+            ) as table_1
+            join (
+                select 	closetime as "date",
+                        closeprice as "crypto_2"
+                    from ohlc_20s os1
+                    where market = '{market_2}' and base = '{base_2}' and "quote" = '{quote_2}'
+                    order by os1.closetime desc
+            ) as table_2
+            on table_1."date" = table_2."date"
+            where table_1."date" >= ('{starting_point}'::timestamp - interval '{delta} minute')::timestamp
+            order by table_1."date" asc;
+        """
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)
         index = data.corr().iloc[0, 1] * 100
@@ -488,3 +513,21 @@ def cci(market_1, base_1, quote_1, market_2, base_2, quote_2, delta: int):
         db.session.commit()
         index = 0
     return {'cci': index}
+
+
+def cci_chart(market_1, base_1, quote_1, market_2, base_2, quote_2, datapoints: int):
+    start = int(time.time())
+    delta = 15 * 60  # in seconds
+    list_of_times = []
+    for i in range(datapoints):
+        list_of_times.append(str(pd.to_datetime(start - i * delta, unit='s'))[:19])
+    list_of_times.reverse()
+    to_return = []
+    for time_ in list_of_times:
+        to_return.append(
+            {
+                'date': time_,
+                'cci': round(cci(market_1, base_1, quote_1, market_2, base_2, quote_2, 60, starting_point=time_)['cci'], 2)
+            }
+        )
+    return to_return
