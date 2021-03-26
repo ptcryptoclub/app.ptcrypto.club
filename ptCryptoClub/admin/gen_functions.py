@@ -450,3 +450,41 @@ def get_price(market, base_1, base_2, quote, data_points):
 
 def hour_rounder(t):
     return t.replace(second=0, microsecond=0, minute=0)
+
+
+def cci(market_1, base_1, quote_1, market_2, base_2, quote_2, delta: int):
+    query = f"""
+    select 	table_1."date" as "closedate",
+    		table_1.crypto_1,
+    		table_2.crypto_2
+    	from (
+    		select 	closetime as "date",
+    				closeprice as "crypto_1"
+    			from ohlc_20s os1
+    			where market = '{market_1}' and base = '{base_1}' and "quote" = '{quote_1}'
+    			order by os1.closetime desc
+    	) as table_1
+    	join (
+    		select 	closetime as "date",
+    				closeprice as "crypto_2"
+    			from ohlc_20s os1
+    			where market = '{market_2}' and base = '{base_2}' and "quote" = '{quote_2}'
+    			order by os1.closetime desc
+    	) as table_2
+    	on table_1."date" = table_2."date"
+    	where table_1."date" >= (now() - interval '{delta} minute')::timestamp
+    	order by table_1."date" asc;
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+        index = data.corr().iloc[0, 1] * 100
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions cci {market_1}, {base_1}, {quote_1}, {market_2}, {base_2}, {quote_2}',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        index = 0
+    return {'cci': index}

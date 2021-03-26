@@ -9,12 +9,12 @@ import os
 # local imports
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
-    candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell
+    candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
-    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price
+    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
@@ -54,7 +54,7 @@ def home():
     delta = request.args.get('delta')
     if delta is None:
         delta = default_delta
-    elif delta not in ['60', '1440']:
+    elif delta not in available_deltas:
         delta = default_delta
     delta = int(delta)
     cards = []
@@ -124,6 +124,18 @@ def api_home_latest_transactions(base, quote, market, number_of_trans, api_secre
     if SecureApi().validate(api_secret=api_secret):
         return jsonify(
             table_latest_transactions(base=base, quote=quote, market=market, number_of_trans=number_of_trans)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/home/cci/<market1>/<base1>/<quote1>/<market2>/<base2>/<quote2>/<delta>/<api_secret>/")
+def api_home_cci(market1, base1, quote1, market2, base2, quote2, delta, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            cci(market_1=market1, base_1=base1, quote_1=quote1, market_2=market2, base_2=base2, quote_2=quote2, delta=delta)
         )
     else:
         return jsonify(

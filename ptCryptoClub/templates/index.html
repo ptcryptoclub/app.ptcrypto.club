@@ -193,6 +193,33 @@
         <i><small class="text-muted"><u>Please note</u>: two y-axis were used for easy comparison.</small></i>
     </div>
 
+
+    <hr class="border-secondary">
+    <div class="row justify-content-end mr-2">
+        <H6><a href="#" class="text-light text-decoration-none">Crypto Correlation Index (%)</a></H6>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-3 mb-2">
+        <div class="col-xl-4 col-lg-4 col-sm-6 mb-2">
+            {% if delta == 60 %}
+            <div class="text-center text-muted"><strong><small>Last hour</small></strong></div>
+            {% else %}
+            <div class="text-center text-muted"><strong><small>Last 24h</small></strong></div>
+            {% endif %}
+            <div class="text-center text-light"><small>BTCEUR vs ETHEUR</small></div>
+            <div id="cci_test" style="height: 140px;"></div>
+            <script>
+                let apiSecret = document.getElementById("APISecret").value;
+                fetch('/api/home/cci/kraken/btc/eur/kraken/eth/eur/{{delta}}/'+ apiSecret +'/').then(function(response) {
+                    response.json().then(function(data) {
+                        var value = data['cci'];
+                        cciGauge('cci_test', value, 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur', {{delta}})
+                    })
+                })
+            </script>
+        </div>
+    </div>
+
+
     <hr class="border-secondary">
     <div class="row justify-content-end mr-2">
         <H6><a href="#" class="text-light text-decoration-none">Lastest transactions</a></H6>
