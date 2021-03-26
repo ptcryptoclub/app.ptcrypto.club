@@ -199,7 +199,7 @@
         <H6><a href="#" class="text-light text-decoration-none">Crypto Correlation Index (%)</a></H6>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 mb-3">
             {% if delta == 60 %}
             <div class="text-center text-muted"><strong><small>Last hour</small></strong></div>
             {% else %}
@@ -217,7 +217,7 @@
                 })
             </script>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8 mb-3">
             <div class="cciChart_test" style="height: 100%;"></div>
             <script>
                 cciChart('cciChart_test', 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur')
