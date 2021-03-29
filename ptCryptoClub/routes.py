@@ -14,7 +14,8 @@ from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetail
     ResetPasswordAuthorizations
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
-    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart
+    get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
+    gen_fiats
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
@@ -103,7 +104,8 @@ def home():
         default_transaction_fee=default_transaction_fee,
         available_assets=available_assets,
         delta=delta,
-        number_days_buy_sell=default_number_days_buy_sell
+        number_days_buy_sell=default_number_days_buy_sell,
+        fiats_data=gen_fiats()
     )
 
 

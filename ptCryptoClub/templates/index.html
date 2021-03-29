@@ -118,6 +118,29 @@
         </script>
         {% endfor %}
     </div>
+
+    <hr class="border-secondary">
+    <div class="row justify-content-end mr-2">
+        <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR)</small></a></H6>
+    </div>
+    <div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-9 mb-1">
+        {% for line in fiats_data %}
+        {% if line.change > 0 %}
+        {% set var = "success" %}
+        {% elif line.change < 0 %}
+        {% set var = "danger" %}
+        {% else %}
+        {% set var = "warning" %}
+        {% endif %}
+        <div class="col p-1">
+            <div class="p-1 border border-{{var}} rounded-lg">
+                <div class="text-center text-light"><strong>{{line.symbol}}</strong></div>
+                <div class="text-center text-{{var}}"><small>{{line.price}}</small></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
     {% if current_user.is_authenticated %}
     <hr class="border-secondary">
     <div class="row justify-content-end mr-2 mb-3">

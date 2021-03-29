@@ -531,3 +531,55 @@ def cci_chart(market_1, base_1, quote_1, market_2, base_2, quote_2, datapoints: 
             }
         )
     return to_return
+
+
+def gen_fiats():
+    query = """
+    select 	table1.symbol as symbol,
+            table1.exchange as price,
+            round(((table1.exchange - table2.exchange)/table2.exchange*100)::numeric, 3) as "change"-- this is already as a percentage 
+        from (
+            select	exchange,
+                    symbol,
+                    date_created 
+                from fiatprices f 
+                where date_created in (
+                    select max(date_created) from fiatprices f2
+                    )
+        ) as table1
+        join (
+            select	exchange,
+                    symbol,
+                    date_created 
+                from fiatprices f 
+                where date_created in (
+                    select distinct (date_created)
+                        from fiatprices f2
+                        order by date_created desc
+                    limit 1 offset 1
+                    )
+        ) as table2
+        on table1.symbol = table2.symbol
+        order by symbol
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame()
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions gen fiats',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "symbol": data['symbol'][i],
+                "price": data['price'][i],
+                "change": data['change'][i]
+            }
+        )
+    return to_return
