@@ -502,7 +502,7 @@ def cci(market_1, base_1, quote_1, market_2, base_2, quote_2, delta: int, starti
         """
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)
-        index = data.corr().iloc[0, 1] * 100
+        index = data.corr().iloc[0, 1]
     except Exception as e:
         # noinspection PyArgumentList
         error_log = ErrorLogs(
@@ -527,7 +527,7 @@ def cci_chart(market_1, base_1, quote_1, market_2, base_2, quote_2, datapoints: 
         to_return.append(
             {
                 'date': time_,
-                'cci': round(cci(market_1, base_1, quote_1, market_2, base_2, quote_2, 60, starting_point=time_)['cci'], 2)
+                'cci': round(cci(market_1, base_1, quote_1, market_2, base_2, quote_2, 60, starting_point=time_)['cci'], 4)
             }
         )
     return to_return

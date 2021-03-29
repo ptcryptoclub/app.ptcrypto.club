@@ -92,7 +92,8 @@ function lineChart() {
     valueAxis.tooltip.disabled = true;
     valueAxis.zIndex = 1;
     valueAxis.renderer.baseGrid.disabled = true;
-
+    valueAxis.title.text = base.innerHTML.toUpperCase() + quote.innerHTML.toUpperCase();
+    valueAxis.title.fontSize = "0.8em"
     valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
     valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
     valueAxis.renderer.inside = true;
@@ -107,6 +108,7 @@ function lineChart() {
     series.dataFields.valueY = "closeValue";
     series.tooltipText = "{valueY.value}";
     series.defaultState.transitionDuration = 0;
+    series.fillOpacity = 0.2;
 
     chart.cursor = new am4charts.XYCursor();
 

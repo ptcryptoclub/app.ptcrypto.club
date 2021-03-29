@@ -211,7 +211,7 @@
                 let apiSecret = document.getElementById("APISecret").value;
                 fetch('/api/home/cci/kraken/btc/eur/kraken/eth/eur/{{delta}}/'+ apiSecret +'/').then(function(response) {
                     response.json().then(function(data) {
-                        var value = data['cci'];
+                        var value = data['cci'] * 100;
                         cciGauge('cci_test', value, 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur', {{delta}})
                     })
                 })
@@ -219,6 +219,9 @@
         </div>
         <div class="col-md-8 mb-3">
             <div class="cciChart_test" style="height: 100%;"></div>
+            <div class="m-0 text-right">
+                <i><small class="text-muted"><u>Please note</u>: Each point is calculated within the last corresponding hour</small></i>
+            </div>
             <script>
                 cciChart('cciChart_test', 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur')
             </script>
@@ -228,7 +231,7 @@
 
     <hr class="border-secondary">
     <div class="row justify-content-end mr-2">
-        <H6><a href="#" class="text-light text-decoration-none">Lastest transactions</a></H6>
+        <H6><a href="#" class="text-light text-decoration-none">Latest transactions</a></H6>
     </div>
     {% for i in range(tables.__len__()) %}
     <table class="table table-sm table-borderless table-hover table-dark" style="background-color: #000000;">

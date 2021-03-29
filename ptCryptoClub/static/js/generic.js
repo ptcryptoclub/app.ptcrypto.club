@@ -275,7 +275,7 @@ function cciGauge(divName, initValue, market_1, base_1, quote_1, market_2, base_
     setInterval(function() {
         fetch('/api/home/cci/'+ market_1 +'/'+ base_1 +'/'+ quote_1 +'/'+ market_2 +'/'+ base_2 +'/'+ quote_2 +'/'+ delta +'/'+ apiSecret +'/').then(function(response) {
             response.json().then(function(data) {
-                var value = data['cci'];
+                var value = data['cci'] * 100;
                 hand.showValue(value, 1000, am4core.ease.cubicOut);
             })
         })
@@ -321,6 +321,13 @@ function cciChart(divName, market_1, base_1, quote_1, market_2, base_2, quote_2)
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.snapToSeries = series;
 
+    let title = chart.titles.create();
+    title.text = "CCI (last 24h)";
+    title.fontSize = "0.7em";
+    title.marginBottom = 2;
+
+    valueAxis.numberFormatter = new am4core.NumberFormatter();
+    valueAxis.numberFormatter.numberFormat = "#. %";
 
     var interval;
     function startInterval() {
