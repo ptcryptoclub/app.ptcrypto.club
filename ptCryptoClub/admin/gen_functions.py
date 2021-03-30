@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData, admins_emails
+from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
 from ptCryptoClub import db
@@ -533,8 +533,18 @@ def cci_chart(market_1, base_1, quote_1, market_2, base_2, quote_2, datapoints: 
     return to_return
 
 
-def gen_fiats():
-    query = """
+def gen_fiats(delta=None):
+    if delta is None:
+        delta = default_delta
+    try:
+        delta = int(delta)
+    except Exception as e:
+        delta = default_delta
+        print(e)  # An error log will not be created
+    delta = delta // 60
+    if delta > 12:
+        delta = 12
+    query = f"""
     select 	table1.symbol as symbol,
             table1.exchange as price,
             round(((table1.exchange - table2.exchange)/table2.exchange*100)::numeric, 3) as "change"-- this is already as a percentage 
@@ -556,7 +566,7 @@ def gen_fiats():
                     select distinct (date_created)
                         from fiatprices f2
                         order by date_created desc
-                    limit 1 offset 1
+                    limit 1 offset {delta}
                     )
         ) as table2
         on table1.symbol = table2.symbol

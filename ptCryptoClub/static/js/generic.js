@@ -347,4 +347,42 @@ function cciChart(divName, market_1, base_1, quote_1, market_2, base_2, quote_2)
     
     startInterval();
 
-}
+};
+
+
+function fiatUpdate(delta) {
+    let apiSecret = document.getElementById("APISecret").value;
+    let htmlCards = document.getElementById("fiatPrices")
+    function startInterval() {
+        fiatInterval = setInterval(function() {
+            fetch('/api/home/fiat-prices/'+ delta +'/'+ apiSecret +'/').then(
+                function(response){
+                    response.json().then(
+                        function (dataNew) {
+                            newHtmlPrices = ""
+                            for (let line of dataNew){
+                                let varColor = ''
+                                let var2 = ''
+                                if (line['change'] > 0) {
+                                    varColor = 'success'
+                                    var2 = 'trending_up'
+                                }
+                                else if (line['change'] < 0) {
+                                    varColor = 'danger'
+                                    var2 = 'trending_down'
+                                }
+                                else {
+                                    varColor = 'warning'
+                                    var2 = 'trending_flat'
+                                }
+                                newHtmlPrices += '<div class="col p-1"><div class="p-1 border border-'+ varColor +' rounded-lg"><div class="row no-gutters align-items-center"><div class="col"><div class="text-center text-light"><strong>'+ line['symbol'] +'</strong></div><div class="text-center text-'+ varColor +'">'+ line['price'] +'</div></div><div class="col-auto"><div class="text-center text-light"><small><span class="material-icons text-'+ varColor +'">'+ var2 +'</span></small></div><div class="text-center text-'+ varColor +'"><small>'+ line['change'] +'%</small></div></div></div></div></div>'
+                            }
+                            htmlCards.innerHTML = newHtmlPrices
+                        }
+                    )
+                }
+            );
+        }, 15*60 * 1000);
+    }
+    startInterval()
+};

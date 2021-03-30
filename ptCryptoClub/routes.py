@@ -105,7 +105,7 @@ def home():
         available_assets=available_assets,
         delta=delta,
         number_days_buy_sell=default_number_days_buy_sell,
-        fiats_data=gen_fiats()
+        fiats_data=gen_fiats(delta=delta)
     )
 
 
@@ -150,6 +150,18 @@ def api_home_cci_chart(market1, base1, quote1, market2, base2, quote2, datapoint
     if SecureApi().validate(api_secret=api_secret):
         return jsonify(
             cci_chart(market1, base1, quote1, market2, base2, quote2, int(datapoints))
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/home/fiat-prices/<delta>/<api_secret>/")
+def api_home_fiat_prices(delta, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            gen_fiats(delta=delta)
         )
     else:
         return jsonify(
