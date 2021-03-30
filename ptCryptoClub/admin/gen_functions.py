@@ -564,8 +564,6 @@ def gen_fiats(delta=None):
         delta = default_delta
         print(e)  # An error log will not be created
     delta = delta // 60
-    if delta > 12:
-        delta = 12
     query = f"""
     select 	table1.symbol as symbol,
             table1.exchange as price,

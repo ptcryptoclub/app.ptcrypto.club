@@ -127,7 +127,7 @@
         <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR) - <i class="text-info">Last 24h</i></small></a></H6>
         {% endif %}
     </div>
-    <div id="fiatPrices" class="p-2 row row-cols-3 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 mb-1">
+    <div id="fiatPrices" class="p-2 row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 mb-1">
         {% for line in fiats_data %}
         {% if line.change > 0 %}
         {% set var = "success" %}
