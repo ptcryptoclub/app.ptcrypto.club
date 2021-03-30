@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta
+from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
 from ptCryptoClub import db
@@ -70,6 +70,28 @@ def get_all_pairs(market):
             }
         )
     return all_pairs
+
+
+def get_all_fiats():
+    query = """
+    select distinct(symbol) as fiat
+	    from public.fiatprices
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='generic functions get all fiats',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        data = pd.DataFrame(columns=["fiat"])
+    all_fiats = []
+    for fiat in data.fiat:
+        all_fiats.append(fiat)
+    return all_fiats
 
 
 def card_generic(base, quote, market, delta):
@@ -590,6 +612,55 @@ def gen_fiats(delta=None):
                 "symbol": data['symbol'][i],
                 "price": data['price'][i],
                 "change": data['change'][i]
+            }
+        )
+    return to_return
+
+
+def fiat_line_chart_data(fiat, delta=None):
+    if delta is None:
+        delta = 24
+    try:
+        delta = int(delta)
+    except Exception as e:
+        print(e)
+        delta = default_delta
+    try:
+        fiat = fiat.upper()
+    except Exception as e:
+        print(e)
+        fiat = default_fiat
+    if fiat not in get_all_fiats():
+        fiat = default_fiat
+    query = f"""
+    select 	DATE_TRUNC('hour', table1.date_created) as "date",
+            table1.price
+        from (
+            select 	date_created,
+                    exchange as price
+                from fiatprices f
+                where f.symbol = '{fiat}' and date_created >= (now() - interval '{delta} hour')::timestamp
+                order by date_created desc
+        ) as table1
+        order by date_created asc
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame()
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions fiat line chart data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                'date': str(data['date'][i]),
+                'price': float(data['price'][i])
             }
         )
     return to_return

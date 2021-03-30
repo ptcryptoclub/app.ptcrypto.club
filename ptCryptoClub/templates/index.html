@@ -139,20 +139,22 @@
         {% set var = "warning" %}
         {% set var2 = "trending_flat" %}
         {% endif %}
-        <div class="col p-1">
-            <div class="p-1 border border-{{var}} rounded-lg">
-                <div class="row no-gutters align-items-center">
-                    <div class="col">
-                        <div class="text-center text-light"><strong>{{line.symbol}}</strong></div>
-                        <div class="text-center text-{{var}}">{{line.price}}</div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="text-center text-light"><small><span class="material-icons text-{{var}}">{{var2}}</span></small></div>
-                        <div class="text-center text-{{var}}"><small>{{line.change}}%</small></div>
+        <a href="{{url_for('chart_line_fiat', fiat=line.symbol)}}" class="text-decoration-none">
+            <div class="col p-1">
+                <div class="p-1 border border-{{var}} rounded-lg">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col">
+                            <div class="text-center text-light"><strong>{{line.symbol}}</strong></div>
+                            <div class="text-center text-{{var}}">{{line.price}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-center text-light"><small><span class="material-icons text-{{var}}">{{var2}}</span></small></div>
+                            <div class="text-center text-{{var}}"><small>{{line.change}}%</small></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
         {% endfor %}
     </div>
     <script>

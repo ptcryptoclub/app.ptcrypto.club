@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+
+{% endblock %}
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto">
+                    <small><a href="#" class="text-decoration-none text-muted">link1</a></small>
+                </div>
+                <div class="col-auto">
+                    <small><a href="#" class="text-decoration-none text-light">Link2</a></small>
+                </div>
+                <div class="col-auto">
+                    <small><a href="#" class="text-decoration-none text-muted">Link3</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='js/fiat_charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+
+<div class="container">
+    <div class="row no-gutters mt-3">
+        <div class="col-xl col-lg py-2">
+            <div id="fiatLineChart" style="height: 400px;"></div>
+            <script>
+                lineChartFiat('fiatLineChart', '{{fiat}}')
+            </script>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -15,7 +15,7 @@ from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetail
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
-    gen_fiats
+    gen_fiats, fiat_line_chart_data
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
@@ -881,6 +881,27 @@ def api_charts_vtp_data(market, base, quote, datapoints, candle, api_secret):
     if SecureApi().validate(api_secret=api_secret):
         return jsonify(
             vtp_chart_data(base, quote, market, datapoints, candle)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/charts/fiat/<fiat>/")
+def chart_line_fiat(fiat):
+    return render_template(
+        "charts-fiat-line.html",
+        title="Charts",
+        fiat=fiat
+    )
+
+
+@app.route("/api/charts/fiat/line/<fiat>/<delta>/<api_secret>/")
+def api_charts_fiat_line_data(fiat, delta, api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            fiat_line_chart_data(fiat=fiat, delta=delta)
         )
     else:
         return jsonify(
