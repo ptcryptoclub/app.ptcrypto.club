@@ -272,7 +272,7 @@ def calculate_total_value(user_id, market='kraken', quote='eur'):
         last_price = get_last_price(market=market, base=asset.asset, quote=quote)['price']
         assets_value += last_price * asset.amount
     total = wallet_value.wallet + assets_value
-    percentage = round(((total - wallet_value.start) / wallet_value.start)*100, 1)
+    percentage = round(((total - wallet_value.start) / wallet_value.start) * 100, 1)
     return {
         'value': round(total, 2),
         'wallet': round(wallet_value.wallet, 2),

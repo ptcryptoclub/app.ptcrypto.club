@@ -241,6 +241,49 @@
             </table>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-12 mb-3">
+            <div class="py-3">
+                <div class="row border-bottom border-info">
+                    <div class="col-auto">
+                        <H5 class="text-light">Webserver</H5>
+                    </div>
+                    <div class="col-auto"></div>
+                </div>
+                <small>
+                    <i class="text-muted">
+                        CPU usage
+                    </i>
+                </small>
+                <div id="cpuUsageWS" style="height: 250px;"></div>
+                <script>
+                    adminCpuUsageWS('cpuUsageWS')
+                </script>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <div class="py-3">
+                <div class="row border-bottom border-info">
+                    <div class="col-auto">
+                        <H5 class="text-light">Data Creator</H5>
+                    </div>
+                    <div class="col-auto"></div>
+                </div>
+                <small>
+                    <i class="text-muted">
+                        CPU usage
+                    </i>
+                </small>
+                <div id="cpuUsageDC" style="height: 250px;"></div>
+                <script>
+                    adminCpuUsageDC('cpuUsageDC')
+                </script>
+            </div>
+        </div>
+    </div>
 </div>
 
 
