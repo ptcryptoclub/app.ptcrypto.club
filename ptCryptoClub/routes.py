@@ -749,7 +749,7 @@ def api_admin_api_usage_top_5(api_secret):
 def api_admin_cpu_usage_webserver(api_secret):
     if SecureApi().validate(api_secret=api_secret, admin=True):
         return jsonify(
-            UsageStats().cpu_utilization(instance=CloudWatchLogin.webserver)
+            UsageStats().cpu_utilization_ec2(instance=CloudWatchLogin.webserver)
         )
     else:
         return jsonify(
@@ -761,7 +761,19 @@ def api_admin_cpu_usage_webserver(api_secret):
 def api_admin_cpu_usage_data_creator(api_secret):
     if SecureApi().validate(api_secret=api_secret, admin=True):
         return jsonify(
-            UsageStats().cpu_utilization(instance=CloudWatchLogin.data_creator)
+            UsageStats().cpu_utilization_ec2(instance=CloudWatchLogin.data_creator)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/admin/cpu-usage/database/<api_secret>/")
+def api_admin_cpu_usage_db(api_secret):
+    if SecureApi().validate(api_secret=api_secret, admin=True):
+        return jsonify(
+            UsageStats().cpu_utilization_db(instance=CloudWatchLogin.database)
         )
     else:
         return jsonify(

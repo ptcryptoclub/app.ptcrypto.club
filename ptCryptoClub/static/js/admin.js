@@ -244,3 +244,66 @@ function adminCpuUsageDC(divName){
     // series.fillOpacity = 0.2;
 
 }
+
+function adminCpuUsageDB(divName){
+    let apiSecret = document.getElementById("APISecret").value;
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0;
+    
+    chart.padding(0, 0, 0, 0);
+    
+    chart.zoomOutButton.disabled = false;
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    chart.dataSource.url = '/api/admin/cpu-usage/database/'+ apiSecret +'/'
+    chart.dataSource.load();
+    chart.dataSource.parser = new am4core.JSONParser();
+
+    chart.cursor = new am4charts.XYCursor();
+    // chart.cursor.behavior = "none";
+    
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.fontSize = "0.75em";
+    dateAxis.tooltip.disabled = false;
+    dateAxis.renderer.grid.template.disabled = true;
+    
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.renderer.inside = true;
+    valueAxis.renderer.minLabelPosition = 0.05;
+    valueAxis.renderer.maxLabelPosition = 0.95;
+    valueAxis.renderer.axisFills.template.disabled = true;
+    valueAxis.renderer.ticks.template.disabled = true;
+    valueAxis.renderer.fontSize = "0.75em"
+    valueAxis.renderer.grid.template.disabled = true;
+    valueAxis.title.text = "CPU usage (%)";
+    valueAxis.title.fontSize = "0.75em"
+    
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "avg";
+    series.tooltipText = "avg: {valueY.value}";
+
+    var series2 = chart.series.push(new am4charts.LineSeries());
+    series2.dataFields.dateX = "date";
+    series2.dataFields.valueY = "max";
+    series2.tooltipText = "max: {valueY.value}";
+    series2.fill = am4core.color("red");
+    series2.stroke = am4core.color("red");
+
+    var series3 = chart.series.push(new am4charts.LineSeries());
+    series3.dataFields.dateX = "date";
+    series3.dataFields.valueY = "min";
+    series3.tooltipText = "min: {valueY.value}";
+    series3.fill = am4core.color("green");
+    series3.stroke = am4core.color("green");
+    // series.tooltipText = "1 EUR = {valueY.value} "+fiat.toUpperCase();
+    // series.fillOpacity = 0.2;
+
+}
