@@ -375,14 +375,14 @@ function fiatUpdate(delta) {
                                     varColor = 'warning'
                                     var2 = 'trending_flat'
                                 }
-                                newHtmlPrices += '<div class="col p-1"><div class="p-1 border border-'+ varColor +' rounded-lg"><div class="row no-gutters align-items-center"><div class="col"><div class="text-center text-light"><strong>'+ line['symbol'] +'</strong></div><div class="text-center text-'+ varColor +'">'+ line['price'] +'</div></div><div class="col-auto"><div class="text-center text-light"><small><span class="material-icons text-'+ varColor +'">'+ var2 +'</span></small></div><div class="text-center text-'+ varColor +'"><small>'+ line['change'] +'%</small></div></div></div></div></div>'
+                                newHtmlPrices += '<a href="charts/fiat/'+ line['symbol'] +'/" class="text-decoration-none"><div class="col p-1"><div class="p-1 border border-'+ varColor +' rounded-lg"><div class="row no-gutters align-items-center"><div class="col"><div class="text-center text-light"><strong>'+ line['symbol'] +'</strong></div><div class="text-center text-'+ varColor +'">'+ line['price'] +'</div></div><div class="col-auto"><div class="text-center text-light"><small><span class="material-icons text-'+ varColor +'">'+ var2 +'</span></small></div><div class="text-center text-'+ varColor +'"><small>'+ line['change'] +'%</small></div></div></div></div></div></a>'
                             }
                             htmlCards.innerHTML = newHtmlPrices
                         }
                     )
                 }
             );
-        }, 15*60 * 1000);
+        }, 10 * 1000);
     }
     startInterval()
 };
