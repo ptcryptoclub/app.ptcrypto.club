@@ -75,7 +75,7 @@ def get_all_pairs(market):
 def get_all_fiats():
     query = """
     select distinct(symbol) as fiat
-	    from public.fiatprices
+	    from public.fiatprices2
     """
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)
@@ -572,19 +572,19 @@ def gen_fiats(delta=None):
             select	exchange,
                     symbol,
                     date_created 
-                from fiatprices f 
+                from fiatprices2 f 
                 where date_created in (
-                    select max(date_created) from fiatprices f2
+                    select max(date_created) from fiatprices2 f2
                     )
         ) as table1
         join (
             select	exchange,
                     symbol,
                     date_created 
-                from fiatprices f 
+                from fiatprices2 f 
                 where date_created in (
                     select distinct (date_created)
-                        from fiatprices f2
+                        from fiatprices2 f2
                         order by date_created desc
                     limit 1 offset {delta}
                     )
@@ -636,7 +636,7 @@ def fiat_line_chart_data(fiat, delta=None):
         from (
             select 	date_created,
                     exchange as price
-                from fiatprices f
+                from fiatprices2 f
                 where f.symbol = '{fiat}' and date_created >= (now() - interval '{delta} hour')::timestamp
                 order by date_created desc
         ) as table1
