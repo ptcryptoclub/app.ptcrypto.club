@@ -251,11 +251,6 @@
                     </div>
                     <div class="col-auto"></div>
                 </div>
-                <small>
-                    <i class="text-muted">
-                        CPU usage
-                    </i>
-                </small>
                 <div id="cpuUsageWS" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageWS('cpuUsageWS')
@@ -272,11 +267,6 @@
                     </div>
                     <div class="col-auto"></div>
                 </div>
-                <small>
-                    <i class="text-muted">
-                        CPU usage
-                    </i>
-                </small>
                 <div id="cpuUsageDC" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageDC('cpuUsageDC')
@@ -293,14 +283,17 @@
                     </div>
                     <div class="col-auto"></div>
                 </div>
-                <small>
-                    <i class="text-muted">
-                        CPU usage
-                    </i>
-                </small>
                 <div id="cpuUsageDB" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageDB('cpuUsageDB')
+                </script>
+                <div id="freeRamDB" style="height: 250px;"></div>
+                <script>
+                    adminFreeRamDB('freeRamDB')
+                </script>
+                <div id="connectionsDB" style="height: 250px;"></div>
+                <script>
+                    adminConnectionsDB('connectionsDB')
                 </script>
             </div>
         </div>

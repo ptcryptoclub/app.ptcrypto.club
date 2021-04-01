@@ -307,3 +307,105 @@ function adminCpuUsageDB(divName){
     // series.fillOpacity = 0.2;
 
 }
+
+
+function adminFreeRamDB(divName){
+    let apiSecret = document.getElementById("APISecret").value;
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0;
+    
+    chart.padding(0, 0, 0, 0);
+    
+    chart.zoomOutButton.disabled = false;
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    chart.dataSource.url = '/api/admin/free-ram/database/'+ apiSecret +'/'
+    chart.dataSource.load();
+    chart.dataSource.parser = new am4core.JSONParser();
+    chart.numberFormatter.numberFormat = "#a";
+
+    chart.cursor = new am4charts.XYCursor();
+    // chart.cursor.behavior = "none";
+    
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.fontSize = "0.75em";
+    dateAxis.tooltip.disabled = false;
+    dateAxis.renderer.grid.template.disabled = true;
+    
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.renderer.inside = true;
+    valueAxis.renderer.minLabelPosition = 0.05;
+    valueAxis.renderer.maxLabelPosition = 0.95;
+    valueAxis.renderer.axisFills.template.disabled = true;
+    valueAxis.renderer.ticks.template.disabled = true;
+    valueAxis.renderer.fontSize = "0.75em"
+    valueAxis.renderer.grid.template.disabled = true;
+    valueAxis.title.text = "Free RAM";
+    valueAxis.title.fontSize = "0.75em"
+    valueAxis.min = 0;
+    valueAxis.max = 1000000000;
+    valueAxis.strictMinMax = true;
+    
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "min";
+    series.tooltipText = "Free RAM: {valueY.value}";
+    series.fillOpacity = 0.2;
+    series.fill = am4core.color("green");
+    series.stroke = am4core.color("green");
+}
+
+function adminConnectionsDB(divName){
+    let apiSecret = document.getElementById("APISecret").value;
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0;
+    
+    chart.padding(0, 0, 0, 0);
+    
+    chart.zoomOutButton.disabled = false;
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    chart.dataSource.url = '/api/admin/connections/database/'+ apiSecret +'/'
+    chart.dataSource.load();
+    chart.dataSource.parser = new am4core.JSONParser();
+    
+
+    chart.cursor = new am4charts.XYCursor();
+    // chart.cursor.behavior = "none";
+    
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.fontSize = "0.75em";
+    dateAxis.tooltip.disabled = false;
+    dateAxis.renderer.grid.template.disabled = true;
+    
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.renderer.inside = true;
+    valueAxis.renderer.minLabelPosition = 0.05;
+    valueAxis.renderer.maxLabelPosition = 0.95;
+    valueAxis.renderer.axisFills.template.disabled = true;
+    valueAxis.renderer.ticks.template.disabled = true;
+    valueAxis.renderer.fontSize = "0.75em"
+    valueAxis.renderer.grid.template.disabled = true;
+    valueAxis.title.text = "DB Connections";
+    valueAxis.title.fontSize = "0.75em"
+    
+    var series = chart.series.push(new am4charts.StepLineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "max";
+    series.tooltipText = "Connections: {valueY.value}";
+    series.fillOpacity = 0.2;
+}

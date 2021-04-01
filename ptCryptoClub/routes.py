@@ -781,6 +781,30 @@ def api_admin_cpu_usage_db(api_secret):
         )
 
 
+@app.route("/api/admin/free-ram/database/<api_secret>/")
+def api_admin_free_ram_db(api_secret):
+    if SecureApi().validate(api_secret=api_secret, admin=True):
+        return jsonify(
+            UsageStats().ram_utilization_db(instance=CloudWatchLogin.database)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/admin/connections/database/<api_secret>/")
+def api_admin_connections_db(api_secret):
+    if SecureApi().validate(api_secret=api_secret, admin=True):
+        return jsonify(
+            UsageStats().connections_db(instance=CloudWatchLogin.database)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
 @app.route("/market/<market>/")
 def market(market):
     cards = []
