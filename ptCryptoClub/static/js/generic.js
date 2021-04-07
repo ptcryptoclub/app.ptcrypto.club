@@ -137,7 +137,7 @@ function cciGauge(divName, initValue, market_1, base_1, quote_1, market_2, base_
     am4core.useTheme(am4themes_animated);
     // Themes end
 
-    var chartMin = 0;
+    var chartMin = -50;
     var chartMax = 100;
 
     var data = {
@@ -145,7 +145,7 @@ function cciGauge(divName, initValue, market_1, base_1, quote_1, market_2, base_
     gradingData: [
         {
         color: "#f04922",
-        lowScore: 0,
+        lowScore: -50,
         highScore: 30
         },
         {

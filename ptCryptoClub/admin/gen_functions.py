@@ -662,3 +662,25 @@ def fiat_line_chart_data(fiat, delta=None):
             }
         )
     return to_return
+
+
+def get_fiat_name(fiat):
+    query = f"""
+    select "name" from public.fiatdescription where symbol = '{fiat}'
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame()
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions get fiat name',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    if data.shape[0] > 0:
+        name = data['name'][0]
+    else:
+        name = None
+    return name

@@ -3,7 +3,7 @@
 function lineChartFiat (divName, fiat) {
 
     let apiSecret = document.getElementById("APISecret").value;
-    let delta = 24 // This will give us the last 24h
+    let delta = 24*7 // This will give us the last 24h
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
