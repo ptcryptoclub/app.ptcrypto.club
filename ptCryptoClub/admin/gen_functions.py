@@ -525,6 +525,7 @@ def cci(market_1, base_1, quote_1, market_2, base_2, quote_2, delta: int, starti
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)
         index = data.corr().iloc[0, 1]
+        index = abs(index)
     except Exception as e:
         # noinspection PyArgumentList
         error_log = ErrorLogs(
