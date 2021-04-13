@@ -43,6 +43,7 @@
             <th scope="col">Account type</th>
             <th scope="col">Active</th>
             <th scope="col">Date</th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -59,6 +60,7 @@
             <td>{{user.account_type}}</td>
             <td>{{user.active}}</td>
             <td>{{user.date}}</td>
+            <td><a href="{{url_for('account_admin_delete_user', user_id=user.id)}}" class="text-decoration-none text-danger">X</a></td>
         </tr>
         {% endfor %}
         </tbody>

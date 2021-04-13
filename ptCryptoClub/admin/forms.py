@@ -3,6 +3,7 @@ from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from ptCryptoClub.admin.models import User
+from ptCryptoClub.admin.gen_functions import email_validation_disposable_emails
 
 
 class RegistrationForm(FlaskForm):
@@ -18,8 +19,11 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Username already in use!')
 
     def validate_email(self, email):
-        email = User.query.filter_by(email=email.data).first()
-        if email:
+        control, message = email_validation_disposable_emails(email=email.data)
+        if not control:
+            raise ValidationError(message)
+        email_control = User.query.filter_by(email=email.data).first()
+        if email_control:
             raise ValidationError('Please choose a different email!')
 
 

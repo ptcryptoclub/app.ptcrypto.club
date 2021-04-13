@@ -1,11 +1,12 @@
-from ptCryptoClub.admin.config import CryptoData
+from ptCryptoClub.admin.config import CryptoData, qr_code_folder, admins_emails
 from ptCryptoClub import db
-from ptCryptoClub.admin.models import ErrorLogs, ApiUsage, User
+from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
 
 from sqlalchemy import create_engine, func
 import pandas as pd
 import time
 from datetime import datetime, timedelta
+import os
 
 
 engine_live_data = create_engine(CryptoData.string)
@@ -404,3 +405,21 @@ def admin_users_data(page):
             }
         )
     return to_return, page, last_page
+
+
+def admin_delete_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user.email in admins_emails or user.username == "notUser":
+        return None
+    else:
+        if user.qrcode_img is not None:
+            if os.path.exists(qr_code_folder+str(user.qrcode_img)+".png"):
+                os.remove(qr_code_folder+str(user.qrcode_img)+".png")
+        User.query.filter_by(id=user_id).delete()
+        LoginUser.query.filter_by(user_ID=user_id).delete()
+        UpdateAuthorizationDetails.query.filter_by(user_id=user_id).delete()
+        TransactionsPTCC.query.filter_by(user_id=user_id).delete()
+        Portfolio.query.filter_by(user_id=user_id).delete()
+        PortfolioAssets.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
+        return None

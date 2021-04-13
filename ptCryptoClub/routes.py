@@ -22,7 +22,7 @@ from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationF
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
-    admin_users_data_sample, admin_api_usage_top_5, admin_users_data
+    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user
 from ptCryptoClub.admin.stats import UsageStats
 
 
@@ -696,6 +696,16 @@ def account_admin_users(page):
             c_page=c_page,
             last_page=last_page
         )
+
+
+@app.route("/account/admin/delete/user/<user_id>/")
+@login_required
+def account_admin_delete_user(user_id):
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        admin_delete_user(user_id)
+        return redirect(url_for("account_admin_users", page=1))
 
 
 @app.route("/api/admin/live-data/<api_secret>/")

@@ -9,6 +9,7 @@ import random
 import string
 from datetime import datetime
 import time
+import requests
 
 engine_live_data = create_engine(CryptoData.string)
 engine_web_app = None
@@ -685,3 +686,29 @@ def get_fiat_name(fiat):
     else:
         name = None
     return name
+
+
+def email_validation_disposable_emails(email):
+    url = f"https://block-temporary-email.com/check/email/{email}"
+    message = 'Valid email'
+    try:
+        data = requests.get(url=url).json()
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions email validation disposable email',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        return True, message
+    if data['status'] == 200:
+        if data['temporary']:
+            return False, 'Please use a non disposable email'
+        else:
+            if data['dns']:
+                return True, message
+            else:
+                return False, 'Please provide a valid email address'
+    else:
+        return False, 'Please provide a valid email address'
