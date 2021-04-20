@@ -12,7 +12,7 @@
             <div class="row justify-content-start">
                 <div class="col-auto">
                     <small>
-                        <a href="#" class="text-decoration-none text-light">Project</a>
+                        <a href="{{ url_for('about_project') }}" class="text-decoration-none text-light">Project</a>
                     </small>
                 </div>
                 <div class="col-auto">
@@ -35,7 +35,68 @@
 {% block content %}
 
 <div class="container mt-3">
-    Some text
+    <H5 class="text-light mt-5">Our project - <a href="https://www.ptcrypto.club" target="_blank"
+                                                 class="text-decoration-none">ptcrypto.club</a></H5>
+    <div>
+        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lectus risus, ultrices eget
+            risus sed, mattis suscipit erat. Integer posuere non lacus in egestas. In convallis at tellus gravida
+            consequat. Vivamus sed ante eu sapien lacinia mattis. Phasellus placerat felis sed lectus dictum, vel
+            accumsan nulla faucibus. Nunc rhoncus lobortis lectus et cursus. Donec viverra blandit tempus.
+            Duis aliquet, nisi ut posuere tristique, lorem nulla lobortis felis, euismod semper diam mi eu felis. </p>
+    </div>
+    <H5 class="text-light mt-5">Our network</H5>
+    <div class="row row-cols-1 row-cols-lg-2 mt-3">
+        <div class="col mb-4">
+            <a href="{{url_for('home')}}" class="text-decoration-none">
+                <div class="card bg-dark">
+                    <div class="row no-gutters">
+                        <div class="col-4 align-self-center text-center">
+                            <img src="{{url_for('static', filename='img/app.png')}}"
+                                 class="rounded mx-auto d-block" alt="...">
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h5 class="card-title text-light"><strong>app.ptcrypto.club</strong></h5>
+                                <ul class="list-group list-group-flush small">
+                                    <li class="list-group-item bg-dark text-light">Live data</li>
+                                    <li class="list-group-item bg-dark text-light">Charts</li>
+                                    <li class="list-group-item bg-dark text-light">Portfolio</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col mb-4">
+            <a href="https://iam.ptcrypto.club" class="text-decoration-none" target="_blank">
+                <div class="card bg-dark">
+                    <div class="row no-gutters">
+                        <div class="col-4 align-self-center text-center">
+                            <img src="{{url_for('static', filename='img/iam.png')}}"
+                                 class="rounded mx-auto d-block" alt="...">
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h5 class="card-title text-light"><strong>iam.ptcrypto.club</strong></h5>
+                                <ul class="list-group list-group-flush small">
+                                    <li class="list-group-item bg-dark text-light">Online community</li>
+                                    <li class="list-group-item bg-dark text-light">Houses</li>
+                                    <li class="list-group-item bg-dark text-light">Books</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <H5 class="text-light mt-5">Our code</H5>
+    <div class="mt-3">
+        <p class="text-muted">All our code is
+            <a href="https://github.com/ptcryptoclub/app.ptcrypto.club" target="_blank" class="text-decoration-none">open source</a>,
+            feel free to have a look and report any bugs you may find.</p>
+    </div>
 </div>
 
 {% endblock %}
