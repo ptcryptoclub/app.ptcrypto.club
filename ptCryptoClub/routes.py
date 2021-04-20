@@ -1276,9 +1276,9 @@ def all_transactions_sell():
     )
 
 
-@app.route("/test/")
-def test():
+@app.route("/about/project")
+def about_project():
     return render_template(
-        "charts-test.html",
-        title="Test"
+        "about-project.html",
+        title="About"
     )
