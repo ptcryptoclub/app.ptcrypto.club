@@ -17,7 +17,8 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
     gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name
-from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data
+from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
+    get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
@@ -1282,3 +1283,60 @@ def about_project():
         "about-project.html",
         title="About"
     )
+
+
+@app.route("/api/historical-charts/line/<base>/<quote>/<market>/<candle>/<api_secret>/")
+def api_historical_charts_line_data(base, quote, market, candle, api_secret):
+    try:
+        candle = int(candle)
+    except Exception as e:
+        print(e)  # An error log will not be created
+        candle = 20
+    start = request.args.get('start')
+    end = request.args.get('end')
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_historical_data_line(base=base, quote=quote, market=market, start=start, end=end, candle=candle)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/historical-charts/ohlc/<base>/<quote>/<market>/<candle>/<api_secret>/")
+def api_historical_charts_ohlc_data(base, quote, market, candle, api_secret):
+    try:
+        candle = int(candle)
+    except Exception as e:
+        print(e)  # An error log will not be created
+        candle = 20
+    start = request.args.get('start')
+    end = request.args.get('end')
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_historical_data_ohlc(base=base, quote=quote, market=market, start=start, end=end, candle=candle)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/historical-charts/vtp/<base>/<quote>/<market>/<candle>/<api_secret>/")
+def api_historical_charts_vtp_data(base, quote, market, candle, api_secret):
+    try:
+        candle = int(candle)
+    except Exception as e:
+        print(e)  # An error log will not be created
+        candle = 20
+    start = request.args.get('start')
+    end = request.args.get('end')
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            get_historical_data_vtp(base=base, quote=quote, market=market, start=start, end=end, candle=candle)
+        )
+    else:
+        return jsonify(
+            {}
+        )

@@ -4,7 +4,7 @@ from ptCryptoClub.admin.models import ErrorLogs
 
 from sqlalchemy import create_engine
 import pandas as pd
-import time
+from datetime import datetime, timedelta
 
 engine_live_data = create_engine(CryptoData.string)
 
@@ -120,6 +120,288 @@ def vtp_chart_data(base, quote, market, datapoints, candle):
         )
         db.session.add(error_log)
         db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "closetime": str(data.closetime[i])[:19],
+                "nTrans": int(data.nTrans[i]),
+                "maxVolume": float(data.maxVolume[i]),
+                "volume": float(data.volume[i]),
+                "maxVolumePrice": float(data.maxVolumePrice[i]),
+                "closeprice": float(data.closeprice[i])
+            }
+        )
+    return to_return
+
+
+def get_historical_data_line(base: str, quote: str, market: str, start=None, end=None, candle=None):
+    default_delta_20 = 8
+    default_delta_60 = 24
+    default_delta_300 = 120
+    if candle is None:
+        candle = 20
+    if candle not in [20, 60, 300]:
+        candle = 20
+    if start is None and end is None:
+        if candle == 20:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_20)
+        elif candle == 60:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_60)
+        else:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_300)
+    elif start is None:
+        try:
+            end = pd.to_datetime(end)
+        except Exception as e:
+            print(e) # An error log will not be created
+            end = datetime.utcnow()
+        else:
+            end = pd.to_datetime(end)
+        if candle == 20:
+            start = end - timedelta(hours=default_delta_20)
+        elif candle == 60:
+            start = end - timedelta(hours=default_delta_60)
+        else:
+            start = end - timedelta(hours=default_delta_300)
+    elif end is None:
+        try:
+            start = pd.to_datetime(start)
+        except Exception as e:
+            print(e)  # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+        if candle == 20:
+            end = start + timedelta(hours=default_delta_20)
+        elif candle == 60:
+            end = start + timedelta(hours=default_delta_60)
+        else:
+            end = start + timedelta(hours=default_delta_300)
+    else:
+        try:
+            start = pd.to_datetime(start)
+        except Exception as e:
+            print(e)  # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
+        try:
+            end = pd.to_datetime(end)
+        except Exception as e:
+            print(e)  # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
+    query_1 = f"""
+        select  closetime,
+                closeprice
+            from public.ohlc_{candle}s
+            where base='{base}' and quote='{quote}' and market='{market}'
+                and closetime between '{start}' and '{end}'
+            order by closetime asc
+    """
+    data_1 = pd.read_sql_query(sql=query_1, con=engine_live_data)
+    query_2 = f"""
+        select  closetime,
+                closeprice
+            from public."zz_ohlc_{candle}sArquive_1"
+                where base='{base}' and quote='{quote}' and market='{market}'
+                    and closetime between '{start}' and '{end}'
+                order by closetime asc
+    """
+    data_2 = pd.read_sql_query(sql=query_2, con=engine_live_data)
+    data = pd.concat([data_1, data_2])
+    data = data.sort_values('closetime').reset_index(drop=True)
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "date": str(data.closetime[i])[:19],
+                "closeprice": data.closeprice[i]
+            }
+        )
+    return to_return
+
+
+def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end=None, candle=None):
+    default_delta_20 = 8
+    default_delta_60 = 24
+    default_delta_300 = 120
+    if candle is None:
+        candle = 20
+    if candle not in [20, 60, 300]:
+        candle = 20
+    if start is None and end is None:
+        if candle == 20:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_20)
+        elif candle == 60:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_60)
+        else:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_300)
+    elif start is None:
+        try:
+            end = pd.to_datetime(end)
+        except Exception as e:
+            print(e) # An error log will not be created
+            end = datetime.utcnow()
+        else:
+            end = pd.to_datetime(end)
+        if candle == 20:
+            start = end - timedelta(hours=default_delta_20)
+        elif candle == 60:
+            start = end - timedelta(hours=default_delta_60)
+        else:
+            start = end - timedelta(hours=default_delta_300)
+    elif end is None:
+        try:
+            start = pd.to_datetime(start)
+        except Exception as e:
+            print(e) # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+        if candle == 20:
+            end = start + timedelta(hours=default_delta_20)
+        elif candle == 60:
+            end = start + timedelta(hours=default_delta_60)
+        else:
+            end = start + timedelta(hours=default_delta_300)
+    else:
+        try:
+            start = pd.to_datetime(start)
+        except Exception as e:
+            print(e) # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
+        try:
+            end = pd.to_datetime(end)
+        except Exception as e:
+            print(e) # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
+    query_1 = f"""
+        select  closetime,
+                openprice,
+                highprice,
+                lowprice,
+                closeprice,
+                volume
+            from public.ohlc_{candle}s
+            where base='{base}' and quote='{quote}' and market='{market}'
+                and closetime between '{start}' and '{end}'
+            order by closetime asc
+    """
+    data_1 = pd.read_sql_query(sql=query_1, con=engine_live_data)
+    query_2 = f"""
+        select  closetime,
+                openprice,
+                highprice,
+                lowprice,
+                closeprice,
+                volume
+            from public."zz_ohlc_{candle}sArquive_1"
+            where base='{base}' and quote='{quote}' and market='{market}'
+                and closetime between '{start}' and '{end}'
+            order by closetime asc
+    """
+    data_2 = pd.read_sql_query(sql=query_2, con=engine_live_data)
+    data = pd.concat([data_1, data_2])
+    data = data.sort_values('closetime').reset_index(drop=True)
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "closetime": str(data.closetime[i])[:19],
+                "openprice": data.openprice[i],
+                "highprice": data.highprice[i],
+                "lowprice": data.lowprice[i],
+                "closeprice": data.closeprice[i],
+                "volume": data.volume[i]
+            }
+        )
+    return to_return
+
+
+def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=None, candle=None):
+    default_delta_20 = 8
+    default_delta_60 = 24
+    default_delta_300 = 120
+    if candle is None:
+        candle = 20
+    if candle not in [20, 60, 300]:
+        candle = 20
+    if start is None and end is None:
+        if candle == 20:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_20)
+        elif candle == 60:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_60)
+        else:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_300)
+    elif start is None:
+        try:
+            end = pd.to_datetime(end)
+        except Exception as e:
+            print(e) # An error log will not be created
+            end = datetime.utcnow()
+        else:
+            end = pd.to_datetime(end)
+        if candle == 20:
+            start = end - timedelta(hours=default_delta_20)
+        elif candle == 60:
+            start = end - timedelta(hours=default_delta_60)
+        else:
+            start = end - timedelta(hours=default_delta_300)
+    elif end is None:
+        try:
+            start = pd.to_datetime(start)
+        except Exception as e:
+            print(e) # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+        if candle == 20:
+            end = start + timedelta(hours=default_delta_20)
+        elif candle == 60:
+            end = start + timedelta(hours=default_delta_60)
+        else:
+            end = start + timedelta(hours=default_delta_300)
+    else:
+        try:
+            start = pd.to_datetime(start)
+        except Exception as e:
+            print(e) # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
+        try:
+            end = pd.to_datetime(end)
+        except Exception as e:
+            print(e) # An error log will not be created
+            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
+    query_1 = f"""
+        select  closetime,
+                "nTrans",
+                "maxVolume",
+                volume - "maxVolume" volume,
+                "maxVolumePrice",
+                closeprice
+            from public.ohlc_{candle}s
+            where base='{base}' and quote='{quote}' and market='{market}'
+                and closetime between '{start}' and '{end}'
+            order by closetime asc
+    """
+    data_1 = pd.read_sql_query(sql=query_1, con=engine_live_data)
+    query_2 = f"""
+        select  closetime,
+                "nTrans",
+                "maxVolume",
+                volume - "maxVolume" volume,
+                "maxVolumePrice",
+                closeprice
+            from public."zz_ohlc_{candle}sArquive_1"
+            where base='{base}' and quote='{quote}' and market='{market}'
+                and closetime between '{start}' and '{end}'
+            order by closetime asc
+    """
+    data_2 = pd.read_sql_query(sql=query_2, con=engine_live_data)
+    data = pd.concat([data_1, data_2])
+    data = data.sort_values('closetime').reset_index(drop=True)
     to_return = []
     for i in data.index:
         to_return.append(
