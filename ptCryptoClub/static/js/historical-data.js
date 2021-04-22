@@ -1,17 +1,30 @@
 function historical_line (divName) {
 
-    // let market = document.getElementById("market");
-    // let base = document.getElementById("base");
-    // let quote = document.getElementById("quote");
-    // let last_x_hours = document.getElementById("last_x_hours");
-    let apiSecret = document.getElementById("APISecret").value;
+    var base = document.getElementById("base").value;
+    var quote = document.getElementById("quote").value;
+    var market = document.getElementById("market").value;
+    var apiSecret = document.getElementById("APISecret").value;
 
     var urlString = window.location.href
     var url = new URL(urlString);
     var start = url.searchParams.get("start");
     var end = url.searchParams.get("end");
 
-    console.log(start, end)
+    console.log(base, quote, market)
+
+    if (start == "" & end == "") {
+        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/";
+    } else if (start == "") {
+        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/?end=" + end +"/";
+    } else if (end == "") {
+        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/?start=" + start +"/";
+    } else if (start == null & end == null) {
+        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/";
+    } else {
+        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/?start="+ start +"&end=" + end;
+    }
+
+    
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -24,7 +37,7 @@ function historical_line (divName) {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     // Load external data
-    chart.dataSource.url = "/api/historical-charts/line/btc/eur/kraken/300/"+ apiSecret +"/?start="+ start +"&end=" + end + "/";
+    chart.dataSource.url = urlToSend;
     chart.dataSource.parser = new am4core.JSONParser();
 
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
