@@ -172,7 +172,7 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
             start = pd.to_datetime(start)
         except Exception as e:
             print(e)  # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+            return get_historical_data_line(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
         if candle == 20:
             end = start + timedelta(hours=default_delta_20)
         elif candle == 60:
@@ -184,12 +184,12 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
             start = pd.to_datetime(start)
         except Exception as e:
             print(e)  # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
+            return get_historical_data_line(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
         try:
             end = pd.to_datetime(end)
         except Exception as e:
             print(e)  # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
+            return get_historical_data_line(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
     query_1 = f"""
         select  closetime,
                 closeprice
@@ -356,7 +356,7 @@ def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=
             start = pd.to_datetime(start)
         except Exception as e:
             print(e) # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+            return get_historical_data_vtp(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
         if candle == 20:
             end = start + timedelta(hours=default_delta_20)
         elif candle == 60:
@@ -368,12 +368,12 @@ def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=
             start = pd.to_datetime(start)
         except Exception as e:
             print(e) # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
+            return get_historical_data_vtp(base=base, quote=quote, market=market, start=None, end=end, candle=candle)
         try:
             end = pd.to_datetime(end)
         except Exception as e:
             print(e) # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
+            return get_historical_data_vtp(base=base, quote=quote, market=market, start=start, end=None, candle=candle)
     query_1 = f"""
         select  closetime,
                 "nTrans",

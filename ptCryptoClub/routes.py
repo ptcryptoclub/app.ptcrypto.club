@@ -1285,6 +1285,14 @@ def about_project():
     )
 
 
+@app.route("/historical-charts/line")
+def historical_charts_line():
+    return render_template(
+        "historical-charts-line.html",
+        title="Historical Charts"
+    )
+
+
 @app.route("/api/historical-charts/line/<base>/<quote>/<market>/<candle>/<api_secret>/")
 def api_historical_charts_line_data(base, quote, market, candle, api_secret):
     try:

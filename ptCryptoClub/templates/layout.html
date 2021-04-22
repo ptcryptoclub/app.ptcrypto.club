@@ -96,6 +96,15 @@
                     </div>
                 </li>
 
+                {% if title == "Historical Charts" %}
+                {% set active = "active" %}
+                {% else %}
+                {% set active = "" %}
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {{active}}" href="{{url_for('historical_charts_line')}}">Historical data</a>
+                </li>
+
                 {% if title == "About" %}
                 {% set active = "active" %}
                 {% else %}
@@ -104,6 +113,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{active}}" href="{{url_for('about_project')}}">About Us</a>
                 </li>
+
             </ul>
             <div class="form-inline my-2 my-lg-0 small">
                 <label for="clock" class="my-1 mr-2 text-secondary">UTC time: </label>
