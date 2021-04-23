@@ -1,5 +1,15 @@
 function historical_line_prefix(divName, prefix) {
 
+    var b1 = document.getElementById("start");
+    var b2 = document.getElementById("start_time");
+    var b3 = document.getElementById("end");
+    var b4 = document.getElementById("end_time");
+
+    b1.value = ""
+    b2.value = ""
+    b3.value = ""
+    b4.value = ""
+
     var base = document.getElementById("base").value;
     var quote = document.getElementById("quote").value;
     var market = document.getElementById("market").value;
