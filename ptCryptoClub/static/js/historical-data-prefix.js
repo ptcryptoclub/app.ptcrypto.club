@@ -5,10 +5,14 @@ function historical_line_prefix(divName, prefix) {
     var b3 = document.getElementById("end");
     var b4 = document.getElementById("end_time");
 
-    b1.value = ""
-    b2.value = ""
-    b3.value = ""
-    b4.value = ""
+    if (b1 != null) {
+        b1.value = ""
+        b2.value = ""
+        b3.value = ""
+        b4.value = ""
+    }
+
+    
 
     var base = document.getElementById("base").value;
     var quote = document.getElementById("quote").value;
