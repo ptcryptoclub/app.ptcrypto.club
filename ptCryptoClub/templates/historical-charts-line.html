@@ -25,49 +25,83 @@
 <script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<script src="{{url_for('static', filename='js/historical-data-prefix.js')}}"></script>
+{% if current_user.is_authenticated %}
 <script src="{{url_for('static', filename='js/historical-data.js')}}"></script>
+{% endif %}
 <div class="container">
     <form class="mt-3" action="{{ url_for('historical_charts_line') }}" method="GET">
-        <div class="row align-items-center mb-2">
-            <div class="col-auto">
-                {% set base = request.args.get('base') %}
-                {% if base == None %}
-                <select id="base" name="base" class="form-control form-control-sm text-light bg-dark border border-dark rounded-lg">
-                    <option selected value="btc">BTC</option>
-                    <option value="eth">ETH</option>
-                </select>
-                {% elif base == 'btc' %}
-                <select id="base" name="base" class="form-control form-control-sm text-light bg-dark border border-dark rounded-lg">
-                    <option selected value="btc">BTC</option>
-                    <option value="eth">ETH</option>
-                </select>
-                {% else %}
-                <select id="base" name="base" class="form-control form-control-sm text-light bg-dark border border-dark rounded-lg">
-                    <option value="btc">BTC</option>
-                    <option selected value="eth">ETH</option>
-                </select>
-                {% endif %}
+        <div class="row align-items-center mb-3">
+            <div class="col-sm-auto mb-2">
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto">
+                        <small class="text-light mr-2">Base:</small>
+                    </div>
+                    <div class="col-auto">
+                        {% set base = request.args.get('base') %}
+                        {% if base == None %}
+                        <select id="base" name="base"
+                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                            <option selected value="btc">BTC</option>
+                            <option value="eth">ETH</option>
+                        </select>
+                        {% elif base == 'btc' %}
+                        <select id="base" name="base"
+                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                            <option selected value="btc">BTC</option>
+                            <option value="eth">ETH</option>
+                        </select>
+                        {% else %}
+                        <select id="base" name="base"
+                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                            <option value="btc">BTC</option>
+                            <option selected value="eth">ETH</option>
+                        </select>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="col-auto">
-                <select id="quote" name="quote" class="form-control form-control-sm text-light bg-dark border border-dark rounded-lg">
-                    <option selected value="eur">EUR</option>
-                </select>
+            <div class="col-sm-auto mb-2">
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto">
+                        <small class="text-light mr-2">Quote:</small>
+                    </div>
+                    <div class="col-auto">
+                        <select id="quote" name="quote"
+                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                            <option selected value="eur">EUR</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="col-auto">
-                <select id="market" name="market" class="form-control form-control-sm text-light bg-dark border border-dark rounded-lg">
-                    <option selected value="kraken">kraken</option>
-                </select>
+            <div class="col-sm-auto mb-2">
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto">
+                        <small class="text-light mr-2">Market:</small>
+                    </div>
+                    <div class="col-auto">
+                        <select id="market" name="market"
+                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                            <option selected value="kraken">kraken</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
+        {% if current_user.is_authenticated %}
         <div class="row align-items-center">
             <div class="col-auto mb-2">
                 <div class="row no-gutters align-items-center">
                     <div class="col-auto">
                         <small class="text-light mr-2">Start:</small>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-auto mr-2">
                         <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
                                type="date" id="start" name="start" value="{{request.args.get('start')}}">
+                    </div>
+                    <div class="col-auto">
+                        <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                               id="start_time" type="time" name="start_time" value="{{request.args.get('start_time')}}">
                     </div>
                 </div>
             </div>
@@ -76,24 +110,74 @@
                     <div class="col-auto">
                         <small class="text-light mr-2">End:</small>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-auto mr-2">
                         <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
                                type="date" id="end" name="end" value="{{request.args.get('end')}}">
                     </div>
+                    <div class="col-auto">
+                        <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                               id="end_time" type="time" name="end_time" value="{{request.args.get('end_time')}}">
+                    </div>
                 </div>
             </div>
-            <div class="col-sm-auto mb-2">
-                <button type="submit" class="btn btn-sm btn-secondary text-light">refresh</button>
+        </div>
+        <div class="mt-3">
+            <div class="row">
+                <div class="col-xl-4 col-lg-6 col-md-9 justify-content-center">
+                    <button type="submit" class="btn btn-sm btn-dark btn-block text-light px-5">refresh chart</button>
+                </div>
             </div>
         </div>
+
+        <div class="row justify-content-end mt-3">
+            <div class="col-auto p-2">
+                <a href="#" id="id1" onclick="historical_line_prefix ('historical-line', 1)" class="btn btn-sm btn-outline-dark text-light px-2">1 D</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id3" onclick="historical_line_prefix ('historical-line', 3)" class="btn btn-sm btn-outline-dark text-light px-2">3 D</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id7" onclick="historical_line_prefix ('historical-line', 7)" class="btn btn-sm btn-secondary text-light px-2">1 W</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id14" onclick="historical_line_prefix ('historical-line', 14)" class="btn btn-sm btn-outline-dark text-light px-2">2 W</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id30" onclick="historical_line_prefix ('historical-line', 30)" class="btn btn-sm btn-outline-dark text-light px-2">1 M</a>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="row justify-content-end mt-3">
+            <div class="col-auto p-2">
+                <a href="#" id="id1" onclick="historical_line_prefix ('historical-line', 1)" class="btn btn-sm btn-outline-dark text-light px-2">1 D</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id3" onclick="historical_line_prefix ('historical-line', 3)" class="btn btn-sm btn-outline-dark text-light px-2">3 D</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id7" onclick="historical_line_prefix ('historical-line', 7)" class="btn btn-sm btn-secondary text-light px-2">1 W</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id14" onclick="historical_line_prefix ('historical-line', 14)" class="btn btn-sm btn-outline-dark text-light px-2">2 W</a>
+            </div>
+            <div class="col-auto p-2">
+                <a href="#" id="id30" onclick="historical_line_prefix ('historical-line', 30)" class="btn btn-sm btn-outline-dark text-light px-2">1 M</a>
+            </div>
+        </div>
+        {% endif %}
     </form>
-    <div>
+    <div class="border-top border-secondary mt-2">
         <div id="historical-line" style="height: 600px;"></div>
+        {% if current_user.is_authenticated %}
         <script>
             historical_line ('historical-line')
-
-
         </script>
+        {% else %}
+        <script>
+            historical_line_prefix ('historical-line', 7)
+        </script>
+        {% endif %}
     </div>
 </div>
 

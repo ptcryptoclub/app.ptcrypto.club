@@ -138,7 +138,7 @@ def vtp_chart_data(base, quote, market, datapoints, candle):
 def get_historical_data_line(base: str, quote: str, market: str, start=None, end=None, candle=None):
     default_delta_20 = 8
     default_delta_60 = 24
-    default_delta_300 = 120
+    default_delta_300 = 168  # one week
     if candle is None:
         candle = 20
     if candle not in [20, 60, 300]:
@@ -224,7 +224,7 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
 def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end=None, candle=None):
     default_delta_20 = 8
     default_delta_60 = 24
-    default_delta_300 = 120
+    default_delta_300 = 168  # one week
     if candle is None:
         candle = 20
     if candle not in [20, 60, 300]:
@@ -322,7 +322,7 @@ def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end
 def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=None, candle=None):
     default_delta_20 = 8
     default_delta_60 = 24
-    default_delta_300 = 120
+    default_delta_300 = 168  # one week
     if candle is None:
         candle = 20
     if candle not in [20, 60, 300]:

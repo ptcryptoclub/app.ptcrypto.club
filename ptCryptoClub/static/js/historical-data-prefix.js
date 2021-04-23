@@ -1,4 +1,9 @@
-function historical_line (divName) {
+function historical_line_prefix(divName, prefix) {
+
+    var base = document.getElementById("base").value;
+    var quote = document.getElementById("quote").value;
+    var market = document.getElementById("market").value;
+    var apiSecret = document.getElementById("APISecret").value;
 
     var a1 = document.getElementById("id1");
     var a2 = document.getElementById("id3");
@@ -12,39 +17,35 @@ function historical_line (divName) {
     a4.className = "btn btn-sm btn-outline-dark text-light px-2"
     a5.className = "btn btn-sm btn-outline-dark text-light px-2"
 
-    var base = document.getElementById("base").value;
-    var quote = document.getElementById("quote").value;
-    var market = document.getElementById("market").value;
-    var apiSecret = document.getElementById("APISecret").value;
-    var start = document.getElementById("start").value;
-    var end = document.getElementById("end").value;
-    var start_time = document.getElementById("start_time").value;
-    var end_time = document.getElementById("end_time").value;
-   
+    elementID = "id" + prefix
+    var prefixSelected = document.getElementById(elementID);
+    prefixSelected.className = "btn btn-sm btn-secondary text-light px-2"
 
-    if (start == "" & end == "") {
-        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/";
-    } else if (start == "") {
-        if (end_time != "") {
-            end += " " + end_time
-        }
-        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/?end=" + end +"/";
-    } else if (end == "") {
-        if (start_time != "") {
-            start += " " + start_time
-        }
-        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/?start=" + start +"/";
-    } else {
-        if (start_time != "") {
-            start += " " + start_time
-        }
-        if (end_time != "") {
-            end += " " + end_time
-        }
-        urlToSend = "/api/historical-charts/line/"+ base +"/"+ quote +"/"+ market +"/300/"+ apiSecret +"/?start="+ start +"&end=" + end;
-    }
+    var nowTime = new Date();
 
-   
+    var end_y = nowTime.getUTCFullYear()
+    var end_m = parseInt(nowTime.getUTCMonth()) + 1
+    var end_d = nowTime.getUTCDate()
+    var end_h = nowTime.getUTCHours()
+    var end_mm = nowTime.getUTCMinutes()
+    var end_s = nowTime.getUTCSeconds()
+
+    var end = end_y + "-" + end_m + "-" + end_d + " " + end_h + ":" + end_mm + ":" + end_s
+
+    nowTime.setDate(nowTime.getDate()-prefix);
+
+    var start_y = nowTime.getUTCFullYear()
+    var start_m = parseInt(nowTime.getUTCMonth()) + 1
+    var start_d = nowTime.getUTCDate()
+    var start_h = nowTime.getUTCHours()
+    var start_mm = nowTime.getUTCMinutes()
+    var start_s = nowTime.getUTCSeconds()
+
+    var start = start_y + "-" + start_m + "-" + start_d + " " + start_h + ":" + start_mm + ":" + start_s
+
+    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/300/" + apiSecret +"/?start="+ start +"&end=" + end;
+
+
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
