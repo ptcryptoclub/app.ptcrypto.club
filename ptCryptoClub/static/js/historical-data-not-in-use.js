@@ -1,4 +1,4 @@
-function historical_line (divName) {
+function historical_line_advanced (divName) {
 
     var a1 = document.getElementById("id1");
     var a2 = document.getElementById("id3");

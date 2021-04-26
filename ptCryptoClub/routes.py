@@ -1287,9 +1287,16 @@ def about_project():
 
 @app.route("/historical-charts/line")
 def historical_charts_line():
+    end = datetime.utcnow()
+    start = end - timedelta(days=14)
+    end += timedelta(days=1)
     return render_template(
-        "historical-charts-line.html",
-        title="Historical Charts"
+        "historical-charts-line-2.html",
+        title="Historical Charts",
+        end=str(end)[:10],
+        start=str(start)[:10],
+        hours=str(start)[11:16],
+        end_pro=str(datetime.utcnow())[:10]
     )
 
 

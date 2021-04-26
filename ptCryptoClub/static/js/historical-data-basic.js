@@ -1,4 +1,19 @@
-function historical_line_prefix(divName, prefix) {
+function historical_line_basic(divName) {
+
+    if (document.getElementById("id-1").checked) {
+        prefix = parseInt(document.getElementById("id-1").value);
+    } else if (document.getElementById("id-3").checked) {
+        prefix = parseInt(document.getElementById("id-3").value);
+    } else if (document.getElementById("id-7").checked) {
+        prefix = parseInt(document.getElementById("id-7").value);
+    } else if (document.getElementById("id-14").checked) {
+        prefix = parseInt(document.getElementById("id-14").value);
+    } else if (document.getElementById("id-30").checked) {
+        prefix = parseInt(document.getElementById("id-30").value);
+    } else {
+        prefix = 7
+    }
+
 
     var b1 = document.getElementById("start");
     var b2 = document.getElementById("start_time");
@@ -14,26 +29,11 @@ function historical_line_prefix(divName, prefix) {
 
     
 
-    var base = document.getElementById("base").value;
-    var quote = document.getElementById("quote").value;
-    var market = document.getElementById("market").value;
+    var base = document.getElementById("base-basic").value;
+    var quote = document.getElementById("quote-basic").value;
+    var market = document.getElementById("market-basic").value;
     var apiSecret = document.getElementById("APISecret").value;
 
-    var a1 = document.getElementById("id1");
-    var a2 = document.getElementById("id3");
-    var a3 = document.getElementById("id7");
-    var a4 = document.getElementById("id14");
-    var a5 = document.getElementById("id30");
-
-    a1.className = "btn btn-sm btn-outline-dark text-light px-2"
-    a2.className = "btn btn-sm btn-outline-dark text-light px-2"
-    a3.className = "btn btn-sm btn-outline-dark text-light px-2"
-    a4.className = "btn btn-sm btn-outline-dark text-light px-2"
-    a5.className = "btn btn-sm btn-outline-dark text-light px-2"
-
-    elementID = "id" + prefix
-    var prefixSelected = document.getElementById(elementID);
-    prefixSelected.className = "btn btn-sm btn-secondary text-light px-2"
 
     var nowTime = new Date();
 
