@@ -26,8 +26,12 @@
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <script src="{{url_for('static', filename='js/historical-data-basic.js')}}"></script>
+{% if current_user.is_authenticated %}
 <script src="{{url_for('static', filename='js/historical-data-advanced.js')}}"></script>
+{% endif %}
+{% if current_user.email in admins_emails %}
 <script src="{{url_for('static', filename='js/historical-data-pro.js')}}"></script>
+{% endif %}
 <div class="container">
 
     <div class="mt-2">
@@ -37,13 +41,23 @@
                    role="tab" onclick="historical_line_basic ('historical-line')" aria-controls="pills-basic"
                    aria-selected="true">Basic</a>
             </li>
+            {% if not current_user.is_authenticated %}
+            {% set dis_1 = "disabled" %}
+            {% else %}
+            {% set dis_1 = "" %}
+            {% endif %}
             <li class="nav-item" role="presentation">
-                <a class="nav-link text-light" id="pills-advanced-tab" data-toggle="pill" href="#pills-advanced"
+                <a class="nav-link text-light {{dis_1}}" id="pills-advanced-tab" data-toggle="pill" href="#pills-advanced"
                    role="tab" onclick="historical_line_advanced ('historical-line')" aria-controls="pills-advanced"
                    aria-selected="false">Advanced</a>
             </li>
+            {% if not current_user.email in admins_emails %}
+            {% set dis_2 = "disabled" %}
+            {% else %}
+            {% set dis_2 = "" %}
+            {% endif %}
             <li class="nav-item" role="presentation">
-                <a class="nav-link text-light" id="pills-pro-tab" data-toggle="pill" href="#pills-pro"
+                <a class="nav-link text-light {{dis_2}}" id="pills-pro-tab" data-toggle="pill" href="#pills-pro"
                    role="tab"
                    onclick="historical_line_pro ('historical-line')" aria-controls="pills-pro"
                    aria-selected="false">Pro</a>
@@ -129,6 +143,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="tab-pane fade" id="pills-advanced" role="tabpanel" aria-labelledby="pills-advanced-tab">
                 <div>
                     <div class="row align-items-center">
