@@ -1291,7 +1291,7 @@ def historical_charts_line():
     start = end - timedelta(days=14)
     end += timedelta(days=1)
     return render_template(
-        "historical-charts-line-2.html",
+        "historical-charts-line.html",
         title="Historical Charts",
         end=str(end)[:10],
         start=str(start)[:10],

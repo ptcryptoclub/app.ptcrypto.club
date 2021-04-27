@@ -25,159 +25,319 @@
 <script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
-<script src="{{url_for('static', filename='js/historical-data-prefix.js')}}"></script>
+<script src="{{url_for('static', filename='js/historical-data-basic.js')}}"></script>
 {% if current_user.is_authenticated %}
-<script src="{{url_for('static', filename='js/historical-data.js')}}"></script>
+<script src="{{url_for('static', filename='js/historical-data-advanced.js')}}"></script>
+{% endif %}
+{% if current_user.email in admins_emails %}
+<script src="{{url_for('static', filename='js/historical-data-pro.js')}}"></script>
 {% endif %}
 <div class="container">
-    <form class="mt-3" action="{{ url_for('historical_charts_line') }}" method="GET">
-        <div class="row align-items-center mb-3">
-            <div class="col-sm-auto mb-2">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-auto">
-                        <small class="text-light mr-2">Base:</small>
-                    </div>
-                    <div class="col-auto">
-                        {% set base = request.args.get('base') %}
-                        {% if base == None %}
-                        <select id="base" name="base"
-                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
-                            <option selected value="btc">BTC</option>
-                            <option value="eth">ETH</option>
-                        </select>
-                        {% elif base == 'btc' %}
-                        <select id="base" name="base"
-                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
-                            <option selected value="btc">BTC</option>
-                            <option value="eth">ETH</option>
-                        </select>
-                        {% else %}
-                        <select id="base" name="base"
-                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
-                            <option value="btc">BTC</option>
-                            <option selected value="eth">ETH</option>
-                        </select>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-auto mb-2">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-auto">
-                        <small class="text-light mr-2">Quote:</small>
-                    </div>
-                    <div class="col-auto">
-                        <select id="quote" name="quote"
-                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
-                            <option selected value="eur">EUR</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-auto mb-2">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-auto">
-                        <small class="text-light mr-2">Market:</small>
-                    </div>
-                    <div class="col-auto">
-                        <select id="market" name="market"
-                                class="custom-select custom-select-sm bg-dark border border-dark text-light">
-                            <option selected value="kraken">kraken</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% if current_user.is_authenticated %}
-        <div class="row align-items-center">
-            <div class="col-auto mb-2">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-auto">
-                        <small class="text-light mr-2">Start:</small>
-                    </div>
-                    <div class="col-auto mr-2">
-                        <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                               type="date" id="start" name="start" value="{{request.args.get('start')}}">
-                    </div>
-                    <div class="col-auto">
-                        <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                               id="start_time" type="time" name="start_time" value="{{request.args.get('start_time')}}">
-                    </div>
-                </div>
-            </div>
-            <div class="col-auto mb-2">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-auto">
-                        <small class="text-light mr-2">End:</small>
-                    </div>
-                    <div class="col-auto mr-2">
-                        <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                               type="date" id="end" name="end" value="{{request.args.get('end')}}">
-                    </div>
-                    <div class="col-auto">
-                        <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                               id="end_time" type="time" name="end_time" value="{{request.args.get('end_time')}}">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-3">
-            <div class="row">
-                <div class="col-xl-4 col-lg-6 col-md-9 justify-content-center">
-                    <button type="submit" class="btn btn-sm btn-dark btn-block text-light px-5">refresh chart</button>
-                </div>
-            </div>
-        </div>
 
-        <div class="row justify-content-end mt-3">
-            <div class="col-auto p-2">
-                <a href="#" id="id1" onclick="historical_line_prefix ('historical-line', 1)" class="btn btn-sm btn-outline-dark text-light px-2">1 D</a>
-            </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id3" onclick="historical_line_prefix ('historical-line', 3)" class="btn btn-sm btn-outline-dark text-light px-2">3 D</a>
-            </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id7" onclick="historical_line_prefix ('historical-line', 7)" class="btn btn-sm btn-secondary text-light px-2">1 W</a>
-            </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id14" onclick="historical_line_prefix ('historical-line', 14)" class="btn btn-sm btn-outline-dark text-light px-2">2 W</a>
-            </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id30" onclick="historical_line_prefix ('historical-line', 30)" class="btn btn-sm btn-outline-dark text-light px-2">1 M</a>
-            </div>
-        </div>
+    <div class="mt-2">
+        <ul class="nav nav-pills justify-content-end mb-3 small" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link text-light active" id="pills-basic-tab" data-toggle="pill" href="#pills-basic"
+                   role="tab" onclick="historical_line_basic ('historical-line')" aria-controls="pills-basic"
+                   aria-selected="true">Basic</a>
+            </li>
+            {% if not current_user.is_authenticated %}
+            {% set dis_1 = "disabled" %}
+            {% set title_1 = "Please login to unlock this option" %}
+            {% else %}
+            {% set dis_1 = "" %}
+            {% set title_1 = "" %}
+            {% endif %}
+            <li class="nav-item" role="presentation" title="{{title_1}}">
+                <a class="nav-link text-light {{dis_1}}" id="pills-advanced-tab" data-toggle="pill" href="#pills-advanced"
+                   role="tab" onclick="historical_line_advanced ('historical-line')" aria-controls="pills-advanced"
+                   aria-selected="false">Advanced</a>
+            </li>
+            {% if not current_user.email in admins_emails %}
+            {% set dis_2 = "disabled" %}
+            {% set title_2 = "Please upgrade your account to unlock this option" %}
+            {% else %}
+            {% set dis_2 = "" %}
+            {% set title_2 = "" %}
+            {% endif %}
+            <li class="nav-item" role="presentation" title="{{title_2}}">
+                <a class="nav-link text-light {{dis_2}}" id="pills-pro-tab" data-toggle="pill" href="#pills-pro"
+                   role="tab"
+                   onclick="historical_line_pro ('historical-line')" aria-controls="pills-pro"
+                   aria-selected="false">Pro</a>
+            </li>
+        </ul>
 
-        {% else %}
-        <div class="row justify-content-end mt-3">
-            <div class="col-auto p-2">
-                <a href="#" id="id1" onclick="historical_line_prefix ('historical-line', 1)" class="btn btn-sm btn-outline-dark text-light px-2">1 D</a>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-basic" role="tabpanel" aria-labelledby="pills-basic-tab">
+                <div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Base:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="base-basic" name="base"
+                                            onchange="historical_line_basic ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="btc">BTC</option>
+                                        <option value="eth">ETH</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Quote:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="quote-basic" name="quote"
+                                            onchange="historical_line_basic ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="eur">EUR</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Market:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="market-basic" name="market"
+                                            onchange="historical_line_basic ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="kraken">kraken</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="id-1" class="custom-control-input" value="1" name="prefix-radio"
+                                   onclick="historical_line_basic ('historical-line')">
+                            <label class="custom-control-label text-light" for="id-1">1 D</label>
+
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="id-3" class="custom-control-input" value="3" name="prefix-radio"
+                                   onclick="historical_line_basic ('historical-line')">
+                            <label class="custom-control-label text-light" for="id-3">3 D</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="id-7" class="custom-control-input" value="7" name="prefix-radio"
+                                   onclick="historical_line_basic ('historical-line')" checked>
+                            <label class="custom-control-label text-light" for="id-7">1 W</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="id-14" class="custom-control-input" value="14" name="prefix-radio"
+                                   onclick="historical_line_basic ('historical-line')">
+                            <label class="custom-control-label text-light" for="id-14">2 W</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="id-30" class="custom-control-input" value="30" name="prefix-radio"
+                                   onclick="historical_line_basic ('historical-line')">
+                            <label class="custom-control-label text-light" for="id-30">1 M</label>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id3" onclick="historical_line_prefix ('historical-line', 3)" class="btn btn-sm btn-outline-dark text-light px-2">3 D</a>
+
+            <div class="tab-pane fade" id="pills-advanced" role="tabpanel" aria-labelledby="pills-advanced-tab">
+                <div>
+                    {% if current_user.is_authenticated %}
+                    <div class="row align-items-center">
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Base:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="base-advanced" name="base"
+                                            onchange="historical_line_advanced ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="btc">BTC</option>
+                                        <option value="eth">ETH</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Quote:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="quote-advanced" name="quote"
+                                            onchange="historical_line_advanced ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="eur">EUR</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Market:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="market-advanced" name="market"
+                                            onchange="historical_line_advanced ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="kraken">kraken</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Start:</small>
+                                </div>
+                                <div class="col-auto mr-2">
+                                    <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                                           type="date" id="start-advanced" value="{{start}}" required
+                                           onchange="historical_line_advanced ('historical-line')">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">End:</small>
+                                </div>
+                                <div class="col-auto mr-2">
+                                    <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                                           type="date" id="end-advanced" value="{{end}}" required
+                                           onchange="historical_line_advanced ('historical-line')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id7" onclick="historical_line_prefix ('historical-line', 7)" class="btn btn-sm btn-secondary text-light px-2">1 W</a>
-            </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id14" onclick="historical_line_prefix ('historical-line', 14)" class="btn btn-sm btn-outline-dark text-light px-2">2 W</a>
-            </div>
-            <div class="col-auto p-2">
-                <a href="#" id="id30" onclick="historical_line_prefix ('historical-line', 30)" class="btn btn-sm btn-outline-dark text-light px-2">1 M</a>
+            <div class="tab-pane fade" id="pills-pro" role="tabpanel" aria-labelledby="pills-pro-tab">
+                <div>
+                    {% if current_user.email in admins_emails %}
+                    <div class="row align-items-center">
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Base:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="base-pro" onchange="historical_line_pro ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="btc">BTC</option>
+                                        <option value="eth">ETH</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Quote:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="quote-pro" name="quote"
+                                            onchange="historical_line_pro ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="eur">EUR</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Market:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="market-pro" onchange="historical_line_pro ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option selected value="kraken">kraken</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Start:</small>
+                                </div>
+                                <div class="col-auto mr-2">
+                                    <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                                           type="date" id="start-pro" value="{{start}}" required
+                                           onchange="historical_line_pro ('historical-line')">
+                                </div>
+                                <div class="col-auto">
+                                    <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                                           id="start-time-pro" type="time" value="{{hours}}" required
+                                           onchange="historical_line_pro ('historical-line')">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">End:</small>
+                                </div>
+                                <div class="col-auto mr-2">
+                                    <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                                           type="date" id="end-pro" value="{{end}}" required
+                                           onchange="historical_line_advanced ('historical-line')">
+                                </div>
+                                <div class="col-auto">
+                                    <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
+                                           id="end-time-pro" type="time" value="00:00" required
+                                           onchange="historical_line_advanced ('historical-line')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-sm-auto mb-2">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-light mr-2">Candle:</small>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="candle-pro" name="base"
+                                            onchange="historical_line_pro ('historical-line')"
+                                            class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                        <option value="20">20 sec</option>
+                                        <option value="60">01 min</option>
+                                        <option selected value="300">05 min</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% endif %}
-    </form>
+    </div>
+
+
     <div class="border-top border-secondary mt-2">
         <div id="historical-line" style="height: 600px;"></div>
-        {% if current_user.is_authenticated %}
         <script>
-            historical_line ('historical-line')
+            historical_line_basic ('historical-line')
+
+
         </script>
-        {% else %}
-        <script>
-            historical_line_prefix ('historical-line', 7)
-        </script>
-        {% endif %}
     </div>
 </div>
 
