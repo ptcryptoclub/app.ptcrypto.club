@@ -228,8 +228,7 @@
                                     <small class="text-light mr-2">Base:</small>
                                 </div>
                                 <div class="col-auto">
-                                    <select id="base-pro" name="base"
-                                            onchange="historical_line_advanced ('historical-line')"
+                                    <select id="base-pro" onchange="historical_line_pro ('historical-line')"
                                             class="custom-select custom-select-sm bg-dark border border-dark text-light">
                                         <option selected value="btc">BTC</option>
                                         <option value="eth">ETH</option>
@@ -244,7 +243,7 @@
                                 </div>
                                 <div class="col-auto">
                                     <select id="quote-pro" name="quote"
-                                            onchange="historical_line_advanced ('historical-line')"
+                                            onchange="historical_line_pro ('historical-line')"
                                             class="custom-select custom-select-sm bg-dark border border-dark text-light">
                                         <option selected value="eur">EUR</option>
                                     </select>
@@ -257,8 +256,7 @@
                                     <small class="text-light mr-2">Market:</small>
                                 </div>
                                 <div class="col-auto">
-                                    <select id="market-pro" name="market"
-                                            onchange="historical_line_advanced ('historical-line')"
+                                    <select id="market-pro" onchange="historical_line_pro ('historical-line')"
                                             class="custom-select custom-select-sm bg-dark border border-dark text-light">
                                         <option selected value="kraken">kraken</option>
                                     </select>
@@ -275,12 +273,12 @@
                                 <div class="col-auto mr-2">
                                     <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
                                            type="date" id="start-pro" value="{{start}}" required
-                                           onchange="historical_line_advanced ('historical-line')">
+                                           onchange="historical_line_pro ('historical-line')">
                                 </div>
                                 <div class="col-auto">
                                     <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                                           id="start-time-pro" type="time" name="start_time" value="{{hours}}" required
-                                           onchange="historical_line_advanced ('historical-line')">
+                                           id="start-time-pro" type="time" value="{{hours}}" required
+                                           onchange="historical_line_pro ('historical-line')">
                                 </div>
                             </div>
                         </div>
@@ -291,12 +289,12 @@
                                 </div>
                                 <div class="col-auto mr-2">
                                     <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                                           type="date" id="end-pro" name="end" value="{{end_pro}}" required
+                                           type="date" id="end-pro" value="{{end}}" required
                                            onchange="historical_line_advanced ('historical-line')">
                                 </div>
                                 <div class="col-auto">
                                     <input class="bg-dark text-light border border-dark rounded-lg form-control form-control-sm"
-                                           id="end-time-pro" type="time" name="end_time" value="{{hours}}" required
+                                           id="end-time-pro" type="time" value="00:00" required
                                            onchange="historical_line_advanced ('historical-line')">
                                 </div>
                             </div>
