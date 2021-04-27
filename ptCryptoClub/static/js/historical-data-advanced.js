@@ -48,6 +48,10 @@ function historical_line_advanced(divName) {
     dateAxis.minHeight = 30;
     dateAxis.renderer.fontSize = "0.8em";
 
+    // this makes the data to be grouped
+    dateAxis.groupData = true;
+    dateAxis.groupCount = 2000;
+
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.tooltip.disabled = true;
