@@ -57,7 +57,7 @@ function historical_line_basic(divName) {
 
     var start = start_y + "-" + start_m + "-" + start_d + " " + start_h + ":" + start_mm + ":" + start_s
 
-    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/300/" + apiSecret +"/?start="+ start +"&end=" + end;
+    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/1800/" + apiSecret +"/?start="+ start +"&end=" + end;
 
 
 

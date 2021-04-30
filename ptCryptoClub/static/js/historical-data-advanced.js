@@ -9,13 +9,13 @@ function historical_line_advanced(divName) {
     var apiSecret = document.getElementById("APISecret").value;
 
     if (start == "" & end == "") {
-        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/300/" + apiSecret +"/"
+        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/900/" + apiSecret +"/"
     } else if (start != "" & end == "") {
-        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/300/" + apiSecret +"/?start="+ start;
+        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/900/" + apiSecret +"/?start="+ start;
     }else if (end != "" & start == "") {
-        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/300/" + apiSecret +"/?end="+ end;
+        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/900/" + apiSecret +"/?end="+ end;
     } else {
-        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/300/" + apiSecret +"/?start="+ start +"&end=" + end;
+        urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/900/" + apiSecret +"/?start="+ start +"&end=" + end;
     }
 
     // Themes begin
