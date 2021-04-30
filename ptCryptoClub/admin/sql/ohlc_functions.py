@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData
+from ptCryptoClub.admin.config import CryptoData, candle_values
 from ptCryptoClub import db
 from ptCryptoClub.admin.models import ErrorLogs
 
@@ -7,6 +7,13 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 engine_live_data = create_engine(CryptoData.string)
+
+default_delta_20 = 8
+default_delta_60 = 24
+default_delta_300 = 168  # 07 days
+default_delta_900 = 336  # 14 days
+default_delta_1800 = 504  # 21 days
+default_delta_3600 = 720  # 30 days
 
 
 def ohlc_chart_data(base, quote, market, datapoints, candle):
@@ -136,13 +143,10 @@ def vtp_chart_data(base, quote, market, datapoints, candle):
 
 
 def get_historical_data_line(base: str, quote: str, market: str, start=None, end=None, candle=None):
-    default_delta_20 = 8
-    default_delta_60 = 24
-    default_delta_300 = 168  # one week
     if candle is None:
-        candle = 20
-    if candle not in [20, 60, 300]:
-        candle = 20
+        candle = 300
+    if candle not in candle_values:
+        candle = 300
     if start is None and end is None:
         if candle == 20:
             end = datetime.utcnow()
@@ -150,14 +154,23 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
         elif candle == 60:
             end = datetime.utcnow()
             start = end - timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             end = datetime.utcnow()
             start = end - timedelta(hours=default_delta_300)
+        elif candle == 900:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_1800)
+        else:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_3600)
     elif start is None:
         try:
             end = pd.to_datetime(end)
         except Exception as e:
-            print(e) # An error log will not be created
+            print(e)  # An error log will not be created
             end = datetime.utcnow()
         else:
             end = pd.to_datetime(end)
@@ -165,8 +178,14 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
             start = end - timedelta(hours=default_delta_20)
         elif candle == 60:
             start = end - timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             start = end - timedelta(hours=default_delta_300)
+        elif candle == 900:
+            start = end - timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            start = end - timedelta(hours=default_delta_1800)
+        else:
+            start = end - timedelta(hours=default_delta_3600)
     elif end is None:
         try:
             start = pd.to_datetime(start)
@@ -177,8 +196,14 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
             end = start + timedelta(hours=default_delta_20)
         elif candle == 60:
             end = start + timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             end = start + timedelta(hours=default_delta_300)
+        elif candle == 900:
+            end = start + timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            end = start + timedelta(hours=default_delta_1800)
+        else:
+            end = start + timedelta(hours=default_delta_3600)
     else:
         try:
             start = pd.to_datetime(start)
@@ -222,13 +247,10 @@ def get_historical_data_line(base: str, quote: str, market: str, start=None, end
 
 
 def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end=None, candle=None):
-    default_delta_20 = 8
-    default_delta_60 = 24
-    default_delta_300 = 168  # one week
     if candle is None:
-        candle = 20
-    if candle not in [20, 60, 300]:
-        candle = 20
+        candle = 300
+    if candle not in candle_values:
+        candle = 300
     if start is None and end is None:
         if candle == 20:
             end = datetime.utcnow()
@@ -236,14 +258,23 @@ def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end
         elif candle == 60:
             end = datetime.utcnow()
             start = end - timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             end = datetime.utcnow()
             start = end - timedelta(hours=default_delta_300)
+        elif candle == 900:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_1800)
+        else:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_3600)
     elif start is None:
         try:
             end = pd.to_datetime(end)
         except Exception as e:
-            print(e) # An error log will not be created
+            print(e)  # An error log will not be created
             end = datetime.utcnow()
         else:
             end = pd.to_datetime(end)
@@ -251,20 +282,32 @@ def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end
             start = end - timedelta(hours=default_delta_20)
         elif candle == 60:
             start = end - timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             start = end - timedelta(hours=default_delta_300)
+        elif candle == 900:
+            start = end - timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            start = end - timedelta(hours=default_delta_1800)
+        else:
+            start = end - timedelta(hours=default_delta_3600)
     elif end is None:
         try:
             start = pd.to_datetime(start)
         except Exception as e:
-            print(e) # An error log will not be created
-            return get_historical_data_ohlc(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+            print(e)  # An error log will not be created
+            return get_historical_data_line(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
         if candle == 20:
             end = start + timedelta(hours=default_delta_20)
         elif candle == 60:
             end = start + timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             end = start + timedelta(hours=default_delta_300)
+        elif candle == 900:
+            end = start + timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            end = start + timedelta(hours=default_delta_1800)
+        else:
+            end = start + timedelta(hours=default_delta_3600)
     else:
         try:
             start = pd.to_datetime(start)
@@ -320,13 +363,10 @@ def get_historical_data_ohlc(base: str, quote: str, market: str, start=None, end
 
 
 def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=None, candle=None):
-    default_delta_20 = 8
-    default_delta_60 = 24
-    default_delta_300 = 168  # one week
     if candle is None:
-        candle = 20
-    if candle not in [20, 60, 300]:
-        candle = 20
+        candle = 300
+    if candle not in candle_values:
+        candle = 300
     if start is None and end is None:
         if candle == 20:
             end = datetime.utcnow()
@@ -334,14 +374,23 @@ def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=
         elif candle == 60:
             end = datetime.utcnow()
             start = end - timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             end = datetime.utcnow()
             start = end - timedelta(hours=default_delta_300)
+        elif candle == 900:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_1800)
+        else:
+            end = datetime.utcnow()
+            start = end - timedelta(hours=default_delta_3600)
     elif start is None:
         try:
             end = pd.to_datetime(end)
         except Exception as e:
-            print(e) # An error log will not be created
+            print(e)  # An error log will not be created
             end = datetime.utcnow()
         else:
             end = pd.to_datetime(end)
@@ -349,20 +398,32 @@ def get_historical_data_vtp(base: str, quote: str, market: str, start=None, end=
             start = end - timedelta(hours=default_delta_20)
         elif candle == 60:
             start = end - timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             start = end - timedelta(hours=default_delta_300)
+        elif candle == 900:
+            start = end - timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            start = end - timedelta(hours=default_delta_1800)
+        else:
+            start = end - timedelta(hours=default_delta_3600)
     elif end is None:
         try:
             start = pd.to_datetime(start)
         except Exception as e:
-            print(e) # An error log will not be created
-            return get_historical_data_vtp(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
+            print(e)  # An error log will not be created
+            return get_historical_data_line(base=base, quote=quote, market=market, start=None, end=None, candle=candle)
         if candle == 20:
             end = start + timedelta(hours=default_delta_20)
         elif candle == 60:
             end = start + timedelta(hours=default_delta_60)
-        else:
+        elif candle == 300:
             end = start + timedelta(hours=default_delta_300)
+        elif candle == 900:
+            end = start + timedelta(hours=default_delta_900)
+        elif candle == 1800:
+            end = start + timedelta(hours=default_delta_1800)
+        else:
+            end = start + timedelta(hours=default_delta_3600)
     else:
         try:
             start = pd.to_datetime(start)

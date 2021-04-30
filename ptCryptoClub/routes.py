@@ -10,7 +10,7 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, CloudWatchLogin, \
-    default_fiat
+    default_fiat, candle_values
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
@@ -888,15 +888,21 @@ def chart_ohlc(market, base, quote, candle):
         candle = int(candle)
     except Exception as e:
         print(e)
-        candle = 60
+        candle = default_candle
     if candle == 20:
         candle_in_use_display = "20 sec"
     elif candle == 60:
-        candle_in_use_display = "1 min"
+        candle_in_use_display = "01 min"
     elif candle == 300:
-        candle_in_use_display = "5 min"
+        candle_in_use_display = "05 min"
+    elif candle == 900:
+        candle_in_use_display = "15 min"
+    elif candle == 1800:
+        candle_in_use_display = "30 min"
+    elif candle == 3600:
+        candle_in_use_display = "01 hour"
     else:
-        return redirect(url_for('chart_ohlc', market='kraken', base='btc', quote='eur', candle=default_candle))
+        return redirect(url_for('chart_ohlc', market=market, base=base, quote=quote, candle=default_candle))
     return render_template(
         "charts-ohlc.html",
         title="Charts",
@@ -928,15 +934,21 @@ def chart_vtp(market, base, quote, candle):
         candle = int(candle)
     except Exception as e:
         print(e)
-        candle = 60
+        candle = default_candle
     if candle == 20:
         candle_in_use_display = "20 sec"
     elif candle == 60:
         candle_in_use_display = "1 min"
     elif candle == 300:
         candle_in_use_display = "5 min"
+    elif candle == 900:
+        candle_in_use_display = "15 min"
+    elif candle == 1800:
+        candle_in_use_display = "30 min"
+    elif candle == 3600:
+        candle_in_use_display = "01 hour"
     else:
-        return redirect(url_for('chart_vtp', market='kraken', base='btc', quote='eur', candle=default_candle))
+        return redirect(url_for('chart_vtp', market=market, base=base, quote=quote, candle=default_candle))
     return render_template(
         "charts-vtp.html",
         title="Charts",

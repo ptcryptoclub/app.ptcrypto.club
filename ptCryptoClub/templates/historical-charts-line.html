@@ -316,9 +316,13 @@
                                     <select id="candle-pro" name="base"
                                             onchange="historical_line_pro ('historical-line')"
                                             class="custom-select custom-select-sm bg-dark border border-dark text-light">
-                                        <option value="20">20 sec</option>
-                                        <option value="60">01 min</option>
-                                        <option selected value="300">05 min</option>
+                                        {% for option in candles %}
+                                        {% if option.value == 300 %}
+                                        <option selected value="{{option.value}}">{{option.display}}</option>
+                                        {% else %}
+                                        <option value="{{option.value}}">{{option.display}}</option>
+                                        {% endif %}
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
