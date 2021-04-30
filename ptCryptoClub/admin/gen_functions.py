@@ -4,6 +4,7 @@ from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfol
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
+from flask import request
 import pandas as pd
 import random
 import string
@@ -288,6 +289,8 @@ class SecureApi:
         pass
 
     def validate(self, api_secret, user_id=None, admin=None):
+        if request.headers.get('Cookie') is None or request.headers.get('Referer') is None:
+            return False
         if admin is not None:
             user = User.query.filter_by(api_secret=api_secret).first()
             if user is not None:
