@@ -10,6 +10,12 @@
                         aria-haspopup="true" aria-expanded="false">
                     {% if delta == 60 %}
                     <small>01 hour</small>
+                    {% elif delta == 180 %}
+                    <small>03 hours</small>
+                    {% elif delta == 360 %}
+                    <small>06 hours</small>
+                    {% elif delta == 720 %}
+                    <small>12 hours</small>
                     {% else %}
                     <small>24 hours</small>
                     {% endif %}
@@ -17,6 +23,12 @@
                 <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
                     <a class="dropdown-item text-light small" href="{{url_for('home', delta=60)}}"><small>01
                         hour</small></a>
+                    <a class="dropdown-item text-light small" href="{{url_for('home', delta=180)}}"><small>03
+                        hours</small></a>
+                    <a class="dropdown-item text-light small" href="{{url_for('home', delta=360)}}"><small>06
+                        hours</small></a>
+                    <a class="dropdown-item text-light small" href="{{url_for('home', delta=720)}}"><small>12
+                        hours</small></a>
                     <a class="dropdown-item text-light small" href="{{url_for('home', delta=1440)}}"><small>24
                         hours</small></a>
                 </div>
@@ -83,6 +95,12 @@
                             <div class="row-fluid text-muted text-center">
                                 {% if delta == 60 %}
                                 <small>Last hour</small>
+                                {% elif delta == 180 %}
+                                <small>Last 03h</small>
+                                {% elif delta == 360 %}
+                                <small>Last 06h</small>
+                                {% elif delta == 720 %}
+                                <small>Last 12h</small>
                                 {% else %}
                                 <small>Last 24h</small>
                                 {% endif %}
@@ -123,6 +141,12 @@
     <div class="row justify-content-end mr-2">
         {% if delta == 60 %}
         <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR) - <i class="text-info">Last hour</i></small></a></H6>
+        {% elif delta == 180 %}
+        <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR) - <i class="text-info">Last 03h</i></small></a></H6>
+        {% elif delta == 360 %}
+        <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR) - <i class="text-info">Last 06h</i></small></a></H6>
+        {% elif delta == 720 %}
+        <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR) - <i class="text-info">Last 12h</i></small></a></H6>
         {% else %}
         <H6><a href="#" class="text-light text-decoration-none">Fiat prices <small>(base: EUR) - <i class="text-info">Last 24h</i></small></a></H6>
         {% endif %}
@@ -248,6 +272,12 @@
         <div class="col-md-4 mb-3">
             {% if delta == 60 %}
             <div class="text-center text-muted"><strong><small>Last hour</small></strong></div>
+            {% elif delta == 180 %}
+            <div class="text-center text-muted"><strong><small>Last 03h</small></strong></div>
+            {% elif delta == 360 %}
+            <div class="text-center text-muted"><strong><small>Last 06h</small></strong></div>
+            {% elif delta == 720 %}
+            <div class="text-center text-muted"><strong><small>Last 12h</small></strong></div>
             {% else %}
             <div class="text-center text-muted"><strong><small>Last 24h</small></strong></div>
             {% endif %}
