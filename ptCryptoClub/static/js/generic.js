@@ -295,7 +295,7 @@ function cciChart(divName, market_1, base_1, quote_1, market_2, base_2, quote_2)
     var chart = am4core.create(divName, am4charts.XYChart);
     chart.paddingRight = 20;
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
-    chart.dataSource.url = '/api/home/cci/chart/'+ market_1 +'/'+ base_1 +'/'+ quote_1 +'/'+ market_2 +'/'+ base_2 +'/'+ quote_2 +'/100/'+ apiSecret +'/'
+    chart.dataSource.url = '/api/home/cci/chart/'+ market_1 +'/'+ base_1 +'/'+ quote_1 +'/'+ market_2 +'/'+ base_2 +'/'+ quote_2 +'/30/'+ apiSecret +'/'
     chart.dataSource.load();
     chart.dataSource.parser = new am4core.JSONParser();
 
@@ -321,10 +321,10 @@ function cciChart(divName, market_1, base_1, quote_1, market_2, base_2, quote_2)
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.snapToSeries = series;
 
-    let title = chart.titles.create();
-    title.text = "CCI (last 24h)";
-    title.fontSize = "0.7em";
-    title.marginBottom = 2;
+    // let title = chart.titles.create();
+    // title.text = "CCI (last 24h)";
+    // title.fontSize = "0.7em";
+    // title.marginBottom = 2;
 
     valueAxis.numberFormatter = new am4core.NumberFormatter();
     valueAxis.numberFormatter.numberFormat = "#. %";

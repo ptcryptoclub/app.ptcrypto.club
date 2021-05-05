@@ -97,6 +97,69 @@ def admin_main_tables():
         )
         db.session.add(error_log)
         db.session.commit()
+    # DATA FROM 900s OHLC TABLE #
+    query_900s = """
+            select  count(*) count,
+                    min(closetime) min_date,
+                    max(closetime) max_date
+                from public.ohlc_900s;
+        """
+    try:
+        data_900s = pd.read_sql_query(sql=query_900s, con=engine_live_data)
+    except Exception as e:
+        data_900s = pd.DataFrame(
+            columns=["count", "min_date", "max_date"],
+            index=[0]
+        )
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin functions admin main tables 900s ohlc data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    # DATA FROM 1800s OHLC TABLE #
+    query_1800s = """
+            select  count(*) count,
+                    min(closetime) min_date,
+                    max(closetime) max_date
+                from public.ohlc_1800s;
+        """
+    try:
+        data_1800s = pd.read_sql_query(sql=query_1800s, con=engine_live_data)
+    except Exception as e:
+        data_1800s = pd.DataFrame(
+            columns=["count", "min_date", "max_date"],
+            index=[0]
+        )
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin functions admin main tables 1800s ohlc data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    # DATA FROM 3600s OHLC TABLE #
+    query_3600s = """
+            select  count(*) count,
+                    min(closetime) min_date,
+                    max(closetime) max_date
+                from public.ohlc_3600s;
+        """
+    try:
+        data_3600s = pd.read_sql_query(sql=query_3600s, con=engine_live_data)
+    except Exception as e:
+        data_3600s = pd.DataFrame(
+            columns=["count", "min_date", "max_date"],
+            index=[0]
+        )
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin functions admin main tables 3600s ohlc data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
     to_return = {
         "trans_count": data_trans['count'][0],
         "trans_min": data_trans['min_date'][0],
@@ -109,7 +172,16 @@ def admin_main_tables():
         "60s_ohlc_max": data_60s['max_date'][0],
         "300s_ohlc_count": data_300s['count'][0],
         "300s_ohlc_min": data_300s['min_date'][0],
-        "300s_ohlc_max": data_300s['max_date'][0]
+        "300s_ohlc_max": data_300s['max_date'][0],
+        "900s_ohlc_count": data_900s['count'][0],
+        "900s_ohlc_min": data_900s['min_date'][0],
+        "900s_ohlc_max": data_900s['max_date'][0],
+        "1800s_ohlc_count": data_1800s['count'][0],
+        "1800s_ohlc_min": data_1800s['min_date'][0],
+        "1800s_ohlc_max": data_1800s['max_date'][0],
+        "3600s_ohlc_count": data_3600s['count'][0],
+        "3600s_ohlc_min": data_3600s['min_date'][0],
+        "3600s_ohlc_max": data_3600s['max_date'][0]
     }
     return to_return
 

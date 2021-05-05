@@ -79,60 +79,30 @@
                         <td>{{table_data['300s_ohlc_min']}}</td>
                         <td>{{table_data['300s_ohlc_max']}}</td>
                     </tr>
+                    <tr>
+                        <td>900s ohlc</td>
+                        <td>{{table_data['900s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data['900s_ohlc_min']}}</td>
+                        <td>{{table_data['900s_ohlc_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>1800s ohlc</td>
+                        <td>{{table_data['1800s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data['1800s_ohlc_min']}}</td>
+                        <td>{{table_data['1800s_ohlc_max']}}</td>
+                    </tr>
+                    <tr>
+                        <td>3600s ohlc</td>
+                        <td>{{table_data['3600s_ohlc_count'] | numberFormat}}</td>
+                        <td>{{table_data['3600s_ohlc_min']}}</td>
+                        <td>{{table_data['3600s_ohlc_max']}}</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="col-lg-6 mb-3">
-            <div class="py-3">
-                <div class="row border-bottom border-info">
-                    <div class="col-auto">
-                        <H5 class="text-light">Archive tables</H5>
-                    </div>
-                    <div class="col-auto"></div>
-                </div>
-                <small>
-                    <i class="text-muted">
-                        Information about archive tables in database.
-                    </i>
-                </small>
-                <table class="table table-borderless table-sm small mt-2">
-                    <thead class="text-light">
-                    <tr>
-                        <th scope="col">Table</th>
-                        <th scope="col">Count</th>
-                        <th scope="col">Min date</th>
-                        <th scope="col">Max date</th>
-                    </tr>
-                    </thead>
-                    <tbody class="text-muted">
-                    <tr>
-                        <td>Transactions</td>
-                        <td>{{table_data_archive['trans_count'] | numberFormat}}</td>
-                        <td>{{table_data_archive['trans_min']}}</td>
-                        <td>{{table_data_archive['trans_max']}}</td>
-                    </tr>
-                    <tr>
-                        <td>20s ohlc</td>
-                        <td>{{table_data_archive['20s_ohlc_count'] | numberFormat}}</td>
-                        <td>{{table_data_archive['20s_ohlc_min']}}</td>
-                        <td>{{table_data_archive['20s_ohlc_max']}}</td>
-                    </tr>
-                    <tr>
-                        <td>60s ohlc</td>
-                        <td>{{table_data_archive['60s_ohlc_count'] | numberFormat}}</td>
-                        <td>{{table_data_archive['60s_ohlc_min']}}</td>
-                        <td>{{table_data_archive['60s_ohlc_max']}}</td>
-                    </tr>
-                    <tr>
-                        <td>300s ohlc</td>
-                        <td>{{table_data_archive['300s_ohlc_count'] | numberFormat}}</td>
-                        <td>{{table_data_archive['300s_ohlc_min']}}</td>
-                        <td>{{table_data_archive['300s_ohlc_max']}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+
         </div>
     </div>
     <div class="row">

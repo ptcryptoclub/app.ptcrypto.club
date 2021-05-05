@@ -666,7 +666,6 @@ def account_admin():
             "account-admin.html",
             title="Account",
             table_data=admin_main_tables(),
-            table_data_archive=admin_archive_tables(),
             last_update=admin_last_update(),
             users_sample=admin_users_data_sample()
         )
