@@ -31,6 +31,12 @@ class ApiUsage(db.Model, UserMixin):
     usage = db.Column(db.BigInteger, nullable=False, default=0)
 
 
+class IpAddressLog(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(255))
+    date = db.Column(db.DateTime)
+
+
 class LoginUser(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_ID = db.Column(db.Integer)

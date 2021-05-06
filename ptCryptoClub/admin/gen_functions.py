@@ -1,6 +1,6 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
+from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -289,6 +289,7 @@ class SecureApi:
         pass
 
     def validate(self, api_secret, user_id=None, admin=None):
+        self.log_ip()
         if request.headers.get('Cookie') is None or request.headers.get('Referer') is None:
             return False
         if admin is not None:
@@ -335,6 +336,23 @@ class SecureApi:
             api_usage_line.usage += 1
             db.session.commit()
         return None
+
+    def log_ip(self):
+        ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        date = hour_rounder(datetime.utcnow())
+        ip_log_line = IpAddressLog.query.filter_by(ip_address=ip_address, date=date).first()
+        if ip_log_line is None:
+            # noinspection PyArgumentList
+            ip_line = IpAddressLog(
+                ip_address=ip_address,
+                date=date,
+            )
+            db.session.add(ip_line)
+            db.session.commit()
+        else:
+            pass
+
+
 
 
 def buy_sell_line_data(user_ID, days):
