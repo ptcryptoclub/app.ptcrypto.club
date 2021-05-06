@@ -83,7 +83,7 @@ function sellReport() {
                     displayFee = document.getElementById("fee_sell");
                     displayResult = document.getElementById("result_sell");
 
-                    displayPrice.innerHTML = data2['price'] + '<small>' + base.toUpperCase() + '</small>'
+                    displayPrice.innerHTML = data2['price'] + '<small> ' + quote.toUpperCase() + '</small>'
                     displayAmount.innerHTML = amountSell
                     displayPriceWithoutFee.innerHTML = price_without_feee
                     displayFee.innerHTML = amountFee
