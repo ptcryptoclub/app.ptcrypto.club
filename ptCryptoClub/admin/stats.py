@@ -157,6 +157,3 @@ class UsageStats:
                 }
             )
         return list_
-
-
-# print(UsageStats().connections_db(instance=CloudWatchLoginabase)).dat
