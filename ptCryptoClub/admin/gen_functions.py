@@ -353,8 +353,6 @@ class SecureApi:
             pass
 
 
-
-
 def buy_sell_line_data(user_ID, days):
     query = f"""
     select 	"type",
