@@ -14,5 +14,6 @@ pyotp==2.4.1
 qrcode==6.1
 pyOpenSSL==20.0.1
 psycopg2-binary==2.8.6
+ipinfo==4.2.0
 
 braintree==4.5.0

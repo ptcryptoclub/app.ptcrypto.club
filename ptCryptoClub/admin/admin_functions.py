@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData, qr_code_folder, admins_emails
+from ptCryptoClub.admin.config import CryptoData, qr_code_folder, admins_emails, IpInfo
 from ptCryptoClub import db
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
 
@@ -7,6 +7,7 @@ import pandas as pd
 import time
 from datetime import datetime, timedelta
 import os
+import ipinfo
 
 
 engine_live_data = create_engine(CryptoData.string)
@@ -495,3 +496,27 @@ def admin_delete_user(user_id):
         PortfolioAssets.query.filter_by(user_id=user_id).delete()
         db.session.commit()
         return None
+
+
+def admin_ip_info(ip_address: str):
+    access_token = IpInfo.access_token
+    handler = ipinfo.getHandler(access_token)
+    details = handler.getDetails(ip_address)
+    try:
+        country = details.country
+    except Exception as e:
+        print(e)
+        country = ''
+    try:
+        country_name = details.country_name
+    except Exception as e:
+        print(e)
+        country_name = ''
+    to_return = {
+        'country': country,
+        'country_name': country_name
+    }
+    return to_return
+
+
+
