@@ -10,7 +10,7 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, CloudWatchLogin, \
-    default_fiat, candle_values
+    default_fiat
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
@@ -22,7 +22,7 @@ from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_da
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
-from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_archive_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
+from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
     admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user
 from ptCryptoClub.admin.stats import UsageStats
 
