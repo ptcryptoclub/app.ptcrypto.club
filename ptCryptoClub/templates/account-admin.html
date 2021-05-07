@@ -32,7 +32,7 @@
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <div class="container mt-3">
     <div class="row">
-        <div class="col-lg-6 mb-3">
+        <div class="col-lg-8 mb-3">
             <div class="py-3">
                 <div class="row border-bottom border-info">
                     <div class="col-auto">
@@ -101,8 +101,39 @@
                 </table>
             </div>
         </div>
-        <div class="col-lg-6 mb-3">
-
+        <div class="col-lg-4 mb-3">
+            <div class="py-3">
+                <div class="row border-bottom border-info">
+                    <div class="col-auto">
+                        <H5 class="text-light">Visitors IP address</H5>
+                    </div>
+                    <div class="col-auto"></div>
+                </div>
+                <small>
+                    <i class="text-muted">
+                        Information about who visited the app.
+                    </i>
+                </small>
+                <table class="table table-borderless table-sm small mt-2">
+                    <thead class="text-light">
+                    <tr>
+                        <th scope="col">IP</th>
+                        <th scope="col">City</th>
+                        <th scope="col">Country</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-muted">
+                    {% for element in ip_list %}
+                    <tr>
+                        <td>{{element.ip}}</td>
+                        <td>{{element.city}}</td>
+                        <td>{{element.country_name}}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -138,6 +169,7 @@
                 adminLastUpdate()
                 var runLastUpdate=setInterval( function() { adminLastUpdate(); }, 4750 )
 
+
             </script>
         </div>
         <div class="col-lg-8 mb-3">
@@ -158,6 +190,7 @@
             <div id="apiUsage" style="height: 250px;"></div>
             <script>
                 adminApiUsage('apiUsage')
+
 
             </script>
         </div>
@@ -224,6 +257,7 @@
                 <div id="cpuUsageWS" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageWS('cpuUsageWS')
+
                 </script>
             </div>
         </div>
@@ -240,6 +274,7 @@
                 <div id="cpuUsageDC" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageDC('cpuUsageDC')
+
                 </script>
             </div>
         </div>
@@ -256,14 +291,17 @@
                 <div id="cpuUsageDB" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageDB('cpuUsageDB')
+
                 </script>
                 <div id="freeRamDB" style="height: 250px;"></div>
                 <script>
                     adminFreeRamDB('freeRamDB')
+
                 </script>
                 <div id="connectionsDB" style="height: 250px;"></div>
                 <script>
                     adminConnectionsDB('connectionsDB')
+
                 </script>
             </div>
         </div>

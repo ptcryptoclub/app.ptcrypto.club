@@ -12,7 +12,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
     CloudWatchLogin, default_fiat
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations
+    ResetPasswordAuthorizations, IpAddressLog
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
@@ -23,7 +23,7 @@ from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationF
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
-    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user
+    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info
 from ptCryptoClub.admin.stats import UsageStats
 
 
@@ -662,12 +662,17 @@ def account_admin():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
+        test = IpAddressLog.query.with_entities(IpAddressLog.ip_address).distinct().limit(7)
+        ip_list = []
+        for t in test:
+            ip_list.append(admin_ip_info(ip_address=t[0]))
         return render_template(
             "account-admin.html",
             title="Account",
             table_data=admin_main_tables(),
             last_update=admin_last_update(),
-            users_sample=admin_users_data_sample()
+            users_sample=admin_users_data_sample(),
+            ip_list=ip_list
         )
 
 

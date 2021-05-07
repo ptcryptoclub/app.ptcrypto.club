@@ -498,25 +498,47 @@ def admin_delete_user(user_id):
         return None
 
 
-def admin_ip_info(ip_address: str):
+def admin_ip_info(ip_address: str, full_info=False):
     access_token = IpInfo.access_token
-    handler = ipinfo.getHandler(access_token)
-    details = handler.getDetails(ip_address)
     try:
-        country = details.country
+        handler = ipinfo.getHandler(access_token)
+        details = handler.getDetails(ip_address)
+        if full_info:
+            to_return = details.all
+        else:
+            try:
+                country = details.country
+            except Exception as e:
+                print(e)
+                country = 'NA'
+            try:
+                country_name = details.country_name
+            except Exception as e:
+                print(e)
+                country_name = 'NA'
+            try:
+                city = details.city
+            except Exception as e:
+                print(e)
+                city = 'NA'
+            to_return = {
+                'ip': ip_address,
+                'country': country,
+                'country_name': country_name,
+                'city': city
+            }
     except Exception as e:
-        print(e)
-        country = ''
-    try:
-        country_name = details.country_name
-    except Exception as e:
-        print(e)
-        country_name = ''
-    to_return = {
-        'country': country,
-        'country_name': country_name
-    }
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin IP info',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+        to_return = {
+            'ip': ip_address,
+            'country': "NA",
+            'country_name': "NA",
+            'city': 'NA'
+        }
     return to_return
-
-
-
