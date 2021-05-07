@@ -1327,6 +1327,21 @@ def historical_charts_ohlc():
     )
 
 
+@app.route("/historical-charts/vtp")
+def historical_charts_vtp():
+    end = datetime.utcnow()
+    start = end - timedelta(days=14)
+    end += timedelta(days=1)
+    return render_template(
+        "historical-charts-vtp.html",
+        title="Historical Charts",
+        end=str(end)[:10],
+        start=str(start)[:10],
+        hours=str(start)[11:16],
+        candles=candle_options,
+    )
+
+
 @app.route("/api/historical-charts/line/<base>/<quote>/<market>/<candle>/<api_secret>/")
 def api_historical_charts_line_data(base, quote, market, candle, api_secret):
     try:
