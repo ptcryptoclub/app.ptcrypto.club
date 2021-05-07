@@ -1297,7 +1297,7 @@ def about_project():
     )
 
 
-@app.route("/historical-charts/line")
+@app.route("/historical-charts/line/")
 def historical_charts_line():
     end = datetime.utcnow()
     start = end - timedelta(days=14)
@@ -1312,7 +1312,7 @@ def historical_charts_line():
     )
 
 
-@app.route("/historical-charts/ohlc")
+@app.route("/historical-charts/ohlc/")
 def historical_charts_ohlc():
     end = datetime.utcnow()
     start = end - timedelta(days=14)
@@ -1327,7 +1327,7 @@ def historical_charts_ohlc():
     )
 
 
-@app.route("/historical-charts/vtp")
+@app.route("/historical-charts/vtp/")
 def historical_charts_vtp():
     end = datetime.utcnow()
     start = end - timedelta(days=14)
