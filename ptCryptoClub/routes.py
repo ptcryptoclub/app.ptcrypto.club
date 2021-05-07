@@ -323,7 +323,7 @@ def qr_activation(ID):
         )
 
 
-@app.route('/activate-account')
+@app.route('/activate-account/')
 def activate_account():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -671,7 +671,7 @@ def account_admin():
         )
 
 
-@app.route("/account/admin/api-info")
+@app.route("/account/admin/api-info/")
 @login_required
 def account_admin_api_info():
     if current_user.email not in admins_emails:
@@ -881,7 +881,7 @@ def api_charts_line_data(market, base, quote, last_x_hours, api_secret):
         )
 
 
-@app.route("/charts/ohlc/<market>/<base>/<quote>/<candle>")
+@app.route("/charts/ohlc/<market>/<base>/<quote>/<candle>/")
 def chart_ohlc(market, base, quote, candle):
     try:
         candle = int(candle)
@@ -1289,7 +1289,7 @@ def all_transactions_sell():
     )
 
 
-@app.route("/about/project")
+@app.route("/about/project/")
 def about_project():
     return render_template(
         "about-project.html",
