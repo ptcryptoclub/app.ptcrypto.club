@@ -3,7 +3,7 @@
 function lineChartFiat (divName, fiat) {
 
     let apiSecret = document.getElementById("APISecret").value;
-    let delta = 24*7 // This will give us the last 24h
+    let delta = document.getElementById("delta").value;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -12,6 +12,8 @@ function lineChartFiat (divName, fiat) {
     
     var chart = am4core.create(divName, am4charts.XYChart);
     chart.hiddenState.properties.opacity = 0;
+    // Auto dispose charts
+    am4core.options.autoDispose = true;
     
     chart.padding(0, 0, 0, 0);
     

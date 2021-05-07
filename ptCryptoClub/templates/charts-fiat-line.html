@@ -6,18 +6,31 @@
 {% endblock %}
 
 {% block info_line %}
-<div class="container border-light border-bottom">
+<div class="container mt-2">
     <div class="row">
         <div class="col">
-            <div class="row justify-content-start">
+            <div class="row justify-content-end">
                 <div class="col-auto">
-                    <small><a href="#" class="text-decoration-none text-muted">link1</a></small>
-                </div>
-                <div class="col-auto">
-                    <small><a href="#" class="text-decoration-none text-light">Link2</a></small>
-                </div>
-                <div class="col-auto">
-                    <small><a href="#" class="text-decoration-none text-muted">Link3</a></small>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-auto">
+                            <small class="text-light mr-2">Showing:</small>
+                        </div>
+                        <div class="col-auto">
+                            <select id="delta" name="base"
+                                    class="custom-select custom-select-sm bg-dark border border-dark text-light"
+                                    onchange="lineChartFiat('fiatLineChart', '{{fiat}}')">
+                                <option value="{{24*1}}">1 day</option>
+                                <option value="{{24*3}}">3 days</option>
+                                <option value="{{24*7}}">7 days</option>
+                                <option value="{{24*14}}">14 days</option>
+                                <option value="{{24*21}}">21 days</option>
+                                <option selected value="{{24*30}}">30 days</option>
+                                <option value="{{24*45}}">45 days</option>
+                                <option value="{{24*60}}">60 days</option>
+                                <option value="{{24*90}}">90 days</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -39,7 +52,8 @@
     </div>
     <div id="fiatLineChart" style="height: 400px;"></div>
     <script>
-                lineChartFiat('fiatLineChart', '{{fiat}}')
+        lineChartFiat('fiatLineChart', '{{fiat}}')
+
     </script>
 </div>
 
