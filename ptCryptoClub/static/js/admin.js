@@ -22,6 +22,8 @@ function adminLastUpdate(){
     );
 };
 
+
+
 function adminApiUsage(divName){
     let apiSecret = document.getElementById("APISecret").value;
 
@@ -74,6 +76,8 @@ function adminApiUsage(divName){
     chart.cursor.behavior = "none";
 };
 
+
+
 function adminApiUsageDetails(){
     let apiSecret = document.getElementById("APISecret").value;
     let elementTotal = document.getElementById('total');
@@ -93,6 +97,8 @@ function adminApiUsageDetails(){
         }
     );
 };
+
+
 
 function adminApiUsageTop5(){
     let apiSecret = document.getElementById("APISecret").value;
@@ -119,6 +125,7 @@ function adminApiUsageTop5(){
         }
     );
 }
+
 
 
 function adminCpuUsageWS(divName){
@@ -182,6 +189,8 @@ function adminCpuUsageWS(divName){
 
 }
 
+
+
 function adminCpuUsageDC(divName){
     let apiSecret = document.getElementById("APISecret").value;
 
@@ -244,6 +253,8 @@ function adminCpuUsageDC(divName){
     // series.fillOpacity = 0.2;
 
 }
+
+
 
 function adminCpuUsageDB(divName){
     let apiSecret = document.getElementById("APISecret").value;
@@ -309,6 +320,7 @@ function adminCpuUsageDB(divName){
 }
 
 
+
 function adminFreeRamDB(divName){
     let apiSecret = document.getElementById("APISecret").value;
 
@@ -362,6 +374,8 @@ function adminFreeRamDB(divName){
     series.stroke = am4core.color("green");
 }
 
+
+
 function adminConnectionsDB(divName){
     let apiSecret = document.getElementById("APISecret").value;
 
@@ -408,4 +422,41 @@ function adminConnectionsDB(divName){
     series.dataFields.valueY = "max";
     series.tooltipText = "Connections: {valueY.value}";
     series.fillOpacity = 0.2;
+}
+
+
+
+function ifFullDetails (ID, ip) {
+    let apiSecret = document.getElementById("APISecret").value;
+    let prevItemValue = document.getElementById("prev-item");
+    let htmlDiv = document.getElementById("ip-full-details")
+    let listElement = document.getElementById(ID)
+    let prevItem = document.getElementById(prevItemValue.value);
+
+    if (prevItem !== null) {
+        prevItem.classList.remove("active")
+    }
+    listElement.classList.add("active")
+    prevItemValue.value = ID
+
+    url = "/api/admin/ip-info/"+ ip +"/"+ apiSecret +"/"
+    
+    fetch(url).then(
+        function(response){
+            response.json().then(
+                function (data) {
+                    const keys = Object.keys(data);
+                    var keysList = ""
+                    var keysListValues = ""
+                    keys.forEach((key, index) => {
+                        keysList += "<div class='border-dark border-bottom border-top px-2 py-2 py-2'><strong>"+ key +":</strong></div>"
+                        keysListValues += "<div class='border-dark border-bottom border-top px-2 py-2 py-2'>"+ data[key] +"</div>"
+                        
+                    });
+                    var fullHTML = '<div class="row no-gutters small"><div class="col-auto text-right">'+keysList+'</div><div class="col-auto">'+ keysListValues +'</div></div>'
+                    htmlDiv.innerHTML = fullHTML
+                }
+            )
+        }
+    );
 }

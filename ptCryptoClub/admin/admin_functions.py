@@ -1,6 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, qr_code_folder, admins_emails, IpInfo
 from ptCryptoClub import db
-from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage
+from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets,\
+    ApiUsage, IpAddressLog
 
 from sqlalchemy import create_engine, func
 import pandas as pd
@@ -505,6 +506,9 @@ def admin_ip_info(ip_address: str, full_info=False):
         details = handler.getDetails(ip_address)
         if full_info:
             to_return = details.all
+            last_visit = IpAddressLog.query.filter_by(ip_address=ip_address).order_by(IpAddressLog.date.desc()).first()
+            sample = {"last_visit": str(last_visit.date)}
+            to_return.update(sample)
         else:
             try:
                 country = details.country

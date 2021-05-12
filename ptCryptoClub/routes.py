@@ -662,10 +662,8 @@ def account_admin():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
-        test = IpAddressLog.query.with_entities(IpAddressLog.ip_address).distinct().limit(7)
-        ip_list = []
-        for t in test:
-            ip_list.append(admin_ip_info(ip_address=t[0]))
+        raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(IpAddressLog.date.desc()).distinct(IpAddressLog.ip_address).limit(7)
+        ip_list = [admin_ip_info(ip_address=t[0], full_info=False) for t in raw_ip_list]
         return render_template(
             "account-admin.html",
             title="Account",
@@ -712,6 +710,22 @@ def account_admin_delete_user(user_id):
     else:
         admin_delete_user(user_id)
         return redirect(url_for("account_admin_users", page=1))
+
+
+@app.route("/account/admin/ip-info/")
+@login_required
+def account_admin_ip_info():
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(
+            IpAddressLog.date.desc()).distinct(IpAddressLog.ip_address).all()
+        full_list = [t[0] for t in raw_ip_list]
+        return render_template(
+            "account-admin-ip-info.html",
+            title="IP info",
+            full_list=full_list
+        )
 
 
 @app.route("/api/admin/live-data/<api_secret>/")
@@ -815,6 +829,18 @@ def api_admin_connections_db(api_secret):
     if SecureApi().validate(api_secret=api_secret, admin=True):
         return jsonify(
             UsageStats().connections_db(instance=CloudWatchLogin.database)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/admin/ip-info/<ip>/<api_secret>/")
+def api_admin_ip_info(ip, api_secret):
+    if SecureApi().validate(api_secret=api_secret, admin=True):
+        return jsonify(
+            admin_ip_info(ip_address=ip, full_info=True)
         )
     else:
         return jsonify(
