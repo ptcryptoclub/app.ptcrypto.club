@@ -9,7 +9,7 @@ from ptCryptoClub.admin.config import GenConfig
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = GenConfig.secret_key
-app.config['SQLALCHEMY_DATABASE_URI'] = GenConfig.prod_db
+app.config['SQLALCHEMY_DATABASE_URI'] = GenConfig.dev_db
 app.config['BT_ENVIRONMENT'] = GenConfig.BT_ENVIRONMENT
 app.config['BT_MERCHANT_ID'] = GenConfig.BT_MERCHANT_ID
 app.config['BT_PUBLIC_KEY'] = GenConfig.BT_PUBLIC_KEY
