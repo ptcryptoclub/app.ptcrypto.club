@@ -662,8 +662,17 @@ def account_admin():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
-        raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(IpAddressLog.date.desc()).distinct(IpAddressLog.ip_address).limit(7)
-        ip_list = [admin_ip_info(ip_address=t[0], full_info=False) for t in raw_ip_list]
+        # THIS NEEDS TO BE REVIEWED REALLY BAD SOLUTION
+        raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(IpAddressLog.date.desc()).distinct()
+        ip_list_7 = []
+        for t in raw_ip_list:
+            if t[0] not in ip_list_7:
+                ip_list_7.append(t[0])
+            else:
+                pass
+            if len(ip_list_7) == 7:
+                break
+        ip_list = [admin_ip_info(ip_address=t, full_info=False) for t in ip_list_7]
         return render_template(
             "account-admin.html",
             title="Account",
@@ -718,9 +727,16 @@ def account_admin_ip_info():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
+        # THIS NEEDS TO BE REVIEWED REALLY BAD SOLUTION
         raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(
-            IpAddressLog.date.desc()).distinct(IpAddressLog.ip_address).all()
-        full_list = [t[0] for t in raw_ip_list]
+            IpAddressLog.date.desc()).distinct()
+        full_list = []
+        for t in raw_ip_list:
+            if t[0] not in full_list:
+                full_list.append(t[0])
+            else:
+                pass
+        # full_list = [t[0] for t in raw_ip_list if t[0] not in full_list]
         return render_template(
             "account-admin-ip-info.html",
             title="IP info",
