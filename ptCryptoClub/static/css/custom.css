@@ -3,3 +3,9 @@
 .nav-pills .nav-link.active {
     background-color: #2e2e2e;
 }
+
+/* dropdown menus */
+.dropdown-menu > a:hover {
+    background-color: #2e2e2e;
+    background-image: none;
+}
