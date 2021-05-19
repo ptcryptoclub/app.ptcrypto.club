@@ -731,3 +731,36 @@ def email_validation_disposable_emails(email):
                 return False, 'Please provide a valid email address'
     else:
         return False, 'Please provide a valid email address'
+
+
+def newsfeed():
+    query = """
+    select 	title,
+            url,
+            img,
+            date_created 
+        from public.newsfeed order by random() limit 6;
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame()
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'newsfeed',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "title": data.title[i],
+                "url": data.url[i],
+                "img": data.img[i],
+                "date": str(data.date_created[i])
+            }
+        )
+    return to_return
+

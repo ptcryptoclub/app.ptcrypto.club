@@ -386,3 +386,21 @@ function fiatUpdate(delta) {
     }
     startInterval()
 };
+
+
+
+function newsFeed () {
+    let apiSecret = document.getElementById("APISecret").value;
+    let htmlDIV = document.getElementById("news-feed")
+    fetch('/api/home/newsfeed/'+ apiSecret +'/').then(function(response) {
+        response.json().then(function(data) {
+            console.log(data)
+            let cards = ""
+            for (let line of data) {
+                cards += '<a href="'+ line['url'] +'" class="text-decoration-none" target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""/></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a>'
+            }
+            htmlDIV.innerHTML = cards
+        })
+    })
+}
+

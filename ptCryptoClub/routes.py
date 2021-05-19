@@ -16,7 +16,7 @@ from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetail
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
-    gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name
+    gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -166,6 +166,18 @@ def api_home_fiat_prices(delta, api_secret):
     if SecureApi().validate(api_secret=api_secret):
         return jsonify(
             gen_fiats(delta=delta)
+        )
+    else:
+        return jsonify(
+            {}
+        )
+
+
+@app.route("/api/home/newsfeed/<api_secret>/")
+def api_home_newsfeed(api_secret):
+    if SecureApi().validate(api_secret=api_secret):
+        return jsonify(
+            newsfeed()
         )
     else:
         return jsonify(
