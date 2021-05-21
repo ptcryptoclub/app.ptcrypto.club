@@ -733,13 +733,13 @@ def email_validation_disposable_emails(email):
         return False, 'Please provide a valid email address'
 
 
-def newsfeed():
-    query = """
+def newsfeed(n):
+    query = f"""
     select 	title,
             url,
             img,
             date_created 
-        from public.newsfeed order by random() limit 6;
+        from public.newsfeed order by random() limit {n};
     """
     try:
         data = pd.read_sql_query(sql=query, con=engine_live_data)

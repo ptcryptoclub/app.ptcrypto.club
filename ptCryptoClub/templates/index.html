@@ -116,6 +116,9 @@
         <script>
             var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 5000 );
 
+
+
+
         </script>
         {% endfor %}
     </div>
@@ -124,12 +127,23 @@
     <div class="row justify-content-end mr-2">
         <H6><a href="#" class="text-light text-decoration-none">Newsfeed</a></H6>
     </div>
-    <div id="news-feed" class="p-2 row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 mb-1 small">
-
+    <div id="news-feed-3" class="p-2 row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 mb-1 small">
+        <div id="newsSlide1" class="carousel slide carousel-fade" data-ride="carousel">
+        </div>
+        <div id="newsSlide2" class="carousel slide carousel-fade" data-ride="carousel">
+        </div>
+        <div id="newsSlide3" class="carousel slide carousel-fade" data-ride="carousel">
+        </div>
+        <div id="newsSlide4" class="carousel slide carousel-fade" data-ride="carousel">
+        </div>
+        <div id="newsSlide5" class="carousel slide carousel-fade" data-ride="carousel">
+        </div>
+        <div id="newsSlide6" class="carousel slide carousel-fade" data-ride="carousel">
+        </div>
     </div>
     <script>
-            newsFeed()
-            var newsFeedInt = setInterval(function() {newsFeed()}, 180000)
+        newsFeed3()
+        var newsFeedInt = setInterval(function() {newsFeed3()}, 600000)
     </script>
 
     <hr class="border-secondary">
@@ -175,6 +189,9 @@
     </div>
     <script>
         fiatUpdate({{delta}})
+
+
+
 
     </script>
     <div class="m-0 text-right">
@@ -241,11 +258,17 @@
 
 
 
+
+
+
         </script>
     </div>
     <div id="buy-sell-chart" style="height: 200px; width: 100%;"></div>
     <script>
             lineBuySell("buy-sell-chart", {{current_user.id}}, {{number_days_buy_sell}})
+
+
+
 
 
 
@@ -261,6 +284,9 @@
     <div id="compareChart" style="height: 350px;"></div>
     <script>
         priceCompareChart('compareChart', 'kraken', 'btc', 'eth', 'eur', 250)
+
+
+
 
 
 
@@ -298,6 +324,9 @@
 
 
 
+
+
+
             </script>
         </div>
         <div class="col-md-8 mb-3">
@@ -307,6 +336,9 @@
             </div>
             <script>
                 cciChart('cciChart_test', 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur')
+
+
+
 
 
 
@@ -350,6 +382,9 @@
 
 
 
+
+
+
         </script>
     </table>
     {% endfor %}
@@ -379,6 +414,9 @@
                         </div>
                         <script>
                             updateBase()
+
+
+
 
 
 
@@ -476,6 +514,9 @@
                         </div>
                         <script>
                             updateBaseSell()
+
+
+
 
 
 
