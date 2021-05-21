@@ -115,10 +115,6 @@
         </div>
         <script>
             var run{{card['market']}}{{card['base']}}{{card['quote']}}=setInterval( function() { cardUpdate('{{card['base']}}', '{{card['quote']}}', '{{card['market']}}', '{{card['delta']}}'); }, 5000 );
-
-
-
-
         </script>
         {% endfor %}
     </div>
@@ -189,10 +185,6 @@
     </div>
     <script>
         fiatUpdate({{delta}})
-
-
-
-
     </script>
     <div class="m-0 text-right">
         <i><small class="text-muted">Source: <a href="https://fixer.io/" class="text-decoration-none" target="_blank">fixer.io</a></small></i>
@@ -253,27 +245,11 @@
                     updatePortfolio({{current_user.id}})
                 }
                 var runPortfolioUpdate=setInterval(auxRunUpdates,30*1000);
-
-
-
-
-
-
-
-
         </script>
     </div>
     <div id="buy-sell-chart" style="height: 200px; width: 100%;"></div>
     <script>
             lineBuySell("buy-sell-chart", {{current_user.id}}, {{number_days_buy_sell}})
-
-
-
-
-
-
-
-
     </script>
     {% endif %}
 
@@ -284,14 +260,6 @@
     <div id="compareChart" style="height: 350px;"></div>
     <script>
         priceCompareChart('compareChart', 'kraken', 'btc', 'eth', 'eur', 250)
-
-
-
-
-
-
-
-
     </script>
     <div class="m-0 text-right">
         <i><small class="text-muted">Two y-axis were used for easy comparison.</small></i>
@@ -319,14 +287,6 @@
                         cciGauge('cci_test', value, 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur', {{delta}})
                     })
                 })
-
-
-
-
-
-
-
-
             </script>
         </div>
         <div class="col-md-8 mb-3">
@@ -336,14 +296,6 @@
             </div>
             <script>
                 cciChart('cciChart_test', 'kraken', 'btc', 'eur', 'kraken', 'eth', 'eur')
-
-
-
-
-
-
-
-
             </script>
         </div>
     </div>
@@ -377,14 +329,6 @@
         </tbody>
         <script>
             var run{{i}}=setInterval( function() { tableUpdate('{{tables[i][0]['base']}}', '{{tables[i][0]['quote']}}', '{{tables[i][0]['market']}}', {{number_of_trans}}, 'table-{{i}}'); }, 20000 );
-
-
-
-
-
-
-
-
         </script>
     </table>
     {% endfor %}
@@ -414,16 +358,6 @@
                         </div>
                         <script>
                             updateBase()
-
-
-
-
-
-
-
-
-
-
                         </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">
@@ -514,14 +448,6 @@
                         </div>
                         <script>
                             updateBaseSell()
-
-
-
-
-
-
-
-
                         </script>
                         <div class="col my-1">
                             <div class="row no-gutters align-items-center justify-content-end">
