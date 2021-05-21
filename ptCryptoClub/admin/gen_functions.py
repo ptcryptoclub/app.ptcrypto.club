@@ -737,6 +737,11 @@ def email_validation_disposable_emails(email):
 
 
 def newsfeed(n):
+    try:
+        n = int(n)
+    except Exception as e:
+        print(e)
+        n = 25
     query = f"""
     select 	title,
             url,
