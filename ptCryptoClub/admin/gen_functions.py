@@ -753,10 +753,16 @@ def newsfeed(n):
         db.session.add(error_log)
         db.session.commit()
     to_return = []
+    cut = 78
     for i in data.index:
+        title = data.title[i]
+        if len(title) >= cut:
+            title = title[:cut] + " ..."
+        else:
+            pass
         to_return.append(
             {
-                "title": data.title[i],
+                "title": title,
                 "url": data.url[i],
                 "img": data.img[i],
                 "date": str(data.date_created[i])

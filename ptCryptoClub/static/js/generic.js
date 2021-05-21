@@ -388,7 +388,7 @@ function fiatUpdate(delta) {
 };
 
 
-
+// NOT IN USE
 function newsFeed (n) {
     let apiSecret = document.getElementById("APISecret").value;
     let htmlDIV = document.getElementById("news-feed")
@@ -404,7 +404,7 @@ function newsFeed (n) {
 }
 
 
-
+// NOT IN USE
 function newsFeed2 (n, divID) {
     let apiSecret = document.getElementById("APISecret").value;
     let htmlDIV = document.getElementById(divID);
@@ -427,6 +427,11 @@ function newsFeed2 (n, divID) {
 }
 
 
+function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
 function newsFeed3 () {
     let apiSecret = document.getElementById("APISecret").value;
     let car1 = document.getElementById("newsSlide1");
@@ -446,41 +451,42 @@ function newsFeed3 () {
             var i = 1
             console.log(data)
             for (let line of data) {
+                const transTime = getRndInteger(30*1000, 60*1000)
                 if  (i <= 8) {
                     if (i == 1) {
-                        car_1 += '<div class="carousel-item active" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_1 += '<div class="carousel-item active" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     } else {
-                        car_1 += '<div class="carousel-item" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_1 += '<div class="carousel-item" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     }
                 } else if (i > 8 && i <= 16) {
                     if (i == 9) {
-                        car_2 += '<div class="carousel-item active" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_2 += '<div class="carousel-item active" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     } else {
-                        car_2 += '<div class="carousel-item" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_2 += '<div class="carousel-item" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     }
                 } else if (i > 16 && i <= 24) {
                     if (i == 17) {
-                        car_3 += '<div class="carousel-item active" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_3 += '<div class="carousel-item active" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     } else {
-                        car_3 += '<div class="carousel-item" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_3 += '<div class="carousel-item" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     }
                 } else if (i > 24 && i <= 32) {
                     if (i == 25) {
-                        car_4 += '<div class="carousel-item active" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_4 += '<div class="carousel-item active" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     } else {
-                        car_4 += '<div class="carousel-item" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_4 += '<div class="carousel-item" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     }
                 } else if (i > 32 && i <= 40) {
                     if (i == 33) {
-                        car_5 += '<div class="carousel-item active" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_5 += '<div class="carousel-item active" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     } else {
-                        car_5 += '<div class="carousel-item" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_5 += '<div class="carousel-item" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     }
                 } else {
                     if (i == 41) {
-                        car_6 += '<div class="carousel-item active" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_6 += '<div class="carousel-item active" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     } else {
-                        car_6 += '<div class="carousel-item" data-interval="20000"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
+                        car_6 += '<div class="carousel-item" data-interval="'+ transTime +'"><a href="'+ line['url'] +'"class="text-decoration-none"target="_blank"><div class="col p-1"><div class="border border-info rounded"><div class="row align-items-center no-gutters"><div class="col-2 p-1"><img src="'+ line['img'] +'"class="img-thumbnail" alt=""></div><div class="col-10 p-1"><div class="text-muted"><strong>'+ line['title'] +'</strong></div><p class="card-text text-right"><small class="text-muted"><i>'+ line['date'] +'</i></small></p></div></div></div></div></a></div>'
                     }
                 }
                 i += 1
