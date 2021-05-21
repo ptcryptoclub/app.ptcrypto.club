@@ -288,10 +288,13 @@ class SecureApi:
     def __init__(self):
         pass
 
-    def validate(self, api_secret, user_id=None, admin=None):
+    def validate(self, api_secret, user_id=None, admin=None, exception=False):
         self.log_ip()
-        if request.headers.get('Cookie') is None or request.headers.get('Referer') is None:
-            return False
+        if exception:
+            pass
+        else:
+            if request.headers.get('Cookie') is None or request.headers.get('Referer') is None:
+                return False
         if admin is not None:
             user = User.query.filter_by(api_secret=api_secret).first()
             if user is not None:

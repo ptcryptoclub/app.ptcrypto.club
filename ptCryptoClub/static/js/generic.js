@@ -426,7 +426,7 @@ function newsFeed2 (n, divID) {
     })
 }
 
-
+// AUX FUNCTION TO GENERATE INT NUMBERS
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
@@ -449,7 +449,6 @@ function newsFeed3 () {
             let car_5 = '';
             let car_6 = '';
             var i = 1
-            console.log(data)
             for (let line of data) {
                 const transTime = getRndInteger(30*1000, 60*1000)
                 if  (i <= 8) {

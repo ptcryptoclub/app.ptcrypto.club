@@ -175,7 +175,7 @@ def api_home_fiat_prices(delta, api_secret):
 
 @app.route("/api/home/newsfeed/<n>/<api_secret>/")
 def api_home_newsfeed(n, api_secret):
-    if SecureApi().validate(api_secret=api_secret):
+    if SecureApi().validate(api_secret=api_secret, exception=True):
         return jsonify(
             newsfeed(n=n)
         )
