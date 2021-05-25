@@ -1480,7 +1480,6 @@ def newsfeed_page(page, per_page):
     if per_page <= 0:
         per_page = default_news_per_page
     total_news = count_all_news(key_words=query)
-    print(total_news)
     if total_news % per_page == 0:
         last_page = total_news // per_page
     else:
