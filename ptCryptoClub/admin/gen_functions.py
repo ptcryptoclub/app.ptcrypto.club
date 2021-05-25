@@ -778,3 +778,106 @@ def newsfeed(n):
         )
     return to_return
 
+
+def count_all_news(key_words):
+    key_words = " ".join(key_words.split())  # this will remove any extra spaces
+    key_list = key_words.split(" ")
+    key_list = [f"'%{word}%'" for word in key_list]
+    title = " and title ilike ".join(key_list)
+    body = " and body ilike ".join(key_list)
+    query = f"""
+    SELECT COUNT(distinct t1.news_id) + COUNT(distinct t2.news_id) as total_rows
+        FROM 
+            (
+                select news_id
+                    from newsfeed nf
+                    where (title ilike {title}) or (body ilike {body})
+            ) as t1, 
+            (
+                select news_id
+                    from "zz_newsfeedArquive1" nfa
+                    where (title ilike {title}) or (body ilike {body})
+            ) as t2;
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(columns=["total_rows"])
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'newsfeed',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    if data.shape[0] > 0:
+        return data['total_rows'][0]
+    else:
+        return 0
+
+
+def news_search(key_words: str, page: int = 1, per_page: int = 12):
+    key_words = " ".join(key_words.split())  # this will remove any extra spaces
+    key_list = key_words.split(" ")
+    key_list = [f"'%{word}%'" for word in key_list]
+    title = " and title ilike ".join(key_list)
+    body = " and body ilike ".join(key_list)
+    query = f"""
+        select  ROW_NUMBER () OVER (ORDER BY date_created desc) as id,
+                news_id,
+                date_created,
+                source_id,
+                title,
+                body,
+                url,
+                img 
+            from (
+                select 	news_id,
+                        date_created,
+                        source_id,
+                        title,
+                        body,
+                        url,
+                        img
+                    from "zz_newsfeedArquive1" zna
+                    where (title ilike {title}) or (body ilike {body})
+                union
+                select 	news_id,
+                        date_created,
+                        source_id,
+                        title,
+                        body,
+                        url,
+                        img
+                    from newsfeed n
+                    where (title ilike {title}) or (body ilike {body})
+            ) as aaa
+            order by date_created desc
+            limit {per_page} offset {(page - 1) * per_page};
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame()
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'newsfeed',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    to_return = []
+    for i in data.index:
+        to_return.append(
+            {
+                "id": data['id'][i],
+                "news_id": data['news_id'][i],
+                "source_id": data['source_id'][i],
+                "date": str(data['date_created'][i])[:19],
+                "title": data['title'][i],
+                "body": data['body'][i],
+                "url": data['url'][i],
+                "img": data['img'][i]
+            }
+        )
+    return to_return

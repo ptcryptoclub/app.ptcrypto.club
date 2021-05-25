@@ -10,13 +10,13 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
-    CloudWatchLogin, default_fiat
+    CloudWatchLogin, default_fiat, default_news_per_page
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations, IpAddressLog
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
-    gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed
+    gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -49,7 +49,8 @@ def send_my_func():
         "all_markets": get_all_markets(),
         "default_candle": default_candle,
         "api_secret": api_secret,
-        "notUserId": User.query.filter_by(username="notUser").first().id
+        "notUserId": User.query.filter_by(username="notUser").first().id,
+        "default_news_per_page": default_news_per_page
     }
 
 
@@ -1457,3 +1458,42 @@ def api_historical_charts_vtp_data(base, quote, market, candle, api_secret):
         return jsonify(
             {}
         )
+
+
+@app.route("/newsfeed/<page>/<per_page>/", methods=["GET", "POST"])
+def newsfeed_page(page, per_page):
+    query = request.args.get('query')
+    if query is None:
+        query = ""
+    try:
+        page = int(page)
+    except Exception as e:
+        print(e)
+        page = 1
+    if page <= 0:
+        page = 1
+    try:
+        per_page = int(per_page)
+    except Exception as e:
+        print(e)
+        per_page = default_news_per_page
+    if per_page <= 0:
+        per_page = default_news_per_page
+    total_news = count_all_news(key_words=query)
+    print(total_news)
+    if total_news % per_page == 0:
+        last_page = total_news // per_page
+    else:
+        last_page = (total_news // per_page) + 1
+    if page > last_page:
+        page = last_page
+
+    return render_template(
+        "newsfeed.html",
+        title="Newsfeed",
+        news=news_search(key_words=query, page=page, per_page=per_page),
+        c_page=page,
+        per_page=per_page,
+        last_page=last_page,
+        total_news=total_news
+    )
