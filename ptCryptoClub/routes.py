@@ -1460,7 +1460,7 @@ def api_historical_charts_vtp_data(base, quote, market, candle, api_secret):
         )
 
 
-@app.route("/newsfeed/<page>/<per_page>/", methods=["GET", "POST"])
+@app.route("/newsfeed/<page>/<per_page>/")
 def newsfeed_page(page, per_page):
     query = request.args.get('query')
     if query is None:
