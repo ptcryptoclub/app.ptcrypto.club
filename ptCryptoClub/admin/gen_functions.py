@@ -785,24 +785,23 @@ def count_all_news(key_words):
     key_list = [f"'%{word}%'" for word in key_list]
     title = " and title ilike ".join(key_list)
     body = " and body ilike ".join(key_list)
-    query = f"""
-    SELECT COUNT(distinct t1.news_id) + COUNT(distinct t2.news_id) as total_rows
-        FROM 
-            (
-                select news_id
-                    from newsfeed nf
-                    where (title ilike {title}) or (body ilike {body})
-            ) as t1, 
-            (
-                select news_id
+    query_1 = f"""
+            select count(*) as count_
+                from newsfeed nf
+                where (title ilike {title}) or (body ilike {body})
+    """
+    query_2 = f"""
+                select count(*) as count_
                     from "zz_newsfeedArquive1" nfa
                     where (title ilike {title}) or (body ilike {body})
-            ) as t2;
-    """
+        """
+
     try:
-        data = pd.read_sql_query(sql=query, con=engine_live_data)
+        data_1 = pd.read_sql_query(sql=query_1, con=engine_live_data)
+        data_2 = pd.read_sql_query(sql=query_2, con=engine_live_data)
     except Exception as e:
-        data = pd.DataFrame(columns=["total_rows"])
+        data_1 = pd.DataFrame(columns=["count_"])
+        data_2 = pd.DataFrame(columns=["count_"])
         # noinspection PyArgumentList
         error_log = ErrorLogs(
             route=f'newsfeed',
@@ -810,10 +809,15 @@ def count_all_news(key_words):
         )
         db.session.add(error_log)
         db.session.commit()
-    if data.shape[0] > 0:
-        return data['total_rows'][0]
+    if data_1.shape[0] > 0:
+        number_1 = data_1["count_"][0]
     else:
-        return 0
+        number_1 = 0
+    if data_2.shape[0] > 0:
+        number_2 = data_2["count_"][0]
+    else:
+        number_2 = 0
+    return number_1 + number_2
 
 
 def news_search(key_words: str, page: int = 1, per_page: int = 12):

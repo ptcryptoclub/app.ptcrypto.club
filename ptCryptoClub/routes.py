@@ -1485,13 +1485,14 @@ def newsfeed_page(page, per_page):
     else:
         last_page = (total_news // per_page) + 1
     if page > last_page:
-        page = last_page
-
+        c_page = last_page
+    else:
+        c_page = page
     return render_template(
         "newsfeed.html",
         title="Newsfeed",
         news=news_search(key_words=query, page=page, per_page=per_page),
-        c_page=page,
+        c_page=c_page,
         per_page=per_page,
         last_page=last_page,
         total_news=total_news
