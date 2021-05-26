@@ -10,20 +10,51 @@
 
 <div class="container mt-3">
     <div class="mb-3">
-        <form action="">
+        <form action="{{url_for('newsfeed_page', page=1, per_page=default_news_per_page)}}">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="form-group">
                         {% if request.args.get('query') %}
                         <input class="form-control form-control-sm bg-dark text-light border-0" id="query" name="query"
-                               placeholder="Search..." required
+                               placeholder="Search..."
+                               type="text" value="{{request.args.get('query')}}">
+                        <small id="queryHelp" class="form-text text-info">{{total_news}} articles found in our database.</small>
+                        {% elif not request.args.get('query') and request.args.get('sources') %}
+                        <input class="form-control form-control-sm bg-dark text-light border-0" id="query" name="query"
+                               placeholder="Search..."
                                type="text" value="{{request.args.get('query')}}">
                         <small id="queryHelp" class="form-text text-info">{{total_news}} articles found in our database.</small>
                         {% else %}
                         <input class="form-control form-control-sm bg-dark text-light border-0" id="query" name="query"
-                               placeholder="Search..." required
+                               placeholder="Search..."
                                type="text" value="">
+                        <small id="queryHelp" class="form-text text-info">You can use multiple words and the search is <strong>not</strong> case sensitive.</small>
                         {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <div class="row no-gutters justify-content-end">
+                            <div class="col-auto">
+                                {% if request.args.get('sources') %}
+                                <select id="sources" name="sources" class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                    <option value="">All sources</option>
+                                    {% for source in all_sources %}
+                                    {% if request.args.get('sources') == source.source_id %}
+                                    <option selected value="{{source.source_id}}">{{source.source_id}}</option>
+                                    {% else %}
+                                    <option value="{{source.source_id}}">{{source.source_id}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <select id="sources" name="sources" class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                                    <option selected value="">All sources</option>
+                                    {% for source in all_sources %}
+                                    <option value="{{source.source_id}}">{{source.source_id}}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-8">
@@ -42,6 +73,9 @@
         </form>
     </div>
     <div class="border-bottom border-secondary mb-3"></div>
+    {% if news == [] %}
+    <div class="text-light my-5">It seems there's nothing on our database that matches your search.</div>
+    {% else %}
     <nav aria-label="Page navigation">
         <ul class="pagination pagination-sm justify-content-end">
             {% if c_page == 0 and last_page == 0 %}
@@ -79,12 +113,12 @@
             <li class="page-item disabled"><a class="page-link border border-dark bg-secondary text-light" href="#">{{c_page}}</a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 +
                 1}}</a></li>
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
@@ -92,24 +126,24 @@
             {% elif c_page != 1 and c_page != last_page %}
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 -
                 1}}</a></li>
             <li class="page-item disabled"><a class="page-link border border-dark bg-secondary text-light" href="#">{{c_page}}</a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 +
                 1}}</a></li>
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
@@ -117,13 +151,13 @@
             {% else %}
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 -
                 1}}</a></li>
             <li class="page-item disabled"><a class="page-link border border-dark bg-secondary text-light" href="#">{{c_page}}</a>
@@ -202,12 +236,12 @@
             <li class="page-item disabled"><a class="page-link border border-dark bg-secondary text-light" href="#">{{c_page}}</a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 +
                 1}}</a></li>
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
@@ -215,24 +249,24 @@
             {% elif c_page != 1 and c_page != last_page %}
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 -
                 1}}</a></li>
             <li class="page-item disabled"><a class="page-link border border-dark bg-secondary text-light" href="#">{{c_page}}</a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page+1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 +
                 1}}</a></li>
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=last_page, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
@@ -240,13 +274,13 @@
             {% else %}
             <li class="page-item">
                 <a class="page-link border border-dark bg-dark text-light"
-                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'))}}"
+                   href="{{url_for('newsfeed_page', page=1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}"
                    aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li class="page-item"><a class="page-link border border-dark bg-dark text-light"
-                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'))}}">{{c_page
+                                     href="{{url_for('newsfeed_page', page=c_page-1, per_page=per_page, query=request.args.get('query'), sources=request.args.get('sources'))}}">{{c_page
                 -
                 1}}</a></li>
             <li class="page-item disabled"><a class="page-link border border-dark bg-secondary text-light" href="#">{{c_page}}</a>
@@ -259,6 +293,7 @@
             {% endif %}
         </ul>
     </nav>
+    {% endif %}
 </div>
 
 

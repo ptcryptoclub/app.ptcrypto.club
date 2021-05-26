@@ -16,7 +16,7 @@ from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetail
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
-    gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news
+    gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news, get_all_news_source_id
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -1465,6 +1465,9 @@ def newsfeed_page(page, per_page):
     query = request.args.get('query')
     if query is None:
         query = ""
+    sources = request.args.get('sources')
+    if sources is None:
+        sources = ""
     try:
         page = int(page)
     except Exception as e:
@@ -1479,7 +1482,7 @@ def newsfeed_page(page, per_page):
         per_page = default_news_per_page
     if per_page <= 0:
         per_page = default_news_per_page
-    total_news = count_all_news(key_words=query)
+    total_news = count_all_news(key_words=query, sources=sources)
     if total_news % per_page == 0:
         last_page = total_news // per_page
     else:
@@ -1491,9 +1494,10 @@ def newsfeed_page(page, per_page):
     return render_template(
         "newsfeed.html",
         title="Newsfeed",
-        news=news_search(key_words=query, page=page, per_page=per_page),
+        news=news_search(key_words=query, sources=sources, page=page, per_page=per_page),
         c_page=c_page,
         per_page=per_page,
         last_page=last_page,
-        total_news=total_news
+        total_news=total_news,
+        all_sources=get_all_news_source_id()
     )

@@ -779,23 +779,24 @@ def newsfeed(n):
     return to_return
 
 
-def count_all_news(key_words):
+def count_all_news(key_words: str, sources: str = ""):
     key_words = " ".join(key_words.split())  # this will remove any extra spaces
     key_list = key_words.split(" ")
-    key_list = [f"'%{word}%'" for word in key_list]
+    key_list = [f"'%%{word}%%'" for word in key_list]
     title = " and title ilike ".join(key_list)
     body = " and body ilike ".join(key_list)
     query_1 = f"""
             select count(*) as count_
                 from newsfeed nf
-                where (title ilike {title}) or (body ilike {body})
+                where ((title ilike {title}) or (body ilike {body}))
+                    and (source_id ilike '%%{sources}%%')
     """
     query_2 = f"""
                 select count(*) as count_
                     from "zz_newsfeedArquive1" nfa
-                    where (title ilike {title}) or (body ilike {body})
+                    where ((title ilike {title}) or (body ilike {body}))
+                        and (source_id ilike '%%{sources}%%')
         """
-
     try:
         data_1 = pd.read_sql_query(sql=query_1, con=engine_live_data)
         data_2 = pd.read_sql_query(sql=query_2, con=engine_live_data)
@@ -820,10 +821,41 @@ def count_all_news(key_words):
     return number_1 + number_2
 
 
-def news_search(key_words: str, page: int = 1, per_page: int = 12):
+def get_all_news_source_id():
+    to_return = []
+    query = """
+        select source_id
+            from (
+                select distinct source_id from newsfeed n
+                union
+                select distinct source_id from "zz_newsfeedArquive1" zna
+            ) as t1
+            order by t1.source_id asc;
+    """
+    try:
+        data = pd.read_sql_query(sql=query, con=engine_live_data)
+    except Exception as e:
+        data = pd.DataFrame(columns=["source_id"])
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'get all news source id',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
+    for i in data.index:
+        to_return.append(
+            {
+                "source_id": data["source_id"][i]
+            }
+        )
+    return to_return
+
+
+def news_search(key_words: str, sources: str = "", page: int = 1, per_page: int = 12):
     key_words = " ".join(key_words.split())  # this will remove any extra spaces
     key_list = key_words.split(" ")
-    key_list = [f"'%{word}%'" for word in key_list]
+    key_list = [f"'%%{word}%%'" for word in key_list]
     title = " and title ilike ".join(key_list)
     body = " and body ilike ".join(key_list)
     query = f"""
@@ -844,7 +876,8 @@ def news_search(key_words: str, page: int = 1, per_page: int = 12):
                         url,
                         img
                     from "zz_newsfeedArquive1" zna
-                    where (title ilike {title}) or (body ilike {body})
+                    where ((title ilike {title}) or (body ilike {body}))
+                        and (source_id ilike '%%{sources}%%')
                 union
                 select 	news_id,
                         date_created,
@@ -854,7 +887,8 @@ def news_search(key_words: str, page: int = 1, per_page: int = 12):
                         url,
                         img
                     from newsfeed n
-                    where (title ilike {title}) or (body ilike {body})
+                    where ((title ilike {title}) or (body ilike {body}))
+                        and (source_id ilike '%%{sources}%%')
             ) as aaa
             order by date_created desc
             limit {per_page} offset {(page - 1) * per_page};
@@ -865,7 +899,7 @@ def news_search(key_words: str, page: int = 1, per_page: int = 12):
         data = pd.DataFrame()
         # noinspection PyArgumentList
         error_log = ErrorLogs(
-            route=f'newsfeed',
+            route=f'news search',
             log=str(e).replace("'", "")
         )
         db.session.add(error_log)
