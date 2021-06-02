@@ -162,10 +162,34 @@ def admin_main_tables():
         )
         db.session.add(error_log)
         db.session.commit()
+    # DATA FROM NEWS TABLES #
+    query_news = """
+            select 	count(*) + (select count(*) from newsfeed n) as count,
+                    (select min(date_created) from newsfeed n) as min_date,
+                    (select max(date_created) from newsfeed n) as max_date
+                from "zz_newsfeedArquive1" zna 
+        """
+    try:
+        data_news = pd.read_sql_query(sql=query_news, con=engine_live_data)
+    except Exception as e:
+        data_news = pd.DataFrame(
+            columns=["count", "min_date", "max_date"],
+            index=[0]
+        )
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route='admin functions admin main table news data',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
     to_return = {
         "trans_count": data_trans['count'][0],
         "trans_min": data_trans['min_date'][0],
         "trans_max": data_trans['max_date'][0],
+        "news_count": data_news['count'][0],
+        "news_min": data_news['min_date'][0],
+        "news_max": data_news['max_date'][0],
         "20s_ohlc_count": data_20s['count'][0],
         "20s_ohlc_min": data_20s['min_date'][0],
         "20s_ohlc_max": data_20s['max_date'][0],

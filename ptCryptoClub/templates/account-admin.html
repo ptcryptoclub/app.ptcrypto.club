@@ -56,6 +56,12 @@
                     </thead>
                     <tbody class="text-muted">
                     <tr>
+                        <td>News</td>
+                        <td>{{table_data['news_count'] | numberFormat}}</td>
+                        <td>{{table_data['news_min']}}</td>
+                        <td>{{table_data['news_max']}}</td>
+                    </tr>
+                    <tr>
                         <td>Transactions</td>
                         <td>{{table_data['trans_count'] | numberFormat}}</td>
                         <td>{{table_data['trans_min']}}</td>
