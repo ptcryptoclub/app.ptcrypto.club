@@ -12,7 +12,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
     CloudWatchLogin, default_fiat, default_news_per_page
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations, IpAddressLog
+    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
@@ -222,6 +222,14 @@ def login():
                                 ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
                                 status=True)
                 db.session.add(log)
+                port_record = calculate_total_value(user_id=user.id)
+                # noinspection PyArgumentList
+                new_record = PortfolioRecord(user_id=user.id,
+                                             value=port_record["value"],
+                                             wallet=port_record["wallet"],
+                                             assets=port_record["assets"],
+                                             percentage=port_record["percentage"])
+                db.session.add(new_record)
                 db.session.commit()
                 return redirect(url_for('portfolio'))
             else:

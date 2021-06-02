@@ -94,6 +94,17 @@ class PortfolioAssets(db.Model, UserMixin):
     amount = db.Column(db.Float, default=0)
 
 
+class PortfolioRecord(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    value = db.Column(db.Float)
+    wallet = db.Column(db.Float)
+    assets = db.Column(db.Float)
+    percentage = db.Column(db.Float)
+    quote = db.Column(db.String(255), default="eur")
+
+
 class ResetPasswordAuthorizations(db.Model, UserMixin):
     auth_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)

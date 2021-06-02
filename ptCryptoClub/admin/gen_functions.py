@@ -919,3 +919,7 @@ def news_search(key_words: str, sources: str = "", page: int = 1, per_page: int 
             }
         )
     return to_return
+
+
+if __name__ == "__main__":
+    print(calculate_total_value(user_id=1))
