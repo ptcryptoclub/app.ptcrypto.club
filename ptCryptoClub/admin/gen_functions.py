@@ -924,7 +924,6 @@ def news_search(key_words: str, sources: str = "", page: int = 1, per_page: int 
 def portfolio_chart(user_id):
     data = PortfolioRecord.query.filter_by(user_id=user_id).all()
     to_return = []
-    print(len(data))
     for i in range(len(data)):
         to_return.append(
             {
