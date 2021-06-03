@@ -926,25 +926,13 @@ def portfolio_chart(user_id):
     to_return = []
     print(len(data))
     for i in range(len(data)):
-        if i == 0:
-            to_return.append(
-                {
-                    "date": str(data[i].date_created)[:19],
-                    "value": data[i].value,
-                    "wallet": data[i].wallet,
-                    "assets": data[i].assets,
-                    "percentage": data[i].percentage
-                }
-            )
-        else:
-            to_return.append(
-                {
-                    "date": str(data[i].date_created)[:19],
-                    "value": data[i].value,
-                    "wallet": data[i].wallet,
-                    "assets": data[i].assets,
-                    "percentage": data[i].percentage
-                }
-            )
-    print(to_return)
+        to_return.append(
+            {
+                "date": str(data[i].date_created)[:19],
+                "value": data[i].value,
+                "wallet": data[i].wallet,
+                "assets": data[i].assets,
+                "percentage": data[i].percentage
+            }
+        )
     return to_return
