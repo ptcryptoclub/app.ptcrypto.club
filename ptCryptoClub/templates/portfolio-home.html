@@ -117,8 +117,17 @@
         <script>
             let portfolio_data = {{total_portfolio | safe}}
             pieWalletAssets(pieWA, portfolio_data)
-
         </script>
+    </div>
+    <div class="mt-3">
+        <div class="text-center mt-2 text-light">
+            <small>Portfolio value</small>
+        </div>
+        <div id="portfolioChart" style="height: 250px;"></div>
+        <script>
+            portfolioChart('portfolioChart', {{current_user.id}})
+        </script>
+        <div class="text-right text-info"><small>This is only recorded on login</small></div>
     </div>
     <div class="border-top border-bottom border-secondary">
         <div class="text-center mt-2 text-light">

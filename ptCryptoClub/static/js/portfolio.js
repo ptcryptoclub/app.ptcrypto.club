@@ -262,7 +262,7 @@ function pieAssets(divName, assetsData) {
     pieSeries.hiddenState.properties.startAngle = -90;
 }
 
-// NOT IN USE //
+
 function lineBuySell(divName, user_ID, numberDays) {
     let apiSecret = document.getElementById("APISecret").value;
 
@@ -359,4 +359,72 @@ function lineBuySell(divName, user_ID, numberDays) {
 }
 
 
+
+function portfolioChart(divName, user_ID) {
+    let apiSecret = document.getElementById("APISecret").value;
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    // Create chart instance
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.zoomOutButton.disabled = true;
+
+    // Add data 
+    chart.dataSource.url = '/api/account/portfolio/chart/'+ user_ID +'/'+ apiSecret +'/';
+
+    // Set input format for the dates
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+
+    // Create axes
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.fontSize = "0.8em";
+    dateAxis.renderer.grid.template.disabled = true;
+    dateAxis.tooltip.disabled = true;
+    dateAxis.start = 0.5;
+    dateAxis.end = 1;
+    dateAxis.keepSelection = true;
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.renderer.fontSize = "0.8em";
+    valueAxis.renderer.grid.template.disabled = true;
+    valueAxis.tooltip.disabled = true;
+    valueAxis.title.text = 'EUR';
+    valueAxis.title.fontSize = "0.8em";
+    valueAxis.renderer.inside = true;
+    
+
+    // Create series
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.valueY = "value";
+    series.dataFields.dateX = "date";
+    series.tooltipText = "[font-size: 0.85em;]Value: {value} EUR\nChange to previous\nAbsolute: {valueY.previousChange} EUR\nPercentage: {valueY.previousChangePercent} %"
+    series.strokeWidth = 2;
+    //series.minBulletDistance = 15;
+
+
+    // Make bullets grow on hover
+    var bullet = series.bullets.push(new am4charts.CircleBullet());
+    bullet.circle.strokeWidth = 2;
+    bullet.circle.radius = 4;
+    bullet.circle.fill = am4core.color("#fff");
+
+    var bullethover = bullet.states.create("hover");
+    bullethover.properties.scale = 1.3;
+
+    // Make a panning cursor
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.behavior = "panX";
+
+
+
+    // Add scrollbar
+    chart.scrollbarX = new am4core.Scrollbar();
+    chart.scrollbarX.minHeight = 5;
+
+
+
+}
 

@@ -1,6 +1,6 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog
+from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -920,3 +920,31 @@ def news_search(key_words: str, sources: str = "", page: int = 1, per_page: int 
         )
     return to_return
 
+
+def portfolio_chart(user_id):
+    data = PortfolioRecord.query.filter_by(user_id=user_id).all()
+    to_return = []
+    print(len(data))
+    for i in range(len(data)):
+        if i == 0:
+            to_return.append(
+                {
+                    "date": str(data[i].date_created)[:19],
+                    "value": data[i].value,
+                    "wallet": data[i].wallet,
+                    "assets": data[i].assets,
+                    "percentage": data[i].percentage
+                }
+            )
+        else:
+            to_return.append(
+                {
+                    "date": str(data[i].date_created)[:19],
+                    "value": data[i].value,
+                    "wallet": data[i].wallet,
+                    "assets": data[i].assets,
+                    "percentage": data[i].percentage
+                }
+            )
+    print(to_return)
+    return to_return
