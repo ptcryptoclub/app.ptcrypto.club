@@ -369,11 +369,13 @@ def activate_account():
                             db.session.add(new_portfolio_assets)
                     port_record = calculate_total_value(user_id=user.id)
                     # noinspection PyArgumentList
-                    new_record = PortfolioRecord(user_id=user.id,
-                                                 value=port_record["value"],
-                                                 wallet=port_record["wallet"],
-                                                 assets=port_record["assets"],
-                                                 percentage=port_record["percentage"])
+                    new_record = PortfolioRecord(
+                        user_id=user.id,
+                        value=port_record["value"],
+                        wallet=port_record["wallet"],
+                        assets=port_record["assets"],
+                        percentage=port_record["percentage"]
+                    )
                     db.session.add(new_record)
                     db.session.commit()
                     flash(f'Your account has been activated.', 'success')
