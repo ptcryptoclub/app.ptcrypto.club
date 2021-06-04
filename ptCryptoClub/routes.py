@@ -222,14 +222,6 @@ def login():
                                 ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
                                 status=True)
                 db.session.add(log)
-                port_record = calculate_total_value(user_id=user.id)
-                # noinspection PyArgumentList
-                new_record = PortfolioRecord(user_id=user.id,
-                                             value=port_record["value"],
-                                             wallet=port_record["wallet"],
-                                             assets=port_record["assets"],
-                                             percentage=port_record["percentage"])
-                db.session.add(new_record)
                 db.session.commit()
                 return redirect(url_for('portfolio'))
             else:
@@ -296,6 +288,14 @@ def register():
             qrcode_img=filename
         )
         db.session.add(user)
+        port_record = calculate_total_value(user_id=user.id)
+        # noinspection PyArgumentList
+        new_record = PortfolioRecord(user_id=user.id,
+                                     value=port_record["value"],
+                                     wallet=port_record["wallet"],
+                                     assets=port_record["assets"],
+                                     percentage=port_record["percentage"])
+        db.session.add(new_record)
         db.session.commit()
         return redirect(url_for('qr_activation', ID=filename))
     else:
