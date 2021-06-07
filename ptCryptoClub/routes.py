@@ -1311,6 +1311,7 @@ def delete_account():
             TransactionsPTCC.query.filter_by(user_id=current_user.id).delete()
             Portfolio.query.filter_by(user_id=current_user.id).delete()
             PortfolioAssets.query.filter_by(user_id=current_user.id).delete()
+            PortfolioRecord.query.filter_by(user_id=current_user.id).delete()
             db.session.commit()
             logout_user()
             flash("Your account has been deleted.", "info")
