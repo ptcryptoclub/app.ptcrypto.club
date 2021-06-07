@@ -370,7 +370,7 @@ function portfolioChart(divName, user_ID) {
 
     // Create chart instance
     var chart = am4core.create(divName, am4charts.XYChart);
-    chart.zoomOutButton.disabled = true;
+    chart.zoomOutButton.disabled = false;
 
     // Add data 
     chart.dataSource.url = '/api/account/portfolio/chart/'+ user_ID +'/'+ apiSecret +'/';
@@ -378,13 +378,12 @@ function portfolioChart(divName, user_ID) {
     // Set input format for the dates
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
 
+
     // Create axes
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.fontSize = "0.8em";
     dateAxis.renderer.grid.template.disabled = true;
     dateAxis.tooltip.disabled = true;
-    dateAxis.start = 0.5;
-    dateAxis.end = 1;
     dateAxis.keepSelection = true;
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -394,7 +393,8 @@ function portfolioChart(divName, user_ID) {
     valueAxis.title.text = 'EUR';
     valueAxis.title.fontSize = "0.8em";
     valueAxis.renderer.inside = true;
-    
+
+       
 
     // Create series
     var series = chart.series.push(new am4charts.LineSeries());
@@ -403,6 +403,22 @@ function portfolioChart(divName, user_ID) {
     series.tooltipText = "[font-size: 0.85em;]Value: {value} EUR\nChange to previous\nAbsolute: {valueY.previousChange} EUR\nPercentage: {valueY.previousChangePercent} %"
     series.strokeWidth = 2;
     //series.minBulletDistance = 15;
+
+
+    // Create series
+    // var series_2 = chart.series.push(new am4charts.LineSeries());
+    // series_2.dataFields.valueY = "assets";
+    // series_2.dataFields.dateX = "date";
+    // series_2.tooltipText = "[font-size: 0.85em;]Assets: {assets} EUR"
+    // series_2.strokeWidth = 2;
+
+
+    // Create series
+    // var series_3 = chart.series.push(new am4charts.LineSeries());
+    // series_3.dataFields.valueY = "wallet";
+    // series_3.dataFields.dateX = "date";
+    // series_3.tooltipText = "[font-size: 0.85em;]Wallet: {assets} EUR"
+    // series_3.strokeWidth = 2;
 
 
     // Make bullets grow on hover
@@ -416,14 +432,7 @@ function portfolioChart(divName, user_ID) {
 
     // Make a panning cursor
     chart.cursor = new am4charts.XYCursor();
-    chart.cursor.behavior = "panX";
-
-
-
-    // Add scrollbar
-    chart.scrollbarX = new am4core.Scrollbar();
-    chart.scrollbarX.minHeight = 5;
-
+    // chart.cursor.behavior = "panX";
 
 
 }
