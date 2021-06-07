@@ -1286,11 +1286,11 @@ def api_account_portfolio_buy_sell_line_chart(user_ID, days, api_secret):
         )
 
 
-@app.route("/api/account/portfolio/chart/<user_id>/<api_secret>/")
-def api_account_portfolio_chart(api_secret, user_id):
+@app.route("/api/account/portfolio/chart/<delta>/<user_id>/<api_secret>/")
+def api_account_portfolio_chart(delta, user_id, api_secret):
     if SecureApi().validate(api_secret=api_secret, user_id=user_id):
         return jsonify(
-            portfolio_chart(user_id=user_id)
+            portfolio_chart(user_id=user_id, delta=delta)
         )
     else:
         return jsonify(

@@ -360,7 +360,7 @@ function lineBuySell(divName, user_ID, numberDays) {
 
 
 
-function portfolioChart(divName, user_ID) {
+function portfolioChart(divName, user_ID, days) {
     let apiSecret = document.getElementById("APISecret").value;
 
     // Themes begin
@@ -373,7 +373,7 @@ function portfolioChart(divName, user_ID) {
     chart.zoomOutButton.disabled = false;
 
     // Add data 
-    chart.dataSource.url = '/api/account/portfolio/chart/'+ user_ID +'/'+ apiSecret +'/';
+    chart.dataSource.url = '/api/account/portfolio/chart/'+ days +'/'+ user_ID +'/'+ apiSecret +'/';
 
     // Set input format for the dates
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";

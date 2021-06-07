@@ -8,7 +8,7 @@ from flask import request
 import pandas as pd
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import requests
 
@@ -921,8 +921,19 @@ def news_search(key_words: str, sources: str = "", page: int = 1, per_page: int 
     return to_return
 
 
-def portfolio_chart(user_id):
-    data = PortfolioRecord.query.filter_by(user_id=user_id).all()
+def portfolio_chart(user_id, delta=30):
+    if delta == "full":
+        data = PortfolioRecord.query.filter(PortfolioRecord.user_id == user_id).all()
+    else:
+        try:
+            delta = int(delta)
+        except Exception as e:
+            print(e)
+            delta = 30
+        data = PortfolioRecord.query.filter(
+            PortfolioRecord.user_id == user_id,
+            PortfolioRecord.date_created >= datetime.utcnow() - timedelta(days=delta)
+        ).all()
     to_return = []
     for i in range(len(data)):
         to_return.append(
