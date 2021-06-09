@@ -128,7 +128,7 @@
             portfolioChart('portfolioChart', {{current_user.id}}, 30)
         </script>
     </div>
-    <div class="text-right"><small><a href="#" class="text-decoration-none text-info">See full chart</a></small></div>
+    <div class="text-right"><small><a href="{{url_for('portfolio_details')}}" class="text-decoration-none text-info">See full chart</a></small></div>
     <div class="border-top border-bottom border-secondary">
         <div class="text-center mt-2 text-light">
             <small>Total amount per day <small>(last {{number_days_buy_sell}} days)</small></small>

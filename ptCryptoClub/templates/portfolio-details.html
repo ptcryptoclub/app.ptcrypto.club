@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-muted text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="{{url_for('account_admin')}}" class="text-muted text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<script src="{{url_for('static', filename='js/portfolio.js')}}"></script>
+<div class="container">
+    <div class="mt-5">
+        <div class="text-light text-center">Overview</div>
+    </div>
+    <div id="chart-1" style="height: 150px;"></div>
+    <script>
+        dataFull = {{data_full | safe}}
+        portfolioChartStart('chart-1', dataFull)
+    </script>
+    <div class="mt-5">
+        <div class="text-light text-center">Assets vs Wallet</div>
+        <div class="row no-gutters align-items-center justify-content-end">
+            <div class="col-auto">
+                <small class="text-light mr-2">Showing:</small>
+            </div>
+            <div class="col-auto">
+                <select id="deltaDays" name="deltaDays"
+                        onchange="portfolioChartFull('chart-test', {{current_user.id}})"
+                        class="custom-select custom-select-sm bg-dark border border-dark text-light">
+                    <option value="7">07 days</option>
+                    <option value="14">14 days</option>
+                    <option selected value="30">30 days</option>
+                    <option value="45">45 days</option>
+                    <option value="60">60 days</option>
+                    <option value="90">90 days</option>
+                    <option value="180">180 days</option>
+                    <option value="365">365 days</option>
+                    <option value="full">All</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div id="chart-test" style="height: 450px;"></div>
+    <script>
+        portfolioChartFull('chart-test', {{current_user.id}})
+    </script>
+</div>
+
+{% endblock %}

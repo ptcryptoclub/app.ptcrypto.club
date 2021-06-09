@@ -270,15 +270,23 @@ def calculate_total_value(user_id, market='kraken', quote='eur'):
     wallet_value = Portfolio.query.filter_by(user_id=user_id).first()
     assets = PortfolioAssets.query.filter_by(user_id=user_id)
     assets_value = 0
+    assets_details = {}
     for asset in assets:
         last_price = get_last_price(market=market, base=asset.asset, quote=quote)['price']
         assets_value += last_price * asset.amount
+        value = last_price * asset.amount
+        assets_details.update(
+            {
+                asset.asset: round(value, 2)
+            }
+        )
     total = wallet_value.wallet + assets_value
     percentage = round(((total - wallet_value.start) / wallet_value.start) * 100, 1)
     return {
         'value': round(total, 2),
         'wallet': round(wallet_value.wallet, 2),
         'assets': round(assets_value, 2),
+        'assets_details': assets_details,
         'percentage': percentage,
         'quote': quote
     }
@@ -946,3 +954,37 @@ def portfolio_chart(user_id, delta=30):
             }
         )
     return to_return
+
+
+def portfolio_data_start_info(user_id: int):
+    try:
+        max_ = PortfolioRecord.query.with_entities(
+            PortfolioRecord.value).filter_by(user_id=user_id).order_by(PortfolioRecord.value.desc()).first()[0]
+    except Exception as e:
+        print(e)
+        max_ = 0
+    try:
+        min_ = PortfolioRecord.query.with_entities(
+            PortfolioRecord.value).filter_by(user_id=user_id).order_by(PortfolioRecord.value.asc()).first()[0]
+    except Exception as e:
+        print(e)
+        min_ = 0
+    try:
+        start_ = Portfolio.query.filter_by(user_id=user_id).first().start
+    except Exception as e:
+        print(e)
+        start_ = 0
+    data_full = [
+        {
+            "name": "Min",
+            "value": min_
+        },
+        {
+            "name": "Max",
+            "value": max_
+        },
+        {
+            "name": "Start",
+            "value": start_
+        }]
+    return  data_full

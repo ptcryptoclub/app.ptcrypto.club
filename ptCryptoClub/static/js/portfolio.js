@@ -405,22 +405,6 @@ function portfolioChart(divName, user_ID, days) {
     //series.minBulletDistance = 15;
 
 
-    // Create series
-    // var series_2 = chart.series.push(new am4charts.LineSeries());
-    // series_2.dataFields.valueY = "assets";
-    // series_2.dataFields.dateX = "date";
-    // series_2.tooltipText = "[font-size: 0.85em;]Assets: {assets} EUR"
-    // series_2.strokeWidth = 2;
-
-
-    // Create series
-    // var series_3 = chart.series.push(new am4charts.LineSeries());
-    // series_3.dataFields.valueY = "wallet";
-    // series_3.dataFields.dateX = "date";
-    // series_3.tooltipText = "[font-size: 0.85em;]Wallet: {assets} EUR"
-    // series_3.strokeWidth = 2;
-
-
     // Make bullets grow on hover
     var bullet = series.bullets.push(new am4charts.CircleBullet());
     bullet.circle.strokeWidth = 2;
@@ -436,4 +420,147 @@ function portfolioChart(divName, user_ID, days) {
 
 
 }
+
+
+function portfolioChartFull (divName, user_ID) {
+
+    let apiSecret = document.getElementById("APISecret").value;
+    let days = document.getElementById("deltaDays").value;
+
+    // Themes begin
+    am4core.useTheme(am4themes_animated);
+    am4core.useTheme(am4themes_dark);
+    // Themes end
+
+    // Auto dispose charts
+    am4core.options.autoDispose = true;
+
+    var chart = am4core.create(divName, am4charts.XYChart);
+
+    chart.colors.step = 7;
+
+    // Add data 
+    chart.dataSource.url = '/api/account/portfolio/chart/'+ days +'/'+ user_ID +'/'+ apiSecret +'/';
+
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.minGridDistance = 60;
+    dateAxis.startLocation = 0.5;
+    dateAxis.endLocation = 0.5;
+    dateAxis.title.fontSize = "0.8em";
+    dateAxis.renderer.fontSize = "0.8em";
+    dateAxis.tooltip.disabled = true;
+
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.title.text = 'EUR';
+    valueAxis.title.fontSize = "0.8em";
+    valueAxis.renderer.fontSize = "0.8em";
+
+    
+    var walletSeries = chart.series.push(new am4charts.LineSeries());
+    walletSeries.name = "Wallet";
+    walletSeries.dataFields.dateX = "date";
+    walletSeries.dataFields.valueY = "wallet";
+    // walletSeries.tooltipHTML = "<img src='/static/crypto_icons/color/eur.png' style='vertical-align:text-top; margin-right: 10px; width:21px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
+    walletSeries.tooltipText = "[font-size: 0.85em; #000]Wallet: {valueY.value} EUR[/]";
+    walletSeries.tooltip.background.fill = am4core.color("#FFF");
+    walletSeries.tooltip.getFillFromObject = false;
+    walletSeries.tooltip.getStrokeFromObject = true;
+    walletSeries.tooltip.background.strokeWidth = 1;
+    walletSeries.sequencedInterpolation = true;
+    // walletSeries.fillOpacity = 0.6;
+    // walletSeries.stacked = true;
+    walletSeries.strokeWidth = 2;
+
+
+    var assetsSeries = chart.series.push(new am4charts.LineSeries());
+    assetsSeries.dataFields.dateX = "date";
+    assetsSeries.name = "Assets";
+    assetsSeries.dataFields.valueY = "assets";
+    // assetsSeries.tooltipHTML = "<img src='/static/crypto_icons/color/btc.png' style='vertical-align:text-top; margin-right: 10px; width:21px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
+    assetsSeries.tooltipText = "[font-size: 0.85em; #000]Assest: {valueY.value} EUR[/]";
+    assetsSeries.tooltip.background.fill = am4core.color("#FFF");
+    assetsSeries.tooltip.getStrokeFromObject = true;
+    assetsSeries.tooltip.background.strokeWidth = 1;
+    assetsSeries.tooltip.getFillFromObject = false;
+    // assetsSeries.fillOpacity = 0.6;
+    assetsSeries.strokeWidth = 2;
+    // assetsSeries.stacked = true;
+
+
+    var totalSeries = chart.series.push(new am4charts.LineSeries());
+    totalSeries.dataFields.dateX = "date";
+    totalSeries.name = "Total";
+    totalSeries.dataFields.valueY = "value";
+    totalSeries.tooltipText = "[font-size: 0.85em; #000]Total: {valueY.value} EUR\n\nChange to start\nAbsolute: {valueY.change} EUR\nPercentage: {valueY.changePercent}%[/]";
+    totalSeries.tooltip.background.fill = am4core.color("#FFF");
+    totalSeries.tooltip.getStrokeFromObject = true;
+    totalSeries.tooltip.background.strokeWidth = 1;
+    totalSeries.tooltip.getFillFromObject = false;
+    // totalSeries.fillOpacity = 0.6;
+    totalSeries.strokeWidth = 2;
+
+    chart.cursor = new am4charts.XYCursor();
+    // chart.cursor.snapToSeries = [assetsSeries, walletSeries];
+
+    /* Add legend */
+    chart.legend = new am4charts.Legend();
+    chart.legend.useDefaultMarker = true;
+
+    let marker = chart.legend.markers.template.children.getIndex(0);
+    marker.cornerRadius(12, 12, 12, 12);
+    marker.strokeWidth = 2;
+    marker.strokeOpacity = 1;
+
+}
+
+
+function portfolioChartStart (divName, data) {
+    // Themes begin
+    am4core.useTheme(am4themes_animated);
+    am4core.useTheme(am4themes_dark);
+    // Themes end
+
+    // Create chart instance
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+    chart.data = data;
+
+    var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+    categoryAxis.dataFields.category = "name";
+    categoryAxis.renderer.grid.template.strokeOpacity = 0;
+    categoryAxis.cursorTooltipEnabled = false;
+    categoryAxis.renderer.fontSize = "0.8em";
+    
+
+    var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+    valueAxis.renderer.inside = true;
+    valueAxis.renderer.labels.template.fillOpacity = 0.3;
+    valueAxis.renderer.grid.template.strokeOpacity = 0;
+    valueAxis.min = 0;
+    valueAxis.cursorTooltipEnabled = false;
+    valueAxis.renderer.baseGrid.strokeOpacity = 0;
+    valueAxis.hidden = true;
+
+    var series = chart.series.push(new am4charts.ColumnSeries);
+    series.dataFields.valueX = "value";
+    series.dataFields.categoryY = "name";
+    series.tooltipText = "[font-size: 0.85em;]{valueX.value} EUR[/]";
+    series.tooltip.pointerOrientation = "vertical";
+
+    var columnTemplate = series.columns.template;
+    columnTemplate.height = am4core.percent(25);
+    columnTemplate.column.cornerRadius(0, 60, 0, 60);
+    columnTemplate.strokeOpacity = 0;
+
+    var cursor = new am4charts.XYCursor();
+    chart.cursor = cursor;
+    cursor.lineX.disabled = true;
+    cursor.lineY.disabled = true;
+    cursor.behavior = "none";
+}
+
 
