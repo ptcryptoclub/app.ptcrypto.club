@@ -437,7 +437,7 @@ function portfolioChartFull (divName, user_ID) {
 
     var chart = am4core.create(divName, am4charts.XYChart);
 
-    chart.colors.step = 7;
+    chart.colors.step = 5;
 
     // Add data 
     chart.dataSource.url = '/api/account/portfolio/chart/'+ days +'/'+ user_ID +'/'+ apiSecret +'/';
@@ -445,6 +445,7 @@ function portfolioChartFull (divName, user_ID) {
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.minGridDistance = 60;
+    dateAxis.renderer.grid.template.strokeOpacity = 0;
     dateAxis.startLocation = 0.5;
     dateAxis.endLocation = 0.5;
     dateAxis.title.fontSize = "0.8em";
@@ -470,8 +471,7 @@ function portfolioChartFull (divName, user_ID) {
     walletSeries.tooltip.getStrokeFromObject = true;
     walletSeries.tooltip.background.strokeWidth = 1;
     walletSeries.sequencedInterpolation = true;
-    // walletSeries.fillOpacity = 0.6;
-    // walletSeries.stacked = true;
+    walletSeries.fillOpacity = 0.05;
     walletSeries.strokeWidth = 2;
 
 
@@ -485,7 +485,7 @@ function portfolioChartFull (divName, user_ID) {
     assetsSeries.tooltip.getStrokeFromObject = true;
     assetsSeries.tooltip.background.strokeWidth = 1;
     assetsSeries.tooltip.getFillFromObject = false;
-    // assetsSeries.fillOpacity = 0.6;
+    assetsSeries.fillOpacity = 0.05;
     assetsSeries.strokeWidth = 2;
     // assetsSeries.stacked = true;
 
@@ -499,7 +499,7 @@ function portfolioChartFull (divName, user_ID) {
     totalSeries.tooltip.getStrokeFromObject = true;
     totalSeries.tooltip.background.strokeWidth = 1;
     totalSeries.tooltip.getFillFromObject = false;
-    // totalSeries.fillOpacity = 0.6;
+    totalSeries.fillOpacity = 0.05;
     totalSeries.strokeWidth = 2;
 
     chart.cursor = new am4charts.XYCursor();
@@ -561,6 +561,130 @@ function portfolioChartStart (divName, data) {
     cursor.lineX.disabled = true;
     cursor.lineY.disabled = true;
     cursor.behavior = "none";
+}
+
+
+function portfolioChartFull_2 (divName, user_ID) {
+
+    let apiSecret = document.getElementById("APISecret").value;
+    let days = document.getElementById("deltaDays").value;
+
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    // Auto dispose charts
+    am4core.options.autoDispose = true;
+
+    // Create chart instance
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.colors.step = 5;
+
+    // Add data 
+    chart.dataSource.url = '/api/account/portfolio/chart/'+ days +'/'+ user_ID +'/'+ apiSecret +'/';
+
+    // Create axes
+    var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+    categoryAxis.dataFields.category = "date";
+    categoryAxis.title.text = "Date";
+    categoryAxis.renderer.grid.template.location = 0;
+    categoryAxis.renderer.minGridDistance = 20;
+    categoryAxis.title.fontSize = "0.8em";
+    categoryAxis.renderer.fontSize = "0.8em";
+
+    categoryAxis.startLocation = 0.5;
+    categoryAxis.endLocation = 0.5;
+
+    categoryAxis.hidden = true;
+    categoryAxis.cursorTooltipEnabled = true;
+
+    /* Configure axis tooltip */
+    var axisTooltip = categoryAxis.tooltip;
+    axisTooltip.background.fill = am4core.color("#fff");
+    axisTooltip.background.strokeWidth = 0;
+    axisTooltip.background.cornerRadius = 3;
+    axisTooltip.background.pointerLength = 0;
+    axisTooltip.fontSize = "0.8em";
+    axisTooltip.dy = 8;
+
+
+    var  valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.title.text = "Percent";
+    valueAxis.calculateTotals = true;
+    valueAxis.min = 0;
+    valueAxis.max = 100;
+    valueAxis.strictMinMax = true;
+    valueAxis.renderer.labels.template.adapter.add("text", function(text) {
+    return text + "%";
+    });
+    valueAxis.cursorTooltipEnabled = false;
+    valueAxis.title.fontSize = "0.8em";
+    valueAxis.renderer.fontSize = "0.8em";
+
+    // Create series
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.valueY = "wallet";
+    series.dataFields.valueYShow = "totalPercent";
+    series.dataFields.categoryX = "date";
+    series.name = "Wallet";
+
+    series.tooltipText = "[font-size: 0.85em; #000]Wallet: {valueY.value} EUR[/]";
+    series.tooltip.background.fill = am4core.color("#FFF");
+    series.tooltip.getFillFromObject = false;
+    series.tooltip.getStrokeFromObject = true;
+    series.tooltip.background.strokeWidth = 1;
+    series.sequencedInterpolation = true;
+    series.strokeWidth = 2;
+
+    series.fillOpacity = 0.20;
+    series.stacked = true;
+
+    // static
+    series.legendSettings.labelText = "Wallet";
+    // series.legendSettings.valueText = "{valueY.close}";
+
+    // hovering
+    // series.legendSettings.itemLabelText = "Cars:";
+    // series.legendSettings.itemValueText = "{valueY}";
+
+    var series2 = chart.series.push(new am4charts.LineSeries());
+    series2.dataFields.valueY = "assets";
+    series2.dataFields.valueYShow = "totalPercent";
+    series2.dataFields.categoryX = "date";
+    series2.name = "Assets";
+
+    series2.tooltipText = "[font-size: 0.85em; #000]Assets: {valueY.value} EUR[/]";
+    series2.tooltip.background.fill = am4core.color("#FFF");
+    series2.tooltip.getFillFromObject = false;
+    series2.tooltip.getStrokeFromObject = true;
+    series2.tooltip.background.strokeWidth = 1;
+    series2.sequencedInterpolation = true;
+    series2.strokeWidth = 2;
+
+    series2.fillOpacity = 0.20;
+    series2.stacked = true;
+
+    // static
+    series2.legendSettings.labelText = "Assets";
+    // series2.legendSettings.valueText = "{valueY.close}";
+
+    // hovering
+    // series2.legendSettings.itemLabelText = "Motorcycles:";
+    // series2.legendSettings.itemValueText = "{valueY}";
+
+    // Add cursor
+    chart.cursor = new am4charts.XYCursor();
+
+    // add legend
+    chart.legend = new am4charts.Legend();
+    chart.legend.useDefaultMarker = true;
+
+    let marker = chart.legend.markers.template.children.getIndex(0);
+    marker.cornerRadius(12, 12, 12, 12);
+    marker.strokeWidth = 2;
+    marker.strokeOpacity = 1;
 }
 
 
