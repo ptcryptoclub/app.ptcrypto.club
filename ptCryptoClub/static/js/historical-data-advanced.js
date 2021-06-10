@@ -118,10 +118,10 @@ function historical_line_advanced(divName) {
 
         var diffPercentage = (diffAbsolute / minDateValue)*100
 
-        if (diffPercentage < 0) {
+        if (diffPercentage.toFixed(2) < 0) {
             var color = "danger"
             var arrow = "south"
-        } else if (diffPercentage > 0) {
+        } else if (diffPercentage.toFixed(2) > 0) {
             var color = "success"
             var arrow = "north"
         } else {
