@@ -9,7 +9,7 @@ boto3==1.15.5
 email-validator==1.1.1
 pandas==1.1.2
 requests==2.24.0
-Pillow==8.1.1
+Pillow== 8.2.0
 pyotp==2.4.1
 qrcode==6.1
 pyOpenSSL==20.0.1
