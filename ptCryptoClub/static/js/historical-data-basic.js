@@ -13,7 +13,7 @@ function historical_line_basic(divName) {
     } else {
         prefix = 7
     }
-  
+
 
     var base = document.getElementById("base-basic").value;
     var quote = document.getElementById("quote-basic").value;
@@ -32,7 +32,7 @@ function historical_line_basic(divName) {
 
     var end = end_y + "-" + end_m + "-" + end_d + " " + end_h + ":" + end_mm + ":" + end_s
 
-    nowTime.setDate(nowTime.getDate()-prefix);
+    nowTime.setDate(nowTime.getDate() - prefix);
 
     var start_y = nowTime.getUTCFullYear()
     var start_m = parseInt(nowTime.getUTCMonth()) + 1
@@ -43,7 +43,7 @@ function historical_line_basic(divName) {
 
     var start = start_y + "-" + start_m + "-" + start_d + " " + start_h + ":" + start_mm + ":" + start_s
 
-    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/1800/" + apiSecret +"/?start="+ start +"&end=" + end;
+    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/" + market + "/1800/" + apiSecret + "/?start=" + start + "&end=" + end;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -61,6 +61,8 @@ function historical_line_basic(divName) {
     // Load external data
     chart.dataSource.url = urlToSend;
     chart.dataSource.parser = new am4core.JSONParser();
+
+
 
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
@@ -102,6 +104,64 @@ function historical_line_basic(divName) {
     series.fillOpacity = 0.2;
 
     chart.cursor = new am4charts.XYCursor();
+
+
+    // CREATE A TABLE WITH INFO ABOUT THE DATA LOADED
+    chart.dataSource.events.on("done", function (ev) {
+        // parsed data is assigned to data source's `data` property
+        var data = ev.target.data;
+        var maxDate = data[data.length - 1].date
+        var maxDateValue = data[data.length - 1].closeprice
+        var minDate = data[0].date
+        var minDateValue = data[0].closeprice
+        var maxValue = Math.max.apply(Math, data.map(function(o) { return o.closeprice; }))
+        var minValue = Math.min.apply(Math, data.map(function(o) { return o.closeprice; }))
+
+        var index1 = 0;
+        var filteredObj1 = data.find(function(item, i){
+        if(item.closeprice == maxValue){
+            index1 = i;
+            return i;
+        }
+        });
+        if (filteredObj1 == null) {
+            var maxValueDate = data[0].date
+        } else {
+            var maxValueDate = filteredObj1.date
+        }
+        
+        var index2 = 0;
+        var filteredObj2 = data.find(function(item, i){
+        if(item.closeprice == minValue){
+            index2 = i;
+            return i;
+        }
+        });
+        if (filteredObj2 == null) {
+            var minValueDate = data[0].date
+        } else {
+            var minValueDate = filteredObj2.date
+        }
+
+        var diffAbsolute = maxDateValue - minDateValue
+
+        var diffPercentage = (diffAbsolute / minDateValue)*100
+
+        if (diffPercentage < 0) {
+            var color = "danger"
+            var arrow = "south"
+        } else if (diffPercentage > 0) {
+            var color = "success"
+            var arrow = "north"
+        } else {
+            var color = "warning"
+            var arrow = "unfold_less"
+        }
+
+        
+        divElement = document.getElementById("overview")
+        divElement.innerHTML = '<div class="p-xl-3 p-lg-3 p-md-3 p-sm-2 p-2 border border-'+ color +' rounded-lg mt-3"><div class="text-light text-center small">Showing data from '+ minDate.toString().slice(0, 24) +' to '+ maxDate.toString().slice(0, 24) +'</div><div class="row no-gutters justify-content-around"><div class="col-md-auto mt-3 align-self-center"><div class="row no-gutters"><div class="col-auto p-1"><div class="text-'+ color +'"><H2>'+ diffPercentage.toFixed(2) +'%</H2></div><div class="small text-'+ color +' text-center"><small>'+ numberFormat(diffAbsolute.toFixed(2)) + ' ' + quote.toUpperCase() +'</small></div></div><div class="col p-1"><span class="material-icons text-'+ color +'" style="font-size:72px">'+ arrow +'</span></div></div></div><div class="col-md-auto mt-3"><div class="row no-gutters justify-content-around"><div class="col-auto"><div class="text-center text-muted mb-1">Maximum</div><div class="text-center"><H5 class="text-light">'+ numberFormat(maxValue) + ' ' + quote.toUpperCase() +'</H5></div><div class="text-center small text-muted">'+ maxValueDate.toString().slice(0, 24) +'</div></div><div class="col-auto ml-3"><div class="text-center text-muted mb-1">Minimum</div><div class="text-center"><H5 class="text-light">'+ numberFormat(minValue) + ' ' + quote.toUpperCase() +'</H5></div><div class="text-center small text-muted">'+ minValueDate.toString().slice(0, 24) +'</div></div></div></div></div></div>'
+    });
 }
 
 
@@ -135,7 +195,7 @@ function historical_ohlc_basic(divName) {
 
     var end = end_y + "-" + end_m + "-" + end_d + " " + end_h + ":" + end_mm + ":" + end_s
 
-    nowTime.setDate(nowTime.getDate()-prefix);
+    nowTime.setDate(nowTime.getDate() - prefix);
     var start_y = nowTime.getUTCFullYear()
     var start_m = parseInt(nowTime.getUTCMonth()) + 1
     var start_d = nowTime.getUTCDate()
@@ -145,7 +205,7 @@ function historical_ohlc_basic(divName) {
 
     var start = start_y + "-" + start_m + "-" + start_d + " " + start_h + ":" + start_mm + ":" + start_s
 
-    urlToSend = "/api/historical-charts/ohlc/" + base + "/" + quote + "/" + market + "/1800/" + apiSecret +"/?start="+ start +"&end=" + end;
+    urlToSend = "/api/historical-charts/ohlc/" + base + "/" + quote + "/" + market + "/1800/" + apiSecret + "/?start=" + start + "&end=" + end;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -247,6 +307,7 @@ function historical_ohlc_basic(divName) {
     chart.cursor.maxPanOut = 0.005
     // Create scrollbars
     // chart.scrollbarX = new am4core.Scrollbar();
+
 }
 
 
@@ -281,7 +342,7 @@ function historical_vtp_basic(divName) {
 
     var end = end_y + "-" + end_m + "-" + end_d + " " + end_h + ":" + end_mm + ":" + end_s
 
-    nowTime.setDate(nowTime.getDate()-prefix);
+    nowTime.setDate(nowTime.getDate() - prefix);
     var start_y = nowTime.getUTCFullYear()
     var start_m = parseInt(nowTime.getUTCMonth()) + 1
     var start_d = nowTime.getUTCDate()
@@ -291,7 +352,7 @@ function historical_vtp_basic(divName) {
 
     var start = start_y + "-" + start_m + "-" + start_d + " " + start_h + ":" + start_mm + ":" + start_s
 
-    urlToSend = "/api/historical-charts/vtp/" + base + "/" + quote + "/" + market + "/3600/" + apiSecret +"/?start="+ start +"&end=" + end;
+    urlToSend = "/api/historical-charts/vtp/" + base + "/" + quote + "/" + market + "/3600/" + apiSecret + "/?start=" + start + "&end=" + end;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -428,5 +489,54 @@ function historical_vtp_basic(divName) {
     chart.cursor.maxPanOut = 0.005
     // Create scrollbars
     // chart.scrollbarX = new am4core.Scrollbar();
+
 }
 
+
+
+
+function overviewNOTINUSE (url, quote) {
+    fetch(url).then(
+        function(response){
+            response.json().then(
+                function (data) {
+                    var maxDate = data[data.length - 1].date
+                    var maxDateValue = data[data.length - 1].closeprice
+                    var minDate = data[0].date
+                    var minDateValue = data[0].closeprice
+                    var maxValue = Math.max.apply(Math, data.map(function(o) { return o.closeprice; }))
+                    var minValue = Math.min.apply(Math, data.map(function(o) { return o.closeprice; }))
+
+                    var index1 = 0;
+                    var filteredObj1 = data.find(function(item, i){
+                    if(item.closeprice == maxValue){
+                        index1 = i;
+                        return i;
+                    }
+                    });
+                    if (filteredObj1 == null) {
+                        var maxValueDate = data[0].date
+                    } else {
+                        var maxValueDate = filteredObj1.date
+                    }
+                    
+                    var index2 = 0;
+                    var filteredObj2 = data.find(function(item, i){
+                    if(item.closeprice == minValue){
+                        index2 = i;
+                        return i;
+                    }
+                    });
+                    if (filteredObj2 == null) {
+                        var minValueDate = data[0].date
+                    } else {
+                        var minValueDate = filteredObj2.date
+                    }
+
+                    divElement = document.getElementById("overview")
+                    divElement.innerHTML = '<table class="table table-sm table-borderless table-hover table-dark small" style="background-color: #000000;"><thead><tr><th scope="col"></th><th scope="col" class="text-right">Close price</th><th scope="col" class="text-center">Date</th></tr></thead><tbody><tr><th scope="col">Start</th><td class="text-right">'+ numberFormat(minDateValue) + ' ' + quote.toUpperCase() +'</td><td class="text-center">'+ minDate +'</td></tr><tr><th scope="col">End</th><td class="text-right">'+ numberFormat(maxDateValue) + ' ' + quote.toUpperCase() +'</td><td class="text-center">'+ maxDate +'</td></tr><tr><th scope="col">Maximum</th><td class="text-right">'+ numberFormat(maxValue) + ' ' + quote.toUpperCase() +'</td><td class="text-center">'+ maxValueDate +'</td></tr><tr><th scope="col">Minimum</th><td class="text-right">'+ numberFormat(minValue) + ' ' + quote.toUpperCase() +'</td><td class="text-center">'+ minValueDate +'</td></tr></tbody></table>'
+                }
+            )
+        }
+    );
+}

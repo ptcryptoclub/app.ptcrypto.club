@@ -6,11 +6,14 @@
     <div class="row">
         <div class="col">
             <div class="row justify-content-start">
-                <div class="col-auto"><small><a href="{{url_for('historical_charts_line')}}" class="text-decoration-none text-light">Line chart</a></small>
+                <div class="col-auto"><small><a href="{{url_for('historical_charts_line')}}"
+                                                class="text-decoration-none text-light">Line chart</a></small>
                 </div>
-                <div class="col-auto"><small><a href="{{url_for('historical_charts_ohlc')}}" class="text-decoration-none text-muted">Ohlc chart</a></small>
+                <div class="col-auto"><small><a href="{{url_for('historical_charts_ohlc')}}"
+                                                class="text-decoration-none text-muted">Ohlc chart</a></small>
                 </div>
-                <div class="col-auto"><small><a href="{{url_for('historical_charts_vtp')}}" class="text-decoration-none text-muted">Vtp chart</a></small>
+                <div class="col-auto"><small><a href="{{url_for('historical_charts_vtp')}}"
+                                                class="text-decoration-none text-muted">Vtp chart</a></small>
                 </div>
             </div>
         </div>
@@ -49,7 +52,8 @@
             {% set title_1 = "" %}
             {% endif %}
             <li class="nav-item" role="presentation" title="{{title_1}}">
-                <a class="nav-link text-light {{dis_1}}" id="pills-advanced-tab" data-toggle="pill" href="#pills-advanced"
+                <a class="nav-link text-light {{dis_1}}" id="pills-advanced-tab" data-toggle="pill"
+                   href="#pills-advanced"
                    role="tab" onclick="historical_line_advanced ('historical-line')" aria-controls="pills-advanced"
                    aria-selected="false">Advanced</a>
             </li>
@@ -334,7 +338,16 @@
         </div>
     </div>
     <div class="border-top border-secondary mt-2">
-        <div id="historical-line" style="height: 600px;"></div>
+        <div class="row justify-content-center">
+            <div id="overview" class="col-xl-7 col-lg-8 col-md-11 col-sm-11">
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3" id="historical-line" style="height: 600px;"></div>
         <script>
             historical_line_basic ('historical-line')
         </script>

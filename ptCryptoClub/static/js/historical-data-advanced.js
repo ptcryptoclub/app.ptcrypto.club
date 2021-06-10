@@ -76,6 +76,62 @@ function historical_line_advanced(divName) {
     series.fillOpacity = 0.2;
 
     chart.cursor = new am4charts.XYCursor();
+
+    // CREATE A TABLE WITH INFO ABOUT THE DATA LOADED
+    chart.dataSource.events.on("done", function (ev) {
+        // parsed data is assigned to data source's `data` property
+        var data = ev.target.data;
+        var maxDate = data[data.length - 1].date
+        var maxDateValue = data[data.length - 1].closeprice
+        var minDate = data[0].date
+        var minDateValue = data[0].closeprice
+        var maxValue = Math.max.apply(Math, data.map(function(o) { return o.closeprice; }))
+        var minValue = Math.min.apply(Math, data.map(function(o) { return o.closeprice; }))
+
+        var index1 = 0;
+        var filteredObj1 = data.find(function(item, i){
+        if(item.closeprice == maxValue){
+            index1 = i;
+            return i;
+        }
+        });
+        if (filteredObj1 == null) {
+            var maxValueDate = data[0].date
+        } else {
+            var maxValueDate = filteredObj1.date
+        }
+        
+        var index2 = 0;
+        var filteredObj2 = data.find(function(item, i){
+        if(item.closeprice == minValue){
+            index2 = i;
+            return i;
+        }
+        });
+        if (filteredObj2 == null) {
+            var minValueDate = data[0].date
+        } else {
+            var minValueDate = filteredObj2.date
+        }
+
+        var diffAbsolute = maxDateValue - minDateValue
+
+        var diffPercentage = (diffAbsolute / minDateValue)*100
+
+        if (diffPercentage < 0) {
+            var color = "danger"
+            var arrow = "south"
+        } else if (diffPercentage > 0) {
+            var color = "success"
+            var arrow = "north"
+        } else {
+            var color = "warning"
+            var arrow = "unfold_less"
+        }
+
+        divElement = document.getElementById("overview")
+        divElement.innerHTML = '<div class="p-xl-3 p-lg-3 p-md-3 p-sm-2 p-2 border border-'+ color +' rounded-lg mt-3"><div class="text-light text-center small">Showing data from '+ minDate.toString().slice(0, 24) +' to '+ maxDate.toString().slice(0, 24) +'</div><div class="row no-gutters justify-content-around"><div class="col-md-auto mt-3 align-self-center"><div class="row no-gutters"><div class="col-auto p-1"><div class="text-'+ color +'"><H2>'+ diffPercentage.toFixed(2) +'%</H2></div><div class="small text-'+ color +' text-center"><small>'+ numberFormat(diffAbsolute.toFixed(2)) + ' ' + quote.toUpperCase() +'</small></div></div><div class="col p-1"><span class="material-icons text-'+ color +'" style="font-size:72px">'+ arrow +'</span></div></div></div><div class="col-md-auto mt-3"><div class="row no-gutters justify-content-around"><div class="col-auto"><div class="text-center text-muted mb-1">Maximum</div><div class="text-center"><H5 class="text-light">'+ numberFormat(maxValue) + ' ' + quote.toUpperCase() +'</H5></div><div class="text-center small text-muted">'+ maxValueDate.toString().slice(0, 24) +'</div></div><div class="col-auto ml-3"><div class="text-center text-muted mb-1">Minimum</div><div class="text-center"><H5 class="text-light">'+ numberFormat(minValue) + ' ' + quote.toUpperCase() +'</H5></div><div class="text-center small text-muted">'+ minValueDate.toString().slice(0, 24) +'</div></div></div></div></div></div>'
+    });
 }
 
 
