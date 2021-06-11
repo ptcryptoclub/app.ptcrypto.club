@@ -48,6 +48,8 @@ function historical_line_pro(divName) {
     chart.dataSource.url = urlToSend;
     chart.dataSource.parser = new am4core.JSONParser();
 
+
+
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
     dateAxis.renderer.ticks.template.length = 8;
@@ -65,7 +67,6 @@ function historical_line_pro(divName) {
     dateAxis.groupData = true;
     dateAxis.groupCount = 2000;
 
-
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.tooltip.disabled = true;
     valueAxis.zIndex = 1;
@@ -74,12 +75,15 @@ function historical_line_pro(divName) {
     valueAxis.title.fontSize = "0.8em"
     valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
     valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
-    valueAxis.renderer.inside = true;
+    valueAxis.renderer.inside = false;
     valueAxis.renderer.labels.template.verticalCenter = "bottom";
     valueAxis.renderer.labels.template.padding(2, 2, 2, 2);
     valueAxis.renderer.grid.template.disabled = true;
 
     valueAxis.renderer.fontSize = "0.8em"
+
+    valueAxis.extraMin = 0.05;
+    valueAxis.extraMax = 0.05;
 
     var series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.dateX = "date";
@@ -89,6 +93,28 @@ function historical_line_pro(divName) {
     series.fillOpacity = 0.2;
 
     chart.cursor = new am4charts.XYCursor();
+    chart.cursor.snapToSeries = series;
+    chart.cursor.behavior = "zoomX"
+
+
+    function createDot(data, color) {
+        var trend = chart.series.push(new am4charts.LineSeries());
+        trend.dataFields.valueY = "closeprice";
+        trend.dataFields.dateX = "date";
+        
+        trend.stroke = trend.fill = am4core.color(color);
+        trend.data = data;
+        trend.strokeWidth = 0
+        var bullet = trend.bullets.push(new am4charts.CircleBullet());
+        // bullet.tooltipText = "{date}\n[bold font-size: 17px]value: {valueY}[/]";
+        bullet.strokeWidth = 1;
+        bullet.stroke = am4core.color("#fff")
+        bullet.circle.fill = trend.stroke;
+
+        var hoverState = bullet.states.create("hover");
+        hoverState.properties.scale = 1.4;
+    };
+
 
     // CREATE A TABLE WITH INFO ABOUT THE DATA LOADED
     chart.dataSource.events.on("done", function (ev) {
@@ -98,28 +124,28 @@ function historical_line_pro(divName) {
         var maxDateValue = data[data.length - 1].closeprice
         var minDate = data[0].date
         var minDateValue = data[0].closeprice
-        var maxValue = Math.max.apply(Math, data.map(function(o) { return o.closeprice; }))
-        var minValue = Math.min.apply(Math, data.map(function(o) { return o.closeprice; }))
+        var maxValue = Math.max.apply(Math, data.map(function (o) { return o.closeprice; }))
+        var minValue = Math.min.apply(Math, data.map(function (o) { return o.closeprice; }))
 
         var index1 = 0;
-        var filteredObj1 = data.find(function(item, i){
-        if(item.closeprice == maxValue){
-            index1 = i;
-            return i;
-        }
+        var filteredObj1 = data.find(function (item, i) {
+            if (item.closeprice == maxValue) {
+                index1 = i;
+                return i;
+            }
         });
         if (filteredObj1 == null) {
             var maxValueDate = data[0].date
         } else {
             var maxValueDate = filteredObj1.date
         }
-        
+
         var index2 = 0;
-        var filteredObj2 = data.find(function(item, i){
-        if(item.closeprice == minValue){
-            index2 = i;
-            return i;
-        }
+        var filteredObj2 = data.find(function (item, i) {
+            if (item.closeprice == minValue) {
+                index2 = i;
+                return i;
+            }
         });
         if (filteredObj2 == null) {
             var minValueDate = data[0].date
@@ -129,7 +155,7 @@ function historical_line_pro(divName) {
 
         var diffAbsolute = maxDateValue - minDateValue
 
-        var diffPercentage = (diffAbsolute / minDateValue)*100
+        var diffPercentage = (diffAbsolute / minDateValue) * 100
 
         if (diffPercentage.toFixed(2) < 0) {
             var color = "danger"
@@ -142,9 +168,52 @@ function historical_line_pro(divName) {
             var arrow = "unfold_less"
         }
 
+
         divElement = document.getElementById("overview")
-        divElement.innerHTML = '<div class="p-xl-3 p-lg-3 p-md-3 p-sm-2 p-2 border border-'+ color +' rounded-lg mt-3"><div class="text-light text-center small">Showing data from '+ minDate.toString().slice(0, 24) +' to '+ maxDate.toString().slice(0, 24) +'</div><div class="row no-gutters justify-content-around"><div class="col-md-auto mt-3 align-self-center"><div class="row no-gutters"><div class="col-auto p-1"><div class="text-'+ color +'"><H2>'+ diffPercentage.toFixed(2) +'%</H2></div><div class="small text-'+ color +' text-center"><small>'+ numberFormat(diffAbsolute.toFixed(2)) + ' ' + quote.toUpperCase() +'</small></div></div><div class="col p-1"><span class="material-icons text-'+ color +'" style="font-size:72px">'+ arrow +'</span></div></div></div><div class="col-md-auto mt-3"><div class="row no-gutters justify-content-around"><div class="col-auto"><div class="text-center text-muted mb-1">Maximum</div><div class="text-center"><H5 class="text-light">'+ numberFormat(maxValue) + ' ' + quote.toUpperCase() +'</H5></div><div class="text-center small text-muted">'+ maxValueDate.toString().slice(0, 24) +'</div></div><div class="col-auto ml-3"><div class="text-center text-muted mb-1">Minimum</div><div class="text-center"><H5 class="text-light">'+ numberFormat(minValue) + ' ' + quote.toUpperCase() +'</H5></div><div class="text-center small text-muted">'+ minValueDate.toString().slice(0, 24) +'</div></div></div></div></div></div>'
-        
+        divElement.innerHTML = '<div class="p-xl-3 p-lg-3 p-md-3 p-sm-2 p-2 border border-' + color + ' rounded-lg mt-3"><div class="text-light text-center small">Showing data from ' + minDate.toString().slice(0, 24) + ' to ' + maxDate.toString().slice(0, 24) + '</div><div class="row no-gutters justify-content-around"><div class="col-md-auto mt-3 align-self-center"><div class="row no-gutters"><div class="col-auto p-1"><div class="text-' + color + '"><H2>' + diffPercentage.toFixed(2) + '%</H2></div><div class="small text-' + color + ' text-center"><small>' + numberFormat(diffAbsolute.toFixed(2)) + ' ' + quote.toUpperCase() + '</small></div></div><div class="col p-1"><span class="material-icons text-' + color + '" style="font-size:72px">' + arrow + '</span></div></div></div><div class="col-md-auto mt-3"><div class="row no-gutters justify-content-around"><div class="col-auto"><div class="text-center text-muted mb-1">Maximum</div><div class="text-center"><H5 class="text-light">' + numberFormat(maxValue) + ' ' + quote.toUpperCase() + '</H5></div><div class="text-center small text-muted">' + maxValueDate.toString().slice(0, 24) + '</div></div><div class="col-auto ml-3"><div class="text-center text-muted mb-1">Minimum</div><div class="text-center"><H5 class="text-light">' + numberFormat(minValue) + ' ' + quote.toUpperCase() + '</H5></div><div class="text-center small text-muted">' + minValueDate.toString().slice(0, 24) + '</div></div></div></div></div></div>'
+
+        // HORIZONTAL MAX LINE
+        var rangeMaxValue = valueAxis.axisRanges.create();
+        rangeMaxValue.value = maxValue;
+        rangeMaxValue.grid.stroke = am4core.color("#00c43b");
+        rangeMaxValue.grid.strokeOpacity = 0.6;
+        rangeMaxValue.grid.strokeDasharray = "5";
+        rangeMaxValue.grid.above = true
+
+        if (maxValueDate < minValueDate) {
+            rangeMaxValue.label.text = "[#00c43b]Maximum:" + " " + maxValue + " " + quote.toUpperCase() + "[/]";
+        } else {
+            var var_1 = (((maxValue - minValue) / minValue)*100).toFixed(2)
+            rangeMaxValue.label.text = "[#00c43b]Maximum:" + " " + maxValue + " " + quote.toUpperCase() + "\nUp "+ var_1 +"% from minimum" + "[/]";
+        }
+        rangeMaxValue.label.inside = true;
+        rangeMaxValue.label.horizontalCenter = "left";
+        rangeMaxValue.label.verticalCenter = "bottom";
+
+        // HORIZONTAL MIN LINE
+        var rangeMinValue = valueAxis.axisRanges.create();
+        rangeMinValue.value = minValue;
+        rangeMinValue.grid.stroke = am4core.color("#c40000");
+        rangeMinValue.grid.strokeOpacity = 0.6;
+        rangeMinValue.grid.strokeDasharray = "5";
+        rangeMinValue.grid.above = true
+
+        if (maxValueDate < minValueDate) {
+            var var_2 = (((minValue - maxValue) / maxValue)*100).toFixed(2)
+            rangeMinValue.label.text = "[#c40000]Minimum:" + " " + maxValue + " " + quote.toUpperCase() + "\nDown "+ var_2 +"% from maximum" + "[/]";
+        } else {
+            rangeMinValue.label.text = "[#c40000]Minimum:" + " " + minValue + " " + quote.toUpperCase() + "[/]";
+        }
+        rangeMinValue.label.inside = true;
+        rangeMinValue.label.horizontalCenter = "left";
+        rangeMinValue.label.verticalCenter = "bottom";
+
+
+        // LINE FROM MAX TO MIN  NOT IN USE FOR NOW
+        createDot([{ "date": maxValueDate, "closeprice": maxValue }], "#00c43b")
+        createDot([{ "date": minValueDate, "closeprice": minValue }], "#c40000")
+
+
     });
 }
 
