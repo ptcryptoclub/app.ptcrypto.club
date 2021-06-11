@@ -195,10 +195,10 @@ function historical_line_basic(divName) {
         rangeMaxValue.grid.above = true
 
         if (maxValueDate < minValueDate) {
-            rangeMaxValue.label.text = "[#00c43b]Maximum:" + " " + maxValue + " " + quote.toUpperCase() + "[/]";
+            rangeMaxValue.label.text = "[#00c43b]Maximum:" + " " + numberFormat(maxValue) + " " + quote.toUpperCase() + "[/]";
         } else {
             var var_1 = (((maxValue - minValue) / minValue)*100).toFixed(2)
-            rangeMaxValue.label.text = "[#00c43b]Maximum:" + " " + maxValue + " " + quote.toUpperCase() + "\nUp "+ var_1 +"% from minimum" + "[/]";
+            rangeMaxValue.label.text = "[#00c43b]Maximum:" + " " + numberFormat(maxValue) + " " + quote.toUpperCase() + "\nUp "+ var_1 +"% from minimum" + "[/]";
         }
         rangeMaxValue.label.inside = true;
         rangeMaxValue.label.horizontalCenter = "left";
@@ -214,9 +214,9 @@ function historical_line_basic(divName) {
 
         if (maxValueDate < minValueDate) {
             var var_2 = (((minValue - maxValue) / maxValue)*100).toFixed(2)
-            rangeMinValue.label.text = "[#c40000]Minimum:" + " " + minValue + " " + quote.toUpperCase() + "\nDown "+ var_2 +"% from maximum" + "[/]";
+            rangeMinValue.label.text = "[#c40000]Minimum:" + " " + numberFormat(minValue) + " " + quote.toUpperCase() + "\nDown "+ var_2 +"% from maximum" + "[/]";
         } else {
-            rangeMinValue.label.text = "[#c40000]Minimum:" + " " + minValue + " " + quote.toUpperCase() + "[/]";
+            rangeMinValue.label.text = "[#c40000]Minimum:" + " " + numberFormat(minValue) + " " + quote.toUpperCase() + "[/]";
         }
         rangeMinValue.label.inside = true;
         rangeMinValue.label.horizontalCenter = "left";
