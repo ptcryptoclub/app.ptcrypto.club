@@ -987,4 +987,32 @@ def portfolio_data_start_info(user_id: int):
             "name": "Start",
             "value": start_
         }]
-    return  data_full
+    return data_full
+
+
+def portfolio_rank_table():
+    # get all users from database
+    users = User.query.filter_by(active=True)
+
+    to_return = []
+    for user in users:
+        wallet_value = Portfolio.query.filter_by(user_id=user.id).first()
+        data = calculate_total_value(user_id=user.id, market='kraken', quote='eur')
+        pct_assets = round(data["assets"]/data["value"]*100)
+        pct_wallet = round(data["wallet"] / data["value"] * 100)
+        data.update(
+            {
+                "username": user.username,
+                "amount": wallet_value.start,
+                "date": str(user.date_active)[:10],
+                "pct_assets": pct_assets,
+                "pct_wallet": pct_wallet
+            }
+        )
+        to_return.append(
+            data
+        )
+    to_return = sorted(to_return, key=lambda k: k['percentage'], reverse=True)
+    return to_return
+
+

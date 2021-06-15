@@ -17,7 +17,7 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
     gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news, get_all_news_source_id, portfolio_chart, \
-    portfolio_data_start_info
+    portfolio_data_start_info, portfolio_rank_table
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -1111,6 +1111,18 @@ def portfolio_details():
         "portfolio-details.html",
         title="Account",
         data_full=data_full
+    )
+
+
+@app.route("/account/portfolio/rank/")
+@login_required
+def portfolio_rank():
+    table = portfolio_rank_table()
+    print(table)
+    return render_template(
+        "portfolio-rank.html",
+        title="Hall of Fame",
+        table=table
     )
 
 

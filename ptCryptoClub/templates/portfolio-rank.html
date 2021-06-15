@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='js/portfolio.js')}}"></script>
+
+<div class="container mt-3">
+    <H4 class="text-center text-light">Hall of Fame</H4>
+    <div class="my-4">
+        <table class="table table-borderless table-striped table-dark" style="background-color: #000000;">
+            <thead class="text-muted">
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th class="text-right">Value</th>
+                <th class="text-center d-none d-sm-table-cell">Assets</th>
+                <th class="text-center d-none d-sm-table-cell">Wallet</th>
+                <th class="text-right d-none d-sm-none d-md-table-cell">Initial amount</th>
+                <th class="text-right d-none d-sm-none d-md-none d-lg-table-cell">Starting date</th>
+
+                <th class="text-right">%</th>
+            </tr>
+            </thead>
+            <tbody class="text-muted" id="table-{{i}}">
+            {% for j in range(table.__len__()) %}
+            {% if table[j].percentage < 0 %}
+            {% set t_color = "danger" %}
+            {% elif table[j].percentage > 0 %}
+            {% set t_color = "success" %}
+            {% else %}
+            {% set t_color = "warning" %}
+            {% endif %}
+            <tr class="text-{{t_color}}">
+                <th>{{j + 1}}</th>
+                <td>{{table[j].username}}</td>
+                <th class="text-right">{{table[j].value | numberFormat}} <small>{{table[j].quote.upper()}}</small></th>
+                <td class="text-center d-none d-sm-table-cell">{{table[j].pct_assets}} <small>%</small></td>
+                <td class="text-center d-none d-sm-table-cell">{{table[j].pct_wallet}} <small>%</small></td>
+                <td class="text-right d-none d-sm-none d-md-table-cell">{{table[j].amount | numberFormat}} <small>{{table[j].quote.upper()}}</small></td>
+                <td class="text-right d-none d-sm-none d-md-none d-lg-table-cell">{{table[j].date}}</td>
+                <th class="text-right">{{table[j].percentage | numberFormat}}</th>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

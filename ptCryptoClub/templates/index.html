@@ -281,6 +281,9 @@
     <script>
             lineBuySell("buy-sell-chart", {{current_user.id}}, {{number_days_buy_sell}})
     </script>
+    <div class="m-0 text-right">
+        <i><small class="text-muted"><a href="{{url_for('portfolio_rank')}}" class="text-decoration-none">Hall of Fame</a></small></i>
+    </div>
     {% endif %}
 
     <hr class="border-secondary">
