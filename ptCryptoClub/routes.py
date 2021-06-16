@@ -216,15 +216,61 @@ def login():
             elif not user.active:
                 flash(f'Your account has not been activated yet, please check your email.', 'info')
                 return redirect(url_for('home'))
-            elif bcrypt.check_password_hash(user.password, password) and totp.verify(given_code):
-                login_user(user, remember=False)
-                # noinspection PyArgumentList
-                log = LoginUser(user_ID=user.id,
-                                ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
-                                status=True)
-                db.session.add(log)
-                db.session.commit()
-                return redirect(url_for('portfolio'))
+            elif bcrypt.check_password_hash(user.password, password): # and totp.verify(given_code):
+                mfa_active = MFA.query.filter_by(user_id=user.id).first()
+                if mfa_active is None:
+                    mfa = True
+                else:
+                    if mfa_active.mfa:
+                        mfa = True
+                    else:
+                        mfa = False
+                if mfa:
+                    if totp.verify(given_code):
+                        login_user(user, remember=False)
+                        # noinspection PyArgumentList
+                        log = LoginUser(user_ID=user.id,
+                                        ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                        status=True)
+                        db.session.add(log)
+                        db.session.commit()
+                        return redirect(url_for('portfolio'))
+                    else:
+                        # noinspection PyArgumentList
+                        log = LoginUser(user_ID=user.id,
+                                        ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                        status=False)
+                        db.session.add(log)
+                        db.session.commit()
+                        flash(f'Incorrect login details, please try again.', 'danger')
+                        return render_template(
+                            "login.html",
+                            title="Login",
+                            form=form
+                        )
+                else:
+                    if bcrypt.check_password_hash(mfa_active.r_pin, given_code):
+                        login_user(user, remember=False)
+                        # noinspection PyArgumentList
+                        log = LoginUser(user_ID=user.id,
+                                        ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                        status=True)
+                        db.session.add(log)
+                        db.session.commit()
+                        return redirect(url_for('portfolio'))
+                    else:
+                        # noinspection PyArgumentList
+                        log = LoginUser(user_ID=user.id,
+                                        ipAddress=request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                        status=False)
+                        db.session.add(log)
+                        db.session.commit()
+                        flash(f'Incorrect login details, please try again.', 'danger')
+                        return render_template(
+                            "login.html",
+                            title="Login",
+                            form=form
+                        )
             else:
                 # noinspection PyArgumentList
                 log = LoginUser(user_ID=user.id,
