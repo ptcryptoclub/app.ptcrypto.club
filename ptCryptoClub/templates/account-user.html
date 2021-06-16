@@ -36,14 +36,31 @@
                             <div class="text-light p-2">Username:</div>
                             <div class="text-light p-2">Email:</div>
                             <div class="text-light p-2">Member since:</div>
+                            <div class="text-light p-2">2FA at login:</div>
                         </div>
                         <div class="col-auto">
                             <div class="text-muted p-2"><small>{{username}}</small></div>
                             <div class="text-muted p-2"><small>{{email}}</small></div>
                             <div class="text-muted p-2"><small>{{member_since}}</small></div>
+                            <div class="text-muted p-2">
+                                <div class="row">
+                                    {% if mfa %}
+                                    <div class="col-auto text-success"><small>Active</small></div>
+                                    <div class="col-auto">
+                                        <a style="transform: scale(0.8,0.8);" class="btn btn-sm btn-outline-info text-light" href="{{url_for('deactivate_2fa', user_id=current_user.id, key=current_user.api_secret)}}" role="button">Deactivate</a>
+                                        <small><i><small>* an automatic email will be sent.</small></i></small>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-auto text-warning"><small>Inactive</small></div>
+                                    <div class="col-auto">
+                                        <a style="transform: scale(0.8,0.8);" class="btn btn-sm btn-outline-info text-light" href="{{url_for('activate_2fa', user_id=current_user.id, key=current_user.api_secret)}}" role="button">Activate</a>
+                                        <small><i><small>* an automatic email will be sent.</small></i></small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                     <div class="my-3 text-left">
                         <a class="btn btn-sm btn-outline-dark text-light" data-toggle="collapse" href="#updateDetails"
                            role="button"

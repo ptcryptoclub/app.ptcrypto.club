@@ -12,7 +12,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
     CloudWatchLogin, default_fiat, default_news_per_page
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord
+    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
@@ -555,7 +555,6 @@ def account_user():
                 # THIS WILL ONLY UPDATE THE USERNAME
                 pin_hash = str(random.getrandbits(128))
                 new_username = update_details_form.username.data
-                print(new_username)
                 # noinspection PyArgumentList
                 update_request = UpdateAuthorizationDetails(
                     pin_hash=pin_hash,
@@ -571,8 +570,6 @@ def account_user():
                 pin_hash = str(random.getrandbits(128))
                 new_username = update_details_form.username.data
                 new_email = update_details_form.email.data
-                print(new_email)
-                print(new_username)
                 # noinspection PyArgumentList
                 update_request = UpdateAuthorizationDetails(
                     pin_hash=pin_hash,
@@ -593,6 +590,14 @@ def account_user():
                 'ipAddress': hide_ip(i.ipAddress)
             }
         )
+    mfa_active = MFA.query.filter_by(user_id=current_user.id).first()
+    if mfa_active is None:
+        mfa = True
+    else:
+        if mfa_active.mfa:
+            mfa = True
+        else:
+            mfa = False
     return render_template(
         "account-user.html",
         title="Account",
@@ -600,8 +605,147 @@ def account_user():
         email=current_user.email,
         member_since=str(current_user.date)[:19],
         logins_table=logins_table,
-        form=update_details_form
+        form=update_details_form,
+        mfa=mfa
     )
+
+
+@app.route("/account/g7KHjWT0YDY5ufo243FYzWCc2WvS522HePt4im2ymFP/<user_id>/<key>/")
+def deactivate_2fa(user_id, key):
+    try:
+        user_id = int(user_id)
+    except Exception as e:
+        print(e)  # an error log will not be created
+        flash(f'Invalid url!', 'danger')
+        return redirect(url_for("account_user"))
+    user = User.query.filter_by(
+        id=user_id,
+        api_secret=key
+    ).first()
+    if user is not None:
+        mfa_request = MFARequests.query.filter_by(user_id=user.id, valid=True, deactivate=True).first()
+        if mfa_request is not None:
+            if datetime.utcnow() <= mfa_request.date + timedelta(seconds=300):
+                flash(f"A request has already been made, please check your email.", "warning")
+            else:
+                mfa_request.valid = False
+                db.session.commit()
+                return redirect(url_for("deactivate_2fa", user_id=user_id, key=key))
+        else:
+            hash = hash_generator(LENGTH=random.randint(150, 200))
+            # noinspection PyArgumentList
+            authorization = MFARequests(
+                user_id=user.id,
+                hash=hash,
+                deactivate=True
+            )
+            db.session.add(authorization)
+            db.session.commit()
+            Email().deactivate_2fa(email=user.email, hash=hash, username=user.username, user_id=user.id)
+            flash(f'An email has been sent, please check your inbox.', 'success')
+        return redirect(url_for("account_user"))
+    else:
+        flash(f'Invalid url!', 'danger')
+        return redirect(url_for("account_user"))
+
+
+@app.route("/account/S3a8709bi1VyV8k2POUhUplG1jnRGwMv2rx59XqDa6ux9qTv7gxR8KcpJ5g9pjsIv9na/<hash>/<user_id>/")
+def deactivate_2fa_confirmation(hash, user_id):
+    mfa_request = MFARequests.query.filter_by(user_id=user_id, hash=hash, valid=True, deactivate=True).first()
+    if mfa_request is not None:
+        if datetime.utcnow() > mfa_request.date + timedelta(seconds=300):
+            mfa_request.valid = False
+            db.session.commit()
+            flash(f'This link is no longer valid.', 'danger')
+            return redirect(url_for("account_user"))
+        else:
+            mfa_request.valid = False
+            mfa_request.used = True
+            mfa_deactivate = MFA.query.filter_by(user_id=user_id).first()
+            pin = "".join(random.choice("0123456789") for _ in range(6))
+            hashed_pin = bcrypt.generate_password_hash(pin).decode('utf-8')
+            if mfa_deactivate is None:
+                # noinspection PyArgumentList
+                mfa_deactivate = MFA(
+                    user_id=user_id,
+                    mfa=False,
+                    r_pin=hashed_pin,
+                    date=datetime.utcnow()
+                )
+                db.session.add(mfa_deactivate)
+            else:
+                mfa_deactivate.date = datetime.utcnow()
+                mfa_deactivate.mfa = False
+                mfa_deactivate.r_pin = hashed_pin
+            db.session.commit()
+            user = User.query.filter_by(id=user_id).first()
+            Email().pin_2fa(email=user.email, username=user.username, pin=pin)
+            flash(f'2FA at login has been deactivated from your account and an email with your access pin has been sent.', 'success')
+            return redirect(url_for("account_user"))
+    else:
+        return redirect(url_for("home"))
+
+
+@app.route("/account/nI0CmSJAt0A48WPV4HM262ZsS5JXtPEQsC3s7LVuD0/<user_id>/<key>/")
+def activate_2fa(user_id, key):
+    try:
+        user_id = int(user_id)
+    except Exception as e:
+        print(e)  # an error log will not be created
+        flash(f'Invalid url!', 'danger')
+        return redirect(url_for("account_user"))
+    user = User.query.filter_by(
+        id=user_id,
+        api_secret=key
+    ).first()
+    if user is not None:
+        mfa_request = MFARequests.query.filter_by(user_id=user.id, valid=True, deactivate=False).first()
+        if mfa_request is not None:
+            if datetime.utcnow() <= mfa_request.date + timedelta(seconds=300):
+                flash(f"A request has already been made, please check your email.", "warning")
+            else:
+                mfa_request.valid = False
+                db.session.commit()
+                return redirect(url_for("activate_2fa", user_id=user_id, key=key))
+        else:
+            hash = hash_generator(LENGTH=random.randint(150, 200))
+            # noinspection PyArgumentList
+            authorization = MFARequests(
+                user_id=user.id,
+                hash=hash,
+                deactivate=False
+            )
+            db.session.add(authorization)
+            db.session.commit()
+            Email().activate_2fa(email=user.email, hash=hash, username=user.username, user_id=user.id)
+            flash(f'An email has been sent, please check your inbox.', 'success')
+        return redirect(url_for("account_user"))
+    else:
+        flash(f'Invalid url!', 'danger')
+        return redirect(url_for("account_user"))
+
+
+@app.route("/account/S3a8709bi1VyV8k2POUhUplG1jnRGv2rqDa36qwMTv7gx59X5g9pj6ux9sIv9naxR8KcpJ/<hash>/<user_id>/")
+def activate_2fa_confirmation(hash, user_id):
+    mfa_request = MFARequests.query.filter_by(user_id=user_id, hash=hash, valid=True, deactivate=False).first()
+    if mfa_request is not None:
+        if datetime.utcnow() > mfa_request.date + timedelta(seconds=300):
+            mfa_request.valid = False
+            db.session.commit()
+            flash(f'This link is no longer valid.', 'danger')
+            return redirect(url_for("account_user"))
+        else:
+            mfa_request.valid = False
+            mfa_request.used = True
+            mfa_activate = MFA.query.filter_by(user_id=user_id).first()
+            if mfa_activate is not None:
+                mfa_activate.mfa = True
+                mfa_activate.date = datetime.utcnow()
+            db.session.commit()
+            flash(f'2FA at login has been reactivated from your account.', 'success')
+            return redirect(url_for("account_user"))
+    else:
+        return redirect(url_for("home"))
 
 
 @app.route("/mfa-authorization/update-details/<user_id>/<pin_hash>/", methods=["GET", "POST"])

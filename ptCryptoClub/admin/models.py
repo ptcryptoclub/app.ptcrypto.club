@@ -24,6 +24,24 @@ class User(db.Model, UserMixin):
     api_secret = db.Column(db.String(255), nullable=False)
 
 
+class MFA(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    mfa = db.Column(db.Boolean, nullable=False, default=False)
+    r_pin = db.Column(db.String(60), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class MFARequests(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    hash = db.Column(db.String(255), nullable=False)
+    valid = db.Column(db.Boolean, nullable=False, default=True)
+    used = db.Column(db.Boolean, nullable=False, default=False)
+    deactivate = db.Column(db.Boolean, nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 class ApiUsage(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)

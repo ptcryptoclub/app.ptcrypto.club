@@ -134,3 +134,138 @@ class Email:
                     }
                 }
             )
+
+    def deactivate_2fa(self, email, hash, username, user_id):
+        ses = boto3.client("ses",
+                           aws_access_key_id=EmailLogin().aws_access_key_id,
+                           aws_secret_access_key=EmailLogin().aws_secret_access_key,
+                           region_name=EmailLogin().region_name)
+        body = f"""
+            <!DOCTYPE html>
+            <body>
+                <br>
+                <H4>Hi {username}</H4>
+                <br>
+                <p>Please use the link below to deactivate 2FA at login in your account.</p>
+                <br>
+                <H5><a href='https://app.ptcrypto.club/account/S3a8709bi1VyV8k2POUhUplG1jnRGwMv2rx59XqDa6ux9qTv7gxR8KcpJ5g9pjsIv9na/{hash}/{user_id}/' target="_blank">Deactivate 2FA at login</a></H5>
+                <small>This link will only be valid during the next 5 minutes.</small>
+                <br>
+                <p><strong>Important information:</strong> This will only replace 2FA at login for a given PIN <i>(to be sent in a separated email)</i>, when using your account you still may be asked for 2FA.</p>
+                <br>
+                <br>
+                <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
+                <br>
+                <br>
+                <p>Kind regards</p>
+                <br>
+                <small><q><i>This email was generated automatically. Please do not reply to this email.</i></q></small>
+            </body>
+        </html>
+        """
+        ses.send_email(
+            Source="donotreply@ptcrypto.club",
+            Destination={
+                "ToAddresses": [f"{email}"]
+                },
+            Message={
+                "Subject": {
+                    "Data": "ptcrypto.club - 2FA deactivation at login",
+                    "Charset": "UTF-8"
+                    },
+                "Body": {
+                    "Html": {
+                        "Data": body,
+                        "Charset": "UTF-8"
+                        }
+                    }
+                }
+            )
+
+    def activate_2fa(self, email, hash, username, user_id):
+        ses = boto3.client("ses",
+                           aws_access_key_id=EmailLogin().aws_access_key_id,
+                           aws_secret_access_key=EmailLogin().aws_secret_access_key,
+                           region_name=EmailLogin().region_name)
+        body = f"""
+            <!DOCTYPE html>
+            <body>
+                <br>
+                <H4>Hi {username}</H4>
+                <br>
+                <p>Please use the link below to reactivate 2FA at login in your account.</p>
+                <br>
+                <H5><a href='https://app.ptcrypto.club/account/S3a8709bi1VyV8k2POUhUplG1jnRGv2rqDa36qwMTv7gx59X5g9pj6ux9sIv9naxR8KcpJ/{hash}/{user_id}/' target="_blank">Reactivate 2FA at login</a></H5>
+                <small>This link will only be valid during the next 5 minutes.</small>
+                <br>
+                <br>
+                <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
+                <br>
+                <br>
+                <p>Kind regards</p>
+                <br>
+                <small><q><i>This email was generated automatically. Please do not reply to this email.</i></q></small>
+            </body>
+        </html>
+        """
+        ses.send_email(
+            Source="donotreply@ptcrypto.club",
+            Destination={
+                "ToAddresses": [f"{email}"]
+                },
+            Message={
+                "Subject": {
+                    "Data": "ptcrypto.club - 2FA reactivation at login",
+                    "Charset": "UTF-8"
+                    },
+                "Body": {
+                    "Html": {
+                        "Data": body,
+                        "Charset": "UTF-8"
+                        }
+                    }
+                }
+            )
+
+    def pin_2fa(self, email, username, pin):
+        ses = boto3.client("ses",
+                           aws_access_key_id=EmailLogin().aws_access_key_id,
+                           aws_secret_access_key=EmailLogin().aws_secret_access_key,
+                           region_name=EmailLogin().region_name)
+        body = f"""
+            <!DOCTYPE html>
+            <body>
+                <br>
+                <H4>Hi {username}</H4>
+                <br>
+                <p>Your pin is <strong>{pin}</strong>. Please keep this pin safe.</p>
+                <br>
+                <br>
+                <br>
+                <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
+                <br>
+                <br>
+                <p>Kind regards</p>
+                <br>
+                <small><q><i>This email was generated automatically. Please do not reply to this email.</i></q></small>
+            </body>
+        </html>
+        """
+        ses.send_email(
+            Source="donotreply@ptcrypto.club",
+            Destination={
+                "ToAddresses": [f"{email}"]
+                },
+            Message={
+                "Subject": {
+                    "Data": "ptcrypto.club - 2FA replacement pin",
+                    "Charset": "UTF-8"
+                    },
+                "Body": {
+                    "Html": {
+                        "Data": body,
+                        "Charset": "UTF-8"
+                        }
+                    }
+                }
+            )
