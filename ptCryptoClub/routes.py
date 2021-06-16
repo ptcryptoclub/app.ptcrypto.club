@@ -1118,7 +1118,6 @@ def portfolio_details():
 @login_required
 def portfolio_rank():
     table = portfolio_rank_table()
-    print(table)
     return render_template(
         "portfolio-rank.html",
         title="Hall of Fame",

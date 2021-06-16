@@ -999,14 +999,14 @@ def portfolio_rank_table():
         wallet_value = Portfolio.query.filter_by(user_id=user.id).first()
         data = calculate_total_value(user_id=user.id, market='kraken', quote='eur')
         pct_assets = round(data["assets"]/data["value"]*100)
-        pct_wallet = round(data["wallet"] / data["value"] * 100)
+        pct_fiat = round(data["wallet"] / data["value"] * 100)
         data.update(
             {
                 "username": user.username,
                 "amount": wallet_value.start,
                 "date": str(user.date_active)[:10],
                 "pct_assets": pct_assets,
-                "pct_wallet": pct_wallet
+                "pct_fiat": pct_fiat
             }
         )
         to_return.append(

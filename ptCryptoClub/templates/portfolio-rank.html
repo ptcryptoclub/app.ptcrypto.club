@@ -19,7 +19,7 @@
                 <th>Username</th>
                 <th class="text-right">Value</th>
                 <th class="text-center d-none d-sm-table-cell">Assets</th>
-                <th class="text-center d-none d-sm-table-cell">Wallet</th>
+                <th class="text-center d-none d-sm-table-cell">Fiat</th>
                 <th class="text-right d-none d-sm-none d-md-table-cell">Initial amount</th>
                 <th class="text-right d-none d-sm-none d-md-none d-lg-table-cell">Starting date</th>
 
@@ -38,12 +38,12 @@
             <tr class="text-{{t_color}}">
                 <th>{{j + 1}}</th>
                 <td>{{table[j].username}}</td>
-                <th class="text-right">{{table[j].value | numberFormat}} <small>{{table[j].quote.upper()}}</small></th>
+                <td class="text-right"><strong>{{table[j].value | numberFormat}}</strong> <small>{{table[j].quote.upper()}}</small></td>
                 <td class="text-center d-none d-sm-table-cell">{{table[j].pct_assets}} <small>%</small></td>
-                <td class="text-center d-none d-sm-table-cell">{{table[j].pct_wallet}} <small>%</small></td>
+                <td class="text-center d-none d-sm-table-cell">{{table[j].pct_fiat}} <small>%</small></td>
                 <td class="text-right d-none d-sm-none d-md-table-cell">{{table[j].amount | numberFormat}} <small>{{table[j].quote.upper()}}</small></td>
                 <td class="text-right d-none d-sm-none d-md-none d-lg-table-cell">{{table[j].date}}</td>
-                <th class="text-right">{{table[j].percentage | numberFormat}}</th>
+                <td class="text-right"><strong>{{table[j].percentage | numberFormat}}</strong></td>
             </tr>
             {% endfor %}
             </tbody>
