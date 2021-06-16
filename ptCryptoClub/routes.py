@@ -216,7 +216,7 @@ def login():
             elif not user.active:
                 flash(f'Your account has not been activated yet, please check your email.', 'info')
                 return redirect(url_for('home'))
-            elif bcrypt.check_password_hash(user.password, password): # and totp.verify(given_code):
+            elif bcrypt.check_password_hash(user.password, password):
                 mfa_active = MFA.query.filter_by(user_id=user.id).first()
                 if mfa_active is None:
                     mfa = True
@@ -531,6 +531,10 @@ def password_recovery_confirmation(hash, user_id):
                     authorization.valid = False
                     authorization.used = True
                     user.password = hashed_password
+                    mfa = MFA.query.filter_by(user_id=user.id).first()
+                    if mfa is not None:
+                        mfa.mfa = True
+                        mfa.date = datetime.utcnow()
                     db.session.commit()
                     flash("Your password has been updated.", "success")
                     return redirect(url_for('login'))

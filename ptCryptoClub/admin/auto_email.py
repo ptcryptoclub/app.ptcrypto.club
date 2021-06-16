@@ -107,6 +107,9 @@ class Email:
                 <H5><a href='https://app.ptcrypto.club/recovery/password/confirmation/{hash}/{user_id}/' target="_blank">Recover password</a></H5>
                 <small>This link will only be valid during the next 5 minutes.</small>
                 <br>
+                <p><strong>Important information:</strong> After changing you password, <u>you will need 2FA to access your account.</u></p>
+                <br>
+                <br>
                 <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
                 <br>
                 <br>
@@ -151,7 +154,7 @@ class Email:
                 <H5><a href='https://app.ptcrypto.club/account/{mfa_routes['deactivate_2fa_confirmation']}/{hash}/{user_id}/' target="_blank">Deactivate 2FA at login</a></H5>
                 <small>This link will only be valid during the next 5 minutes.</small>
                 <br>
-                <p><strong>Important information:</strong> This will only replace 2FA at login for a given PIN <i>(to be sent in a separated email)</i>, when using your account you still may be asked for 2FA.</p>
+                <p><strong>Important information:</strong> This will only replace 2FA at login for a given PIN <i>(to be sent in a separated email)</i>, when using your account you still may be asked for 2FA. <u>Also, if you need to change or reset your password, 2FA will be reactivated automatically.</u></p>
                 <br>
                 <br>
                 <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
