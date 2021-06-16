@@ -10,7 +10,7 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
-    CloudWatchLogin, default_fiat, default_news_per_page
+    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
@@ -649,7 +649,7 @@ def deactivate_2fa(user_id, key):
         return redirect(url_for("account_user"))
 
 
-@app.route("/account/S3a8709bi1VyV8k2POUhUplG1jnRGwMv2rx59XqDa6ux9qTv7gxR8KcpJ5g9pjsIv9na/<hash>/<user_id>/")
+@app.route(f"/account/{mfa_routes['deactivate_2fa_confirmation']}/<hash>/<user_id>/")
 def deactivate_2fa_confirmation(hash, user_id):
     mfa_request = MFARequests.query.filter_by(user_id=user_id, hash=hash, valid=True, deactivate=True).first()
     if mfa_request is not None:
@@ -725,7 +725,7 @@ def activate_2fa(user_id, key):
         return redirect(url_for("account_user"))
 
 
-@app.route("/account/S3a8709bi1VyV8k2POUhUplG1jnRGv2rqDa36qwMTv7gx59X5g9pj6ux9sIv9naxR8KcpJ/<hash>/<user_id>/")
+@app.route(f"/account/{mfa_routes['activate_2fa_confirmation']}/<hash>/<user_id>/")
 def activate_2fa_confirmation(hash, user_id):
     mfa_request = MFARequests.query.filter_by(user_id=user_id, hash=hash, valid=True, deactivate=False).first()
     if mfa_request is not None:

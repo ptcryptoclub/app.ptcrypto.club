@@ -1,6 +1,6 @@
 import boto3
 
-from ptCryptoClub.admin.config import EmailLogin
+from ptCryptoClub.admin.config import EmailLogin, mfa_routes
 
 
 class Email:
@@ -148,7 +148,7 @@ class Email:
                 <br>
                 <p>Please use the link below to deactivate 2FA at login in your account.</p>
                 <br>
-                <H5><a href='https://app.ptcrypto.club/account/S3a8709bi1VyV8k2POUhUplG1jnRGwMv2rx59XqDa6ux9qTv7gxR8KcpJ5g9pjsIv9na/{hash}/{user_id}/' target="_blank">Deactivate 2FA at login</a></H5>
+                <H5><a href='https://app.ptcrypto.club/account/{mfa_routes['deactivate_2fa_confirmation']}/{hash}/{user_id}/' target="_blank">Deactivate 2FA at login</a></H5>
                 <small>This link will only be valid during the next 5 minutes.</small>
                 <br>
                 <p><strong>Important information:</strong> This will only replace 2FA at login for a given PIN <i>(to be sent in a separated email)</i>, when using your account you still may be asked for 2FA.</p>
@@ -195,7 +195,7 @@ class Email:
                 <br>
                 <p>Please use the link below to reactivate 2FA at login in your account.</p>
                 <br>
-                <H5><a href='https://app.ptcrypto.club/account/S3a8709bi1VyV8k2POUhUplG1jnRGv2rqDa36qwMTv7gx59X5g9pj6ux9sIv9naxR8KcpJ/{hash}/{user_id}/' target="_blank">Reactivate 2FA at login</a></H5>
+                <H5><a href='https://app.ptcrypto.club/account/{mfa_routes['activate_2fa_confirmation']}/{hash}/{user_id}/' target="_blank">Reactivate 2FA at login</a></H5>
                 <small>This link will only be valid during the next 5 minutes.</small>
                 <br>
                 <br>
