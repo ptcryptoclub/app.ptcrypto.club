@@ -24,7 +24,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError(message)
         email_control = User.query.filter_by(email=email.data).first()
         if email_control:
-            raise ValidationError('Please choose a different email!')
+            raise ValidationError('Email already in use!')
 
 
 class LoginForm(FlaskForm):
@@ -52,9 +52,12 @@ class UpdateDetailsForm(FlaskForm):
             raise ValidationError('Username already in use!')
 
     def validate_email(self, email):
-        email = User.query.filter_by(email=email.data).first()
-        if email:
-            raise ValidationError('Please choose a different email!')
+        control, message = email_validation_disposable_emails(email=email.data)
+        if not control:
+            raise ValidationError(message)
+        email_control = User.query.filter_by(email=email.data).first()
+        if email_control:
+            raise ValidationError('Email already in use!')
 
 
 class BuyAssetForm(FlaskForm):
