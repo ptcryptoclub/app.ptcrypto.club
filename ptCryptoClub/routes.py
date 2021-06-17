@@ -12,7 +12,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
     CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests
+    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
@@ -433,6 +433,43 @@ def activate_account():
         else:
             flash(f'Your activation details are incorrect, please try again.', 'danger')
             return redirect(url_for('home'))
+
+
+@app.route("/recovery/2FA/", methods=["GET", "POST"])
+def recovery_2FA():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    else:
+        form = PasswordRecoveryEmailForm()
+        if request.method == "POST":
+            if form.validate_on_submit():
+                email = form.email.data
+                user = User.query.filter_by(email=email).first()
+                if user is not None:
+                    hash_1 = hash_generator(LENGTH=random.randint(50, 200))
+                    hash_2 = hash_generator(LENGTH=random.randint(100, 200))
+                    # noinspection PyArgumentList
+                    line = Reset2FARequests(
+                        user_id=user.id,
+                        hash_1=hash_1,
+                        hash_2=hash_2
+                    )
+                    db.session.add(line)
+                    db.session.commit()
+                else:
+                    # No feedback will be given
+                    pass
+            else:
+                # No feedback will be given
+                pass
+            flash(f'An email has been sent, please check your inbox for further instructions.', 'success')
+            return redirect(url_for("recovery_2FA"))
+        else:
+            return render_template(
+                "recovery-2FA.html",
+                title="Reset 2FA",
+                form=form
+            )
 
 
 @app.route("/recovery/password/email/", methods=["GET", "POST"])

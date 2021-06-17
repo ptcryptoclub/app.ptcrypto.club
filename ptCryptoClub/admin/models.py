@@ -43,6 +43,16 @@ class MFARequests(db.Model, UserMixin):
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
+class Reset2FARequests(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    hash_1 = db.Column(db.String(255), nullable=False)
+    hash_2 = db.Column(db.String(255), nullable=False)
+    valid = db.Column(db.Boolean, nullable=False, default=True)
+    used = db.Column(db.Boolean, nullable=False, default=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 class ApiUsage(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
