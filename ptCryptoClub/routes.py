@@ -234,7 +234,7 @@ def login():
                                         status=True)
                         db.session.add(log)
                         db.session.commit()
-                        return redirect(url_for('portfolio'))
+                        return redirect(url_for('first_time_pin_change'))
                     else:
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -257,7 +257,7 @@ def login():
                                         status=True)
                         db.session.add(log)
                         db.session.commit()
-                        return redirect(url_for('portfolio'))
+                        return redirect(url_for('first_time_pin_change'))
                     else:
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -720,13 +720,15 @@ def deactivate_2fa_confirmation(hash, user_id):
                     user_id=user_id,
                     mfa=False,
                     r_pin=hashed_pin,
-                    date=datetime.utcnow()
+                    date=datetime.utcnow(),
+                    first_login=True
                 )
                 db.session.add(mfa_deactivate)
             else:
                 mfa_deactivate.date = datetime.utcnow()
                 mfa_deactivate.mfa = False
                 mfa_deactivate.r_pin = hashed_pin
+                mfa_deactivate.first_login = True
             db.session.commit()
             user = User.query.filter_by(id=user_id).first()
             Email().pin_2fa(email=user.email, username=user.username, pin=pin)
@@ -791,6 +793,7 @@ def activate_2fa_confirmation(hash, user_id):
             if mfa_activate is not None:
                 mfa_activate.mfa = True
                 mfa_activate.date = datetime.utcnow()
+                mfa_activate.first_login = False
             db.session.commit()
             flash(f'2FA at login has been reactivated from your account.', 'success')
             return redirect(url_for("account_user"))
@@ -798,13 +801,31 @@ def activate_2fa_confirmation(hash, user_id):
         return redirect(url_for("home"))
 
 
-@app.route("/first-time-pin-change/")
+@app.route("/A9hQDxZeu3Yc03rSaaMepCpCQDYc03urSqFxZqFaaM9h/", methods=["GET", "POST"])
+@login_required
 def first_time_pin_change():
-
-    return render_template(
-        "pin-change.html",
-        title="Change pin"
-    )
+    test = MFA.query.filter_by(user_id=current_user.id).first()
+    if test is None:
+        return redirect(url_for("portfolio"))
+    else:
+        if not test.first_login:
+            return redirect(url_for("portfolio"))
+        else:
+            form = FirstPinLogin()
+            if form.validate_on_submit():
+                new_pin = form.new_pin.data
+                hashed_pin = bcrypt.generate_password_hash(new_pin).decode('utf-8')
+                test.r_pin = hashed_pin
+                test.first_login = False
+                db.session.commit()
+                flash(f'Your PIN has been changed.', 'success')
+                return redirect(url_for("portfolio"))
+            else:
+                return render_template(
+                    "pin-change.html",
+                    title="Change default pin",
+                    form=form
+                )
 
 
 @app.route("/mfa-authorization/update-details/<user_id>/<pin_hash>/", methods=["GET", "POST"])

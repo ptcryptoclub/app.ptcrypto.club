@@ -30,7 +30,7 @@ class MFA(db.Model, UserMixin):
     mfa = db.Column(db.Boolean, nullable=False, default=False)
     r_pin = db.Column(db.String(60), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    # first_login = db.Column(db.Boolean, default=True)
+    first_login = db.Column(db.Boolean)
 
 
 class MFARequests(db.Model, UserMixin):

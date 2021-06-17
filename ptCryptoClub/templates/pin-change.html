@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+
+{% block height %}
+<style>
+    body, html {
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid mt-4 h-75">
+    <div class="row align-items-center justify-content-center mx-1 px-2 h-100">
+        <div class="col-xl-5 col-lg-6 col-md-7 col-sm-9 justify-content-center p-4 rounded border border-info">
+            <div class="text-light"><H4>Change default PIN</H4></div>
+            <small class="text-info">This page will appear everytime you login until this step is completed.</small>
+            <div class="mb-4"></div>
+            <form action="{{url_for('first_time_pin_change')}}" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {% if form.new_pin.errors %}
+                    {{ form.new_pin(class="form-control bg-dark text-light is-invalid", placeholder="New PIN*", autocomplete="off", value="", maxlength="6") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.new_pin.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.new_pin(class="form-control bg-dark text-light border-0", placeholder="New PIN*", autocomplete="off", value="", maxlength="6") }}
+                    {% endif %}
+                    <small id="new_pinHelp" class="form-text text-muted">Your new pin has to be 6 digits.</small>
+                </div>
+                <div class="form-group">
+                    {% if form.new_pin_confirmation.errors %}
+                    {{ form.new_pin_confirmation(class="form-control bg-dark text-light is-invalid", placeholder="Confirm new PIN*", autocomplete="off", value="", maxlength="6") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.new_pin_confirmation.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.new_pin_confirmation(class="form-control bg-dark text-light border-0", placeholder="Confirm new PIN*", autocomplete="off", value="", maxlength="6") }}
+                    {% endif %}
+                </div>
+                {{ form.submit(class="btn btn-outline-dark text-light px-5") }}
+                <small id="submitHelp" class="form-text text-muted mt-3"><strong>Important information:</strong> This PIN can not be changed after this step is completed. If you forget this PIN you will need to reset your password and <u>2FA will be turned on automatically.</u></small>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

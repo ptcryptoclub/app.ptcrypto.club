@@ -95,6 +95,7 @@ class PasswordRecoveryConfirmationForm(FlaskForm):
 class FirstPinLogin(FlaskForm):
     new_pin = StringField('PIN', validators=[DataRequired(), Length(max=6, min=6)])
     new_pin_confirmation = StringField('Re-PIN', validators=[DataRequired(), Length(max=6, min=6), EqualTo('new_pin')])
+    submit = SubmitField('Change PIN')
 
     def validate_new_pin(self, new_pin):
         to_validate = new_pin.data
