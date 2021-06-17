@@ -6,6 +6,8 @@
     body, html {
         height: 100%;
     }
+
+
 </style>
 {% endblock %}
 
@@ -26,19 +28,31 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-auto">
-                            {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off", placeholder="2FA or PIN*", value="", maxlength="6") }}
+                            {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off",
+                            placeholder="2FA or PIN*", value="", maxlength="6") }}
                         </div>
                     </div>
-                    <small id="pinHelp" class="form-text text-info">If you didn't finished the MFA activation process please use "000000".</small>
+                    <small id="pinHelp" class="form-text text-info">If you didn't finished the 2FA activation process
+                        please use "000000".</small>
                 </div>
-                <div class="row align-items-center mt-4">
+                <div class="row justify-content-around align-items-center mt-4">
                     <div class="col-auto">
                         {{ form.submit(class="btn btn-outline-dark text-light px-5") }}
                     </div>
                     <div class="col">
-                        <small id="passHelp" class="form-text">
-                            <a href="{{url_for('password_recovery_email')}}" class="text-decoration-none text-muted">Lost password?</a>
-                        </small>
+                        <div class="row justify-content-start align-items-center">
+                            <div class="col-auto">
+                                <small class="form-text">
+                                    <a href="{{url_for('password_recovery_email')}}"
+                                       class="text-decoration-none text-muted">Lost password?</a>
+                                </small>
+                            </div>
+                            <div class="col-auto">
+                                <small class="form-text">
+                                    <a href="#" class="text-decoration-none text-muted">Lost 2FA?</a>
+                                </small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
