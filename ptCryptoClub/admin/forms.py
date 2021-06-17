@@ -90,3 +90,13 @@ class PasswordRecoveryConfirmationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
     confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password'), Length(min=8)])
     submit = SubmitField('Reset password')
+
+
+class FirstPinLogin(FlaskForm):
+    new_pin = StringField('PIN', validators=[DataRequired(), Length(max=6, min=6)])
+    new_pin_confirmation = StringField('Re-PIN', validators=[DataRequired(), Length(max=6, min=6), EqualTo('new_pin')])
+
+    def validate_new_pin(self, new_pin):
+        to_validate = new_pin.data
+        if not to_validate.isdigit():
+            raise ValidationError('Your pin must be only digits.')

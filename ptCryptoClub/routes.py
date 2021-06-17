@@ -21,7 +21,7 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
-    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm
+    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
     admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info
@@ -796,6 +796,15 @@ def activate_2fa_confirmation(hash, user_id):
             return redirect(url_for("account_user"))
     else:
         return redirect(url_for("home"))
+
+
+@app.route("/first-time-pin-change/")
+def first_time_pin_change():
+
+    return render_template(
+        "pin-change.html",
+        title="Change pin"
+    )
 
 
 @app.route("/mfa-authorization/update-details/<user_id>/<pin_hash>/", methods=["GET", "POST"])
