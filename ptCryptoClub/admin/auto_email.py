@@ -36,7 +36,7 @@ class Email:
                 },
             Message={
                 "Subject": {
-                    "Data": "ptcrypto.club - Email confirmation",
+                    "Data": "app.ptcrypto.club - Email confirmation",
                     "Charset": "UTF-8"
                     },
                 "Body": {
@@ -79,7 +79,7 @@ class Email:
                 },
             Message={
                 "Subject": {
-                    "Data": "ptcrypto.club - Updated details",
+                    "Data": "app.ptcrypto.club - Updated details",
                     "Charset": "UTF-8"
                     },
                 "Body": {
@@ -105,7 +105,7 @@ class Email:
                 <p>Please use the link below to recover your password.</p>
                 <br>
                 <H5><a href='https://app.ptcrypto.club/recovery/password/confirmation/{hash}/{user_id}/' target="_blank">Recover password</a></H5>
-                <small>This link will only be valid during the next 5 minutes.</small>
+                <small>This link will only be valid for the next 5 minutes.</small>
                 <br>
                 <p><strong>Important information:</strong> After changing you password, <u>you will need 2FA to access your account.</u></p>
                 <br>
@@ -126,7 +126,7 @@ class Email:
                 },
             Message={
                 "Subject": {
-                    "Data": "ptcrypto.club - Recover password",
+                    "Data": "app.ptcrypto.club - Recover password",
                     "Charset": "UTF-8"
                     },
                 "Body": {
@@ -152,7 +152,7 @@ class Email:
                 <p>Please use the link below to deactivate 2FA at login in your account.</p>
                 <br>
                 <H5><a href='https://app.ptcrypto.club/account/{mfa_routes['deactivate_2fa_confirmation']}/{hash}/{user_id}/' target="_blank">Deactivate 2FA at login</a></H5>
-                <small>This link will only be valid during the next 5 minutes.</small>
+                <small>This link will only be valid for the next 5 minutes.</small>
                 <br>
                 <p><strong>Important information:</strong> This will only replace 2FA at login for a given PIN <i>(to be sent in a separated email)</i>, when using your account you still may be asked for 2FA. <u>Also, if you need to change or reset your password, 2FA will be reactivated automatically.</u></p>
                 <br>
@@ -173,7 +173,7 @@ class Email:
                 },
             Message={
                 "Subject": {
-                    "Data": "ptcrypto.club - 2FA deactivation at login",
+                    "Data": "app.ptcrypto.club - 2FA deactivation at login",
                     "Charset": "UTF-8"
                     },
                 "Body": {
@@ -199,7 +199,7 @@ class Email:
                 <p>Please use the link below to reactivate 2FA at login in your account.</p>
                 <br>
                 <H5><a href='https://app.ptcrypto.club/account/{mfa_routes['activate_2fa_confirmation']}/{hash}/{user_id}/' target="_blank">Reactivate 2FA at login</a></H5>
-                <small>This link will only be valid during the next 5 minutes.</small>
+                <small>This link will only be valid for the next 5 minutes.</small>
                 <br>
                 <br>
                 <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
@@ -218,7 +218,7 @@ class Email:
                 },
             Message={
                 "Subject": {
-                    "Data": "ptcrypto.club - 2FA reactivation at login",
+                    "Data": "app.ptcrypto.club - 2FA reactivation at login",
                     "Charset": "UTF-8"
                     },
                 "Body": {
@@ -261,7 +261,52 @@ class Email:
                 },
             Message={
                 "Subject": {
-                    "Data": "ptcrypto.club - 2FA replacement pin",
+                    "Data": "app.ptcrypto.club - 2FA replacement pin",
+                    "Charset": "UTF-8"
+                    },
+                "Body": {
+                    "Html": {
+                        "Data": body,
+                        "Charset": "UTF-8"
+                        }
+                    }
+                }
+            )
+
+    def request_2fa_reset(self, email, username, user_id, hash_1, hash_2):
+        ses = boto3.client("ses",
+                           aws_access_key_id=EmailLogin().aws_access_key_id,
+                           aws_secret_access_key=EmailLogin().aws_secret_access_key,
+                           region_name=EmailLogin().region_name)
+        body = f"""
+            <!DOCTYPE html>
+            <body>
+                <br>
+                <H4>Hi {username}</H4>
+                <br>
+                <p>Please use the link below to reset 2FA in your account.</p>
+                <br>
+                <H5><a href='https://app.ptcrypto.club/account/{mfa_routes['reset_2fa_confirmation']}/{hash_1}/{user_id}/{hash_2}/' target="_blank">RESET 2FA</a></H5>
+                <small>This link will only be valid for the next 5 minutes.</small>
+                <br>
+                <br>
+                <p>If you didn't expect this email, please contact our team at humans@ptcrypto.club and ignore the link above.</p>
+                <br>
+                <br>
+                <p>Kind regards</p>
+                <br>
+                <small><q><i>This email was generated automatically. Please do not reply to this email.</i></q></small>
+            </body>
+        </html>
+        """
+        ses.send_email(
+            Source="donotreply@ptcrypto.club",
+            Destination={
+                "ToAddresses": [f"{email}"]
+                },
+            Message={
+                "Subject": {
+                    "Data": "app.ptcrypto.club - Reset 2FA",
                     "Charset": "UTF-8"
                     },
                 "Body": {

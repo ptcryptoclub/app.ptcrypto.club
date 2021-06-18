@@ -1,4 +1,4 @@
-from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat
+from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord
 from ptCryptoClub import db
@@ -720,9 +720,10 @@ def get_fiat_name(fiat):
 
 def email_validation_disposable_emails(email):
     url = f"https://block-temporary-email.com/check/email/{email}"
+    headers = {'x-api-key': BlockEmail.access_token}
     message = 'Valid email'
     try:
-        data = requests.get(url=url).json()
+        data = requests.get(url=url, headers=headers).json()
     except Exception as e:
         # noinspection PyArgumentList
         error_log = ErrorLogs(
@@ -741,7 +742,7 @@ def email_validation_disposable_emails(email):
             else:
                 return False, 'Please provide a valid email address'
     else:
-        return False, 'Please provide a valid email address'
+        return True, message
 
 
 def newsfeed(n):

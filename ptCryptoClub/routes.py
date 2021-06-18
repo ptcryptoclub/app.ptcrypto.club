@@ -359,13 +359,20 @@ def qr_activation(ID):
         totp = pyotp.TOTP(secret)
         given_code = form.pin.data
         if totp.verify(given_code):
+            hash_1 = request.args.get('hash_1')
+            hash_2 = request.args.get('hash_2')
+            secret = request.args.get('secret')
+            db_request = Reset2FARequests.query.filter_by(id=secret, hash_1=hash_1, hash_2=hash_2).first()
+            if db_request is None:
+                Email().activation_email(email=user.email, hash=user.hash, username=user.username)
+                flash(f'Your account has been create. Please check your email to activate your account.', 'success')
+            else:
+                flash(f'2FA has been successfully reset in your account.', 'success')
             os.remove(qr_code_folder + user.qrcode_img + '.png')
             user.active_qr = True
-            Email().activation_email(email=user.email, hash=user.hash, username=user.username)
             user.qrcode_img = None
             db.session.commit()
-            flash(f'Your account has been create. Please check your email to activate your account.', 'success')
-            return redirect(url_for('home', market="kraken"))
+            return redirect(url_for('home'))
         else:
             flash(f'The passcode you provided is not correct. Please try again.', 'danger')
             return render_template(
@@ -435,7 +442,7 @@ def activate_account():
             return redirect(url_for('home'))
 
 
-@app.route("/recovery/2FA/", methods=["GET", "POST"])
+@app.route("/W79MS82B0nr5x9i2CSsg05bhy0M09x0B77E1hJSvj4hB6591PBQv8vDoy2/", methods=["GET", "POST"])
 def recovery_2FA():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -446,16 +453,36 @@ def recovery_2FA():
                 email = form.email.data
                 user = User.query.filter_by(email=email).first()
                 if user is not None:
-                    hash_1 = hash_generator(LENGTH=random.randint(50, 200))
-                    hash_2 = hash_generator(LENGTH=random.randint(100, 200))
-                    # noinspection PyArgumentList
-                    line = Reset2FARequests(
-                        user_id=user.id,
-                        hash_1=hash_1,
-                        hash_2=hash_2
-                    )
-                    db.session.add(line)
-                    db.session.commit()
+                    check_old = Reset2FARequests.query.filter_by(user_id=user.id, valid=True).first()
+                    if check_old is not None:
+                        if datetime.utcnow() <= check_old.date + timedelta(seconds=300):
+                            # There is a valid request so no action is needed
+                            pass
+                        else:
+                            check_old.valid = False
+                            hash_1 = hash_generator(LENGTH=random.randint(50, 200))
+                            hash_2 = hash_generator(LENGTH=random.randint(100, 200))
+                            # noinspection PyArgumentList
+                            line = Reset2FARequests(
+                                user_id=user.id,
+                                hash_1=hash_1,
+                                hash_2=hash_2
+                            )
+                            db.session.add(line)
+                            db.session.commit()
+                            Email().request_2fa_reset(email=user.email, username=user.username, user_id=user.id, hash_1=hash_1, hash_2=hash_2)
+                    else:
+                        hash_1 = hash_generator(LENGTH=random.randint(50, 200))
+                        hash_2 = hash_generator(LENGTH=random.randint(100, 200))
+                        # noinspection PyArgumentList
+                        line = Reset2FARequests(
+                            user_id=user.id,
+                            hash_1=hash_1,
+                            hash_2=hash_2
+                        )
+                        db.session.add(line)
+                        db.session.commit()
+                        Email().request_2fa_reset(email=user.email, username=user.username, user_id=user.id, hash_1=hash_1, hash_2=hash_2)
                 else:
                     # No feedback will be given
                     pass
@@ -470,6 +497,32 @@ def recovery_2FA():
                 title="Reset 2FA",
                 form=form
             )
+
+
+@app.route(f"/account/{mfa_routes['reset_2fa_confirmation']}/<hash_1>/<user_id>/<hash_2>/")
+def recovery_2FA_confirmation(hash_1, user_id, hash_2):
+    if current_user.is_authenticated:
+        logout_user()
+    db_request = Reset2FARequests.query.filter_by(user_id=user_id, hash_1=hash_1, hash_2=hash_2).first()
+    if db_request is None:
+        return redirect(url_for("home"))
+    else:
+        if datetime.utcnow() > db_request.date + timedelta(seconds=300):
+            flash("This link has expired.", "warning")
+            return redirect(url_for("home"))
+        else:
+            user = User.query.filter_by(id=user_id).first()
+            qrcode_secret = pyotp.random_base32()
+            url = pyotp.totp.TOTP(qrcode_secret).provisioning_uri(name=user.username, issuer_name='app.ptcrypto.club')
+            filename = str(random.getrandbits(64))
+            QRCode(info=url, filename=filename)
+            user.active_qr = False
+            user.qrcode_secret = qrcode_secret
+            user.qrcode_img = filename
+            db_request.used = True
+            db_request.valid = False
+            db.session.commit()
+            return redirect(url_for('qr_activation', ID=filename, hash_1=hash_1, hash_2=hash_2, secret=db_request.id))
 
 
 @app.route("/recovery/password/email/", methods=["GET", "POST"])
@@ -1596,6 +1649,10 @@ def delete_account():
             Portfolio.query.filter_by(user_id=current_user.id).delete()
             PortfolioAssets.query.filter_by(user_id=current_user.id).delete()
             PortfolioRecord.query.filter_by(user_id=current_user.id).delete()
+            MFA.query.filter_by(user_id=current_user.id).delete()
+            MFARequests.query.filter_by(user_id=current_user.id).delete()
+            Reset2FARequests.query.filter_by(user_id=current_user.id).delete()
+            ResetPasswordAuthorizations.query.filter_by(user_id=current_user.id).delete()
             db.session.commit()
             logout_user()
             flash("Your account has been deleted.", "info")

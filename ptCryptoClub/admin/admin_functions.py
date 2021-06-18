@@ -1,7 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, qr_code_folder, admins_emails, IpInfo
 from ptCryptoClub import db
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets,\
-    ApiUsage, IpAddressLog, PortfolioRecord
+    ApiUsage, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, ResetPasswordAuthorizations
 
 from sqlalchemy import create_engine, func
 import pandas as pd
@@ -520,6 +520,10 @@ def admin_delete_user(user_id):
         Portfolio.query.filter_by(user_id=user_id).delete()
         PortfolioAssets.query.filter_by(user_id=user_id).delete()
         PortfolioRecord.query.filter_by(user_id=user_id).delete()
+        MFA.query.filter_by(user_id=user_id).delete()
+        MFARequests.query.filter_by(user_id=user_id).delete()
+        Reset2FARequests.query.filter_by(user_id=user_id).delete()
+        ResetPasswordAuthorizations.query.filter_by(user_id=user_id).delete()
         db.session.commit()
         return None
 
