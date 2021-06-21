@@ -1082,6 +1082,15 @@ def account_admin_ip_info():
         )
 
 
+@app.route("/account/admin/create-competition/")
+@login_required
+def account_admin_create_competition():
+    return render_template(
+        "account-admin-create-competition.html",
+        title="Create competition"
+    )
+
+
 @app.route("/api/admin/live-data/<api_secret>/")
 def api_admin_live_data(api_secret):
     if SecureApi().validate(api_secret=api_secret, admin=True):

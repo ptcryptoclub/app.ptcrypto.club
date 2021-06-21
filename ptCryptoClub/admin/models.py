@@ -141,3 +141,26 @@ class ResetPasswordAuthorizations(db.Model, UserMixin):
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     valid = db.Column(db.Boolean, nullable=False, default=True)
     used = db.Column(db.Boolean, nullable=False, default=False)
+
+
+class Competitions:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)  # name to be displayed in html page
+    created_by = db.Column(db.Integer, nullable=False)  # user_id from creator
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    start_date = db.Column(db.DateTime, nullable=False)  # date to start competition
+    end_date = db.Column(db.DateTime, nullable=False)  # date to end competition
+    start_amount = db.Column(db.Float, nullable=False)  # Every user will start with this amount
+    amount_quote = db.Column(db.String(255), nullable=False, default="eur")  # quote to be used during the competition
+    buy_fee = db.Column(db.Float, nullable=False, default=0.002)  # pct to be collected with any buy, 0.002 = 0.2%
+    sell_fee = db.Column(db.Float, nullable=False, default=0.003)  # pct to be collected with any sell, 0.003 = 0.3%
+    max_users = db.Column(db.Integer, default=None)  # If left None there will be no limit of users
+    type_users = db.Column(db.Integer, nullable=False, default=None)  # If left None all type of users can participate
+    send_email = db.Column(db.Boolean, nullable=False, default=False)  # if True all users (by type) will receive an email promoting the competition
+    is_paid = db.Column(db.Boolean, nullable=False, default=False)  # if True there will be a price to join the competition, NOT TO BE USED YET
+
+
+class UsersInCompetitions:
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

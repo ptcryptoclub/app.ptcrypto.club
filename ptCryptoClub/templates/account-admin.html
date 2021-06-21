@@ -31,6 +31,52 @@
 <script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
 <script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <div class="container mt-3">
+    <div class="row align-items-center">
+        <div class="col-md-10 mb-3">
+            <div class="py-3">
+                <div class="row border-bottom border-info">
+                    <div class="col-auto">
+                        <H5 class="text-light">Competitions</H5>
+                    </div>
+                    <div class="col-auto">
+                        <a class="text-muted" href="{{url_for('account_admin_create_competition')}}"><span
+                            class="material-icons">info</span></a>
+                    </div>
+                </div>
+                <small>
+                    <i class="text-muted">
+                        Information about all competition portfolios.
+                    </i>
+                </small>
+                <table class="table table-borderless table-sm small mt-2">
+                    <thead class="text-light">
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Start</th>
+                        <th scope="col">End</th>
+                        <th scope="col">Users</th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-muted">
+                    {% for i in range(5) %}
+                    <tr>
+                        <td>{{i+1}}</td>
+                        <td>NAME</td>
+                        <td>2021/06/01 00:00:00</td>
+                        <td>2021/08/01 00:00:00</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-2 text-center mb-3">
+            <a class="btn btn-lg btn-outline-success text-light" href="#" role="button">Create new competition</a>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-lg-8 mb-3">
             <div class="py-3">
