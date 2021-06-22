@@ -1,9 +1,12 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms.fields.html5 import DateField
 from ptCryptoClub.admin.models import User
 from ptCryptoClub.admin.gen_functions import email_validation_disposable_emails
+import string
+from datetime import datetime, date
 
 
 class RegistrationForm(FlaskForm):
@@ -101,3 +104,79 @@ class FirstPinLogin(FlaskForm):
         to_validate = new_pin.data
         if not to_validate.isdigit():
             raise ValidationError('Your pin must be only digits.')
+
+
+class CreateCompetitionForm(FlaskForm):
+    name = StringField('Competition name', validators=[DataRequired(), Length(max=20)])
+    start_date = DateField('Start date', validators=[DataRequired()])
+    end_date = DateField('End date', validators=[DataRequired()])
+    amount = StringField('Amount', validators=[DataRequired()])
+    quote = SelectField('Quote', choices=[("eur", "EUR"), ("usd", "USD")], validators=[DataRequired()])
+    buy_fee = StringField('Buy fee (%)', validators=[DataRequired()])
+    sell_fee = StringField('Sell fee (%)', validators=[DataRequired()])
+    max_users = StringField('Users limit')
+    users = SelectField('Users type', choices=[(0, "All")], validators=[DataRequired()])
+    p_email = BooleanField('Promotional email')
+    submit = SubmitField('Create competition')
+
+    def validate_name(self, name):
+        if not name.data[0] in string.ascii_letters:
+            raise ValidationError('Must start with a letter')
+        elif " " in name.data:
+            raise ValidationError('Cannot have blank spaces')
+
+    def validate_amount(self, amount):
+        if not amount.data.isdigit():
+            raise ValidationError('Must be a positive integer')
+
+    def validate_buy_fee(self, buy_fee):
+        try:
+            fee = float(buy_fee.data)
+        except Exception as e:
+            print(e)
+            raise ValidationError('Must be a decimal between 0 and 1')
+        else:
+            if fee >= 1:
+                raise ValidationError('Cannot be >= 1')
+            elif fee < 0:
+                raise ValidationError('Cannot be negative')
+
+    def validate_sell_fee(self, sell_fee):
+        try:
+            fee = float(sell_fee.data)
+        except Exception as e:
+            print(e)
+            raise ValidationError('Must be a decimal between 0 and 1')
+        else:
+            if fee >= 1:
+                raise ValidationError('Cannot be >= 1')
+            elif fee < 0:
+                raise ValidationError('Cannot be negative')
+
+    def validate_max_users(self, max_users):
+        if max_users.data == "":
+            pass
+        elif not max_users.data.isdigit():
+            raise ValidationError('Must be a positive integer')
+
+    def validate_start_date(self, start_date):
+        date_now = datetime.utcnow()
+        if start_date.data < date(date_now.year, date_now.month, date_now.day):
+            raise ValidationError("Start date cannot be in the past")
+        elif self.end_date.data == start_date.data:
+            raise ValidationError("Start and end date cannot be the same")
+        elif start_date.data == date(date_now.year, date_now.month, date_now.day):
+            raise ValidationError("Start date cannot be today")
+        elif start_date.data > self.end_date.data:
+            raise ValidationError("Start date cannot be after end date")
+
+    def validate_end_date(self, end_date):
+        date_now = datetime.utcnow()
+        if end_date.data < date(date_now.year, date_now.month, date_now.day):
+            raise ValidationError("End date cannot be in the past")
+        elif self.start_date.data == end_date.data:
+            raise ValidationError("Start and end date cannot be the same")
+        elif end_date.data == date(date_now.year, date_now.month, date_now.day):
+            raise ValidationError("End date cannot be today")
+        elif end_date.data < self.start_date.data:
+            raise ValidationError("End date cannot be before start date")

@@ -12,7 +12,7 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
     CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests
+    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, Competitions, UsersInCompetitions
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
@@ -21,7 +21,7 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
-    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin
+    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin, CreateCompetitionForm
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
     admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info
@@ -1082,12 +1082,51 @@ def account_admin_ip_info():
         )
 
 
-@app.route("/account/admin/create-competition/")
+@app.route("/account/admin/create-competition/", methods=["GET", "POST"])
 @login_required
 def account_admin_create_competition():
+    form = CreateCompetitionForm()
+    if form.validate_on_submit():
+        if form.max_users.data == "":
+            m_users = None
+        else:
+            m_users = form.max_users.data
+        if form.users.data == '0':
+            t_users = None
+        else:
+            t_users = form.users.data
+        # noinspection PyArgumentList
+        new_competition = Competitions(
+            name=form.name.data,
+            created_by=current_user.id,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            start_amount=form.amount.data,
+            amount_quote=form.quote.data,
+            buy_fee=form.buy_fee.data,
+            sell_fee=form.sell_fee.data,
+            max_users=m_users,
+            type_users=t_users,
+            send_email=form.p_email.data,
+        )
+        db.session.add(new_competition)
+        db.session.commit()
+        return redirect(url_for('account_admin_create_competition_review', comp_id=new_competition.id))
     return render_template(
         "account-admin-create-competition.html",
-        title="Create competition"
+        title="Create competition",
+        form=form
+    )
+
+
+@app.route("/account/admin/create-competition/review/<comp_id>/")
+@login_required
+def account_admin_create_competition_review(comp_id):
+    to_review = Competitions.query.filter_by(id=comp_id).first()
+    print(to_review)
+    return render_template(
+        "account-admin-create-competition-review.html",
+        title="Competition review"
     )
 
 
