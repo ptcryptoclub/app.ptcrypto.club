@@ -733,15 +733,25 @@ def email_validation_disposable_emails(email):
         db.session.add(error_log)
         db.session.commit()
         return True, message
-    if data['status'] == 200:
-        if data['temporary']:
-            return False, 'Please use a non disposable email'
-        else:
-            if data['dns']:
-                return True, message
+    try:
+        if data['status'] == 200:
+            if data['temporary']:
+                return False, 'Please use a non disposable email'
             else:
-                return False, 'Please provide a valid email address'
-    else:
+                if data['dns']:
+                    return True, message
+                else:
+                    return False, 'Please provide a valid email address'
+        else:
+            return True, message
+    except Exception as e:
+        # noinspection PyArgumentList
+        error_log = ErrorLogs(
+            route=f'generic functions email validation disposable email 2',
+            log=str(e).replace("'", "")
+        )
+        db.session.add(error_log)
+        db.session.commit()
         return True, message
 
 
