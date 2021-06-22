@@ -1123,10 +1123,22 @@ def account_admin_create_competition():
 @login_required
 def account_admin_create_competition_review(comp_id):
     to_review = Competitions.query.filter_by(id=comp_id).first()
-    print(to_review)
+    info = {
+        "name": to_review.name,
+        "start_date": to_review.start_date,
+        "end_date": to_review.end_date,
+        "start_amount": to_review.start_amount,
+        "amount_quote": to_review.amount_quote,
+        "buy_fee": to_review.buy_fee,
+        "sell_fee": to_review.sell_fee,
+        "max_users": to_review.max_users,
+        "type_users": to_review.type_users,
+        "send_email": to_review.send_email,
+    }
     return render_template(
         "account-admin-create-competition-review.html",
-        title="Competition review"
+        title="Competition review",
+        info=info
     )
 
 
