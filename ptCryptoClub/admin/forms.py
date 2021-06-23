@@ -118,6 +118,7 @@ class CreateCompetitionForm(FlaskForm):
     users = SelectField('Users type', choices=[(0, "All")], validators=[DataRequired()])
     p_email = BooleanField('Promotional email')
     submit = SubmitField('Create competition')
+    submit_2 = SubmitField('Modify competition')
 
     def validate_name(self, name):
         if not name.data[0] in string.ascii_letters:
@@ -136,7 +137,7 @@ class CreateCompetitionForm(FlaskForm):
             print(e)
             raise ValidationError('Must be a decimal between 0 and 1')
         else:
-            if fee >= 1:
+            if fee >= 100:
                 raise ValidationError('Cannot be >= 1')
             elif fee < 0:
                 raise ValidationError('Cannot be negative')
@@ -148,7 +149,7 @@ class CreateCompetitionForm(FlaskForm):
             print(e)
             raise ValidationError('Must be a decimal between 0 and 1')
         else:
-            if fee >= 1:
+            if fee >= 100:
                 raise ValidationError('Cannot be >= 1')
             elif fee < 0:
                 raise ValidationError('Cannot be negative')

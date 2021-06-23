@@ -147,7 +147,9 @@ class Competitions(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)  # name to be displayed in html page
     created_by = db.Column(db.Integer, nullable=False)  # user_id from creator
+    modified_by = db.Column(db.Integer, default=None)  # user_id from user who edit
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_modified = db.Column(db.DateTime)
     start_date = db.Column(db.DateTime, nullable=False)  # date to start competition
     end_date = db.Column(db.DateTime, nullable=False)  # date to end competition
     start_amount = db.Column(db.Integer, nullable=False)  # Every user will start with this amount
@@ -157,6 +159,7 @@ class Competitions(db.Model, UserMixin):
     max_users = db.Column(db.Integer, default=None)  # If left None there will be no limit of users
     type_users = db.Column(db.Integer, default=None)  # If left None all type of users can participate
     send_email = db.Column(db.Boolean, nullable=False, default=False)  # if True all users (by type) will receive an email promoting the competition
+    is_live = db.Column(db.Boolean, nullable=False, default=False)  # if True users can see and subscribe the competition
     is_paid = db.Column(db.Boolean, nullable=False, default=False)  # if True there will be a price to join the competition, NOT TO BE USED YET
 
 

@@ -24,7 +24,7 @@ from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationF
     PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin, CreateCompetitionForm
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
-    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info
+    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info, admin_competition_list
 from ptCryptoClub.admin.stats import UsageStats
 
 
@@ -1017,7 +1017,8 @@ def account_admin():
             table_data=admin_main_tables(),
             last_update=admin_last_update(),
             users_sample=admin_users_data_sample(),
-            ip_list=ip_list
+            ip_list=ip_list,
+            competition_list=admin_competition_list(limit=5)
         )
 
 
@@ -1085,61 +1086,144 @@ def account_admin_ip_info():
 @app.route("/account/admin/create-competition/", methods=["GET", "POST"])
 @login_required
 def account_admin_create_competition():
-    form = CreateCompetitionForm()
-    if form.validate_on_submit():
-        if form.max_users.data == "":
-            m_users = None
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        form = CreateCompetitionForm()
+        competition_id = request.args.get('edit')
+        if competition_id is not None:
+            competition_to_edit = Competitions.query.filter_by(id=competition_id).first()
+            if competition_to_edit is None:
+                return redirect(url_for("account_user"))
+            else:
+                if request.method == "POST":
+                    if form.validate_on_submit():
+                        if form.max_users.data == "":
+                            m_users = None
+                        else:
+                            m_users = form.max_users.data
+                        if form.users.data == "0":
+                            t_users = None
+                        else:
+                            t_users = form.users.data
+                        competition_to_edit.name = form.name.data
+                        competition_to_edit.modified_by = current_user.id
+                        competition_to_edit.date_modified = datetime.utcnow()
+                        competition_to_edit.start_date = form.start_date.data
+                        competition_to_edit.end_date = form.end_date.data
+                        competition_to_edit.start_amount = form.amount.data
+                        competition_to_edit.amount_quote = form.quote.data
+                        competition_to_edit.buy_fee = form.buy_fee.data
+                        competition_to_edit.sell_fee = form.sell_fee.data
+                        competition_to_edit.max_users = m_users
+                        competition_to_edit.type_users = t_users
+                        competition_to_edit.send_email = form.p_email.data
+                        db.session.commit()
+                        return redirect(url_for('account_admin'))
+
+                    else:
+                        return render_template(
+                            "account-admin-create-competition.html",
+                            title="Create competition",
+                            form=form
+                        )
+                else:
+                    form.name.data = competition_to_edit.name
+                    form.start_date.data = competition_to_edit.start_date
+                    form.end_date.data = competition_to_edit.end_date
+                    form.amount.data = competition_to_edit.start_amount
+                    form.quote.data = competition_to_edit.amount_quote
+                    form.buy_fee.data = competition_to_edit.buy_fee
+                    form.sell_fee.data = competition_to_edit.sell_fee
+                    form.max_users.data = competition_to_edit.max_users
+                    form.users.data = competition_to_edit.type_users
+                    form.p_email.data = competition_to_edit.send_email
+                    return render_template(
+                        "account-admin-create-competition.html",
+                        title="Create competition",
+                        form=form
+                    )
         else:
-            m_users = form.max_users.data
-        if form.users.data == '0':
-            t_users = None
-        else:
-            t_users = form.users.data
-        # noinspection PyArgumentList
-        new_competition = Competitions(
-            name=form.name.data,
-            created_by=current_user.id,
-            start_date=form.start_date.data,
-            end_date=form.end_date.data,
-            start_amount=form.amount.data,
-            amount_quote=form.quote.data,
-            buy_fee=form.buy_fee.data,
-            sell_fee=form.sell_fee.data,
-            max_users=m_users,
-            type_users=t_users,
-            send_email=form.p_email.data,
-        )
-        db.session.add(new_competition)
-        db.session.commit()
-        return redirect(url_for('account_admin_create_competition_review', comp_id=new_competition.id))
-    return render_template(
-        "account-admin-create-competition.html",
-        title="Create competition",
-        form=form
-    )
+            if form.validate_on_submit():
+                if form.max_users.data == "":
+                    m_users = None
+                else:
+                    m_users = form.max_users.data
+                if form.users.data == '0':
+                    t_users = None
+                else:
+                    t_users = form.users.data
+                # noinspection PyArgumentList
+                new_competition = Competitions(
+                    name=form.name.data,
+                    created_by=current_user.id,
+                    start_date=form.start_date.data,
+                    end_date=form.end_date.data,
+                    start_amount=form.amount.data,
+                    amount_quote=form.quote.data,
+                    buy_fee=form.buy_fee.data,
+                    sell_fee=form.sell_fee.data,
+                    max_users=m_users,
+                    type_users=t_users,
+                    send_email=form.p_email.data,
+                )
+                db.session.add(new_competition)
+                db.session.commit()
+                return redirect(url_for('account_admin'))
+            return render_template(
+                "account-admin-create-competition.html",
+                title="Create competition",
+                form=form
+            )
 
 
-@app.route("/account/admin/create-competition/review/<comp_id>/")
+@app.route("/account/admin/competition/review/<comp_id>/")
 @login_required
 def account_admin_create_competition_review(comp_id):
-    to_review = Competitions.query.filter_by(id=comp_id).first()
-    info = {
-        "name": to_review.name,
-        "start_date": to_review.start_date,
-        "end_date": to_review.end_date,
-        "start_amount": to_review.start_amount,
-        "amount_quote": to_review.amount_quote,
-        "buy_fee": to_review.buy_fee,
-        "sell_fee": to_review.sell_fee,
-        "max_users": to_review.max_users,
-        "type_users": to_review.type_users,
-        "send_email": to_review.send_email,
-    }
-    return render_template(
-        "account-admin-create-competition-review.html",
-        title="Competition review",
-        info=info
-    )
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        to_review = Competitions.query.filter_by(id=comp_id).first()
+        if to_review is not None:
+            info = {
+                "id": to_review.id,
+                "name": to_review.name,
+                "start_date": to_review.start_date,
+                "end_date": to_review.end_date,
+                "start_amount": to_review.start_amount,
+                "amount_quote": to_review.amount_quote,
+                "buy_fee": to_review.buy_fee,
+                "sell_fee": to_review.sell_fee,
+                "max_users": to_review.max_users,
+                "type_users": to_review.type_users,
+                "send_email": to_review.send_email,
+                "is_live": to_review.is_live
+            }
+            return render_template(
+                "account-admin-create-competition-review.html",
+                title="Competition review",
+                info=info,
+                comp_id=comp_id
+            )
+        else:
+            return redirect(url_for("account_user"))
+
+
+@app.route("/account/admin/competition/delete/<comp_id>/")
+@login_required
+def account_admin_create_competition_delete(comp_id):
+    to_delete = Competitions.query.filter_by(id=comp_id).first()
+    if to_delete is not None:
+        if to_delete.is_live:
+            flash("You cannot delete a live competition", "danger")
+            return redirect(url_for("account_admin"))
+        else:
+            Competitions.query.filter_by(id=comp_id).delete()
+            db.session.commit()
+            flash("Competition deleted", "success")
+            return redirect(url_for("account_admin"))
+    else:
+        return redirect(url_for("account_user"))
 
 
 @app.route("/api/admin/live-data/<api_secret>/")
