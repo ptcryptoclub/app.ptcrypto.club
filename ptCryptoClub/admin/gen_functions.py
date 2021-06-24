@@ -1017,3 +1017,67 @@ def portfolio_rank_table():
     return to_return
 
 
+def my_competitions(user_id):
+    to_return = []
+    for line in range(3):
+        to_return.append(
+            {
+                "id": line,
+                "name": "This is the name",
+                "start_date": "2021/08/01 00:00:00",
+                "end_date": "2021/10/01 00:00:00",
+                "start_amount": 100000,
+                "amount_quote": "eur",
+                "buy_fee": 0.2,
+                "sell_fee": 0.3,
+                "max_users": None,
+                "type_users": None,
+                "send_email": True,
+                "is_live": True,
+            }
+        )
+    return to_return
+
+
+def future_competitions():
+    to_return = []
+    for line in range(5):
+        to_return.append(
+            {
+                "id": line,
+                "name": "This is the name",
+                "start_date": "2021/08/01 00:00:00",
+                "end_date": "2021/10/01 00:00:00",
+                "start_amount": 100000,
+                "amount_quote": "eur",
+                "buy_fee": 0.2,
+                "sell_fee": 0.3,
+                "max_users": None,
+                "type_users": None,
+                "send_email": True,
+                "is_live": True,
+            }
+        )
+    return to_return
+
+
+def ongoing_competitions():
+    to_return = []
+    for line in range(2):
+        to_return.append(
+            {
+                "id": line,
+                "name": "This is the name",
+                "start_date": "2021/08/01 00:00:00",
+                "end_date": "2021/10/01 00:00:00",
+                "start_amount": 100000,
+                "amount_quote": "eur",
+                "buy_fee": 0.2,
+                "sell_fee": 0.3,
+                "max_users": None,
+                "type_users": None,
+                "send_email": True,
+                "is_live": True,
+            }
+        )
+    return to_return

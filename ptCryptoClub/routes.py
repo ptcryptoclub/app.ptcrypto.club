@@ -17,7 +17,7 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
     gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news, get_all_news_source_id, portfolio_chart, \
-    portfolio_data_start_info, portfolio_rank_table
+    portfolio_data_start_info, portfolio_rank_table, my_competitions, future_competitions, ongoing_competitions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -1177,7 +1177,7 @@ def account_admin_create_competition():
             )
 
 
-@app.route("/account/admin/competition/review/<comp_id>/")
+@app.route("/account/admin/competition/review/<comp_id>/", methods=["GET", "POST"])
 @login_required
 def account_admin_create_competition_review(comp_id):
     if current_user.email not in admins_emails:
@@ -1185,26 +1185,43 @@ def account_admin_create_competition_review(comp_id):
     else:
         to_review = Competitions.query.filter_by(id=comp_id).first()
         if to_review is not None:
-            info = {
-                "id": to_review.id,
-                "name": to_review.name,
-                "start_date": to_review.start_date,
-                "end_date": to_review.end_date,
-                "start_amount": to_review.start_amount,
-                "amount_quote": to_review.amount_quote,
-                "buy_fee": to_review.buy_fee,
-                "sell_fee": to_review.sell_fee,
-                "max_users": to_review.max_users,
-                "type_users": to_review.type_users,
-                "send_email": to_review.send_email,
-                "is_live": to_review.is_live
-            }
-            return render_template(
-                "account-admin-create-competition-review.html",
-                title="Competition review",
-                info=info,
-                comp_id=comp_id
-            )
+            form = AuthorizationForm()
+            if request.method == "POST":
+                if form.validate_on_submit():
+                    secret = current_user.qrcode_secret
+                    totp = pyotp.TOTP(secret)
+                    if totp.verify(form.pin.data):
+                        to_review.is_live = True
+                        db.session.commit()
+                        flash("Competition is now live", "success")
+                        return redirect(url_for("account_admin"))
+                    else:
+                        flash("2FA is not correct, please try again.", "danger")
+                        return redirect(url_for("account_admin_create_competition_review", comp_id=comp_id))
+                else:
+                    return redirect(url_for("account_admin_create_competition_review", comp_id=comp_id))
+            else:
+                info = {
+                    "id": to_review.id,
+                    "name": to_review.name,
+                    "start_date": to_review.start_date,
+                    "end_date": to_review.end_date,
+                    "start_amount": to_review.start_amount,
+                    "amount_quote": to_review.amount_quote,
+                    "buy_fee": to_review.buy_fee,
+                    "sell_fee": to_review.sell_fee,
+                    "max_users": to_review.max_users,
+                    "type_users": to_review.type_users,
+                    "send_email": to_review.send_email,
+                    "is_live": to_review.is_live
+                }
+                return render_template(
+                    "account-admin-create-competition-review.html",
+                    title="Competition review",
+                    info=info,
+                    comp_id=comp_id,
+                    form=form
+                )
         else:
             return redirect(url_for("account_user"))
 
@@ -2008,4 +2025,15 @@ def newsfeed_page(page, per_page):
         last_page=last_page,
         total_news=total_news,
         all_sources=get_all_news_source_id()
+    )
+
+
+@app.route("/competitions/")
+def competitions_home():
+    return render_template(
+        "competitions-home.html",
+        title="Competitions",
+        my_competitions=my_competitions(user_id=1),
+        future_competitions=future_competitions(),
+        ongoing_competitions=ongoing_competitions()
     )

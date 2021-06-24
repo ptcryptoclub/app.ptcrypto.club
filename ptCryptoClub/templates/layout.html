@@ -19,7 +19,7 @@
 
 
 <div class="container border-light border-bottom">
-    <nav class="navbar navbar-expand-md navbar-dark" style="background-color: #000000;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000000;">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="material-icons">apps</span>
@@ -109,6 +109,15 @@
                 {% endif %}
                 <li class="nav-item">
                     <a class="nav-link {{active}}" href="{{url_for('historical_charts_line')}}">Historical data</a>
+                </li>
+
+                {% if title == "Competitions" %}
+                {% set active = "active" %}
+                {% else %}
+                {% set active = "" %}
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {{active}}" href="{{url_for('competitions_home')}}">Competitions</a>
                 </li>
 
                 {% if title == "About" %}

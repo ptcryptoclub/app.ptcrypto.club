@@ -33,63 +33,80 @@
 <div class="container mt-3">
     <div class="">
         <div class="py-3">
-                <div class="row border-bottom border-info">
-                    <div class="col-auto">
-                        <H5 class="text-light">Competitions</H5>
-                    </div>
-                    <div class="col-auto">
-                        <a class="text-muted" href="#"><span
-                            class="material-icons">info</span></a>
-                    </div>
+            <div class="row border-bottom border-info">
+                <div class="col-auto">
+                    <H5 class="text-light">Competitions</H5>
                 </div>
-                <small>
-                    <i class="text-muted">
-                        Information about all competition portfolios.
-                    </i>
-                </small>
-                <table class="table table-borderless table-sm small mt-2">
-                    <thead class="text-light">
-                    <tr>
-                        <th scope="col" class="d-none d-sm-none d-md-none d-lg-none d-xl-table-cell">Id</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Start</th>
-                        <th scope="col" class="d-none d-sm-none d-md-none d-lg-none d-xl-table-cell">End</th>
-                        <th scope="col" class="d-none d-sm-none d-md-table-cell">Amount</th>
-                        <th scope="col" class="d-none d-sm-table-cell">Fee buy</th>
-                        <th scope="col" class="d-none d-sm-table-cell">Fee sell</th>
-                        <th scope="col" class="d-none d-sm-none d-md-none d-lg-table-cell">Max users</th>
-                        <th scope="col" class="d-none d-sm-none d-md-none d-lg-table-cell">User type</th>
-                        <th scope="col">Live</th>
-                        <th scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody class="text-muted">
-                    {% for line in competition_list %}
-                    {% if line.is_live %}
-                    {% set ccc = "success" %}
-                    {% else %}
-                    {% set ccc = "" %}
-                    {% endif %}
-                    <tr class="text-{{ccc}}">
-                        <td class="d-none d-sm-none d-md-none d-lg-none d-xl-table-cell">{{line.id}}</td>
-                        <td>{{line.name}}</td>
-                        <td>{{line.start_date}}</td>
-                        <td class="d-none d-sm-none d-md-none d-lg-none d-xl-table-cell">{{line.end_date}}</td>
-                        <td class="d-none d-sm-none d-md-table-cell">{{line.start_amount  | numberFormat}} <small>{{line.amount_quote.upper()}}</small></td>
-                        <td class="d-none d-sm-table-cell">{{line.buy_fee}}%</td>
-                        <td class="d-none d-sm-table-cell">{{line.sell_fee}}%</td>
-                        <td class="d-none d-sm-none d-md-none d-lg-table-cell">{{line.max_users}}</td>
-                        <td class="d-none d-sm-none d-md-none d-lg-table-cell">{{line.type_users}}</td>
-                        <td>{{line.is_live}}</td>
-                        <td><a href="{{url_for('account_admin_create_competition_review', comp_id=line.id)}}" class="text-decoration-none text-warning"><span
-                            class="material-icons" style="font-size:20px">preview</span></a></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="col-auto">
+                    <a class="text-muted" href="#"><span
+                            class="material-icons">info</span></a>
+                </div>
             </div>
+            <small>
+                <i class="text-muted">
+                    Information about competitions.
+                </i>
+            </small>
+            {% if competition_list.__len__() == 0 %}
+            <div class="text-warning text-center">
+                There is no competitions to show.
+            </div>
+            {% else %}
+            <table class="table table-borderless table-sm small mt-2">
+                <thead class="text-light">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Start</th>
+                    <th scope="col" class="d-none d-sm-none d-md-none d-lg-none d-xl-table-cell">End</th>
+                    <th scope="col" class="d-none d-sm-none d-md-table-cell">Amount</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Fee buy</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Fee sell</th>
+                    <th scope="col" class="d-none d-sm-none d-md-none d-lg-table-cell">Max users</th>
+                    <th scope="col" class="d-none d-sm-none d-md-none d-lg-table-cell">User type</th>
+                    <th scope="col">Live</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody class="text-muted">
+                {% for line in competition_list %}
+                {% if line.is_live %}
+                {% set ccc = "success" %}
+                {% else %}
+                {% set ccc = "" %}
+                {% endif %}
+                <tr class="text-{{ccc}}">
+                    <td>{{line.name}}</td>
+                    <td>{{line.start_date}}</td>
+                    <td class="d-none d-sm-none d-md-none d-lg-none d-xl-table-cell">{{line.end_date}}</td>
+                    <td class="d-none d-sm-none d-md-table-cell">{{line.start_amount | numberFormat}} <small>{{line.amount_quote.upper()}}</small>
+                    </td>
+                    <td class="d-none d-sm-table-cell">{{line.buy_fee}}%</td>
+                    <td class="d-none d-sm-table-cell">{{line.sell_fee}}%</td>
+                    {% if line.max_users %}
+                    <td class="d-none d-sm-none d-md-none d-lg-table-cell">{{line.max_users}}</td>
+                    {% else %}
+                    <td class="d-none d-sm-none d-md-none d-lg-table-cell">No limit</td>
+                    {% endif %}
+
+                    {% if line.type_users %}
+                    <td class="d-none d-sm-none d-md-none d-lg-table-cell">{{line.type_users}}</td>
+                    {% else %}
+                    <td class="d-none d-sm-none d-md-none d-lg-table-cell">All users</td>
+                    {% endif %}
+
+                    <td>{{line.is_live}}</td>
+                    <td><a href="{{url_for('account_admin_create_competition_review', comp_id=line.id)}}"
+                           class="text-decoration-none text-warning"><span
+                            class="material-icons" style="font-size:20px">preview</span></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
         <div class="text-right mb-3">
-            <a class="btn btn-info" href="{{url_for('account_admin_create_competition')}}" role="button">Create new competition</a>
+            <a class="btn btn-info" href="{{url_for('account_admin_create_competition')}}" role="button">Create new
+                competition</a>
         </div>
     </div>
 
@@ -178,7 +195,7 @@
                     </div>
                     <div class="col-auto">
                         <a class="text-muted" href="{{url_for('account_admin_ip_info')}}"><span
-                            class="material-icons">info</span></a>
+                                class="material-icons">info</span></a>
                     </div>
                 </div>
                 <small>
@@ -242,6 +259,7 @@
                 var runLastUpdate=setInterval( function() { adminLastUpdate(); }, 4750 )
 
 
+
             </script>
         </div>
         <div class="col-lg-8 mb-3">
@@ -262,6 +280,7 @@
             <div id="apiUsage" style="height: 250px;"></div>
             <script>
                 adminApiUsage('apiUsage')
+
 
 
             </script>
@@ -330,6 +349,7 @@
                 <script>
                     adminCpuUsageWS('cpuUsageWS')
 
+
                 </script>
             </div>
         </div>
@@ -346,6 +366,7 @@
                 <div id="cpuUsageDC" style="height: 250px;"></div>
                 <script>
                     adminCpuUsageDC('cpuUsageDC')
+
 
                 </script>
             </div>
@@ -364,15 +385,18 @@
                 <script>
                     adminCpuUsageDB('cpuUsageDB')
 
+
                 </script>
                 <div id="freeRamDB" style="height: 250px;"></div>
                 <script>
                     adminFreeRamDB('freeRamDB')
 
+
                 </script>
                 <div id="connectionsDB" style="height: 250px;"></div>
                 <script>
                     adminConnectionsDB('connectionsDB')
+
 
                 </script>
             </div>

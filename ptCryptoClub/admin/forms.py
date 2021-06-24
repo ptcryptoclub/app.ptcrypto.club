@@ -42,6 +42,7 @@ class AuthorizationForm(FlaskForm):
     submit = SubmitField('Confirm MFA')
     submit_2 = SubmitField('Update')
     submit_3 = SubmitField('Delete my account')
+    submit_4 = SubmitField('Submit competition')
 
 
 class UpdateDetailsForm(FlaskForm):
@@ -107,7 +108,7 @@ class FirstPinLogin(FlaskForm):
 
 
 class CreateCompetitionForm(FlaskForm):
-    name = StringField('Competition name', validators=[DataRequired(), Length(max=20)])
+    name = StringField('Competition name', validators=[DataRequired(), Length(max=30)])
     start_date = DateField('Start date', validators=[DataRequired()])
     end_date = DateField('End date', validators=[DataRequired()])
     amount = StringField('Amount', validators=[DataRequired()])
@@ -123,8 +124,6 @@ class CreateCompetitionForm(FlaskForm):
     def validate_name(self, name):
         if not name.data[0] in string.ascii_letters:
             raise ValidationError('Must start with a letter')
-        elif " " in name.data:
-            raise ValidationError('Cannot have blank spaces')
 
     def validate_amount(self, amount):
         if not amount.data.isdigit():

@@ -173,6 +173,13 @@
                     {{ form.submit_2(class="btn btn-block btn-success text-light mt-4") }}
                     {% endif %}
                 </div>
+                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-6">
+                    {% if not request.args.get('edit') %}
+                    <a class="btn btn-block btn-danger text-light mt-4" href="{{url_for('account_admin')}}" role="button">Cancel</a>
+                    {% else %}
+                    <a class="btn btn-block btn-danger text-light mt-4" href="{{url_for('account_admin')}}" role="button">Discard</a>
+                    {% endif %}
+                </div>
             </div>
         </form>
     </div>

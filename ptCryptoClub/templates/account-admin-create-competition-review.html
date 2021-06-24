@@ -98,18 +98,55 @@
                     {% if info.is_live %}
                     <a class="btn btn-lg btn-block btn-success mb-5 disabled" href="#" role="button">Go live</a>
                     {% else %}
-                    <a class="btn btn-lg btn-block btn-success mb-5" href="#" role="button">Go live</a>
+                    <a class="btn btn-lg btn-block btn-success mb-5" data-toggle="collapse" href="#go-live-submit"
+                       role="button" aria-expanded="false" aria-controls="go-live-submit">
+                        Go live
+                    </a>
                     {% endif %}
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-6 mt-xl-5 mt-lg-5 mt-md-0 mt-sm-5 mt-0 text-center">
-                    <a class="btn btn-lg btn-block btn-warning mb-5" href="{{url_for('account_admin_create_competition', edit=comp_id)}}" role="button">Edit</a>
+                    <a class="btn btn-lg btn-block btn-warning mb-5"
+                       href="{{url_for('account_admin_create_competition', edit=comp_id)}}" role="button">Edit</a>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-6 mt-xl-5 mt-lg-5 mt-md-0 mt-sm-5 mt-0 text-center">
                     {% if info.is_live %}
                     <a class="btn btn-lg btn-block btn-danger mb-5 disabled" href="#" role="button">Delete</a>
                     {% else %}
-                    <a class="btn btn-lg btn-block btn-danger mb-5" href="{{url_for('account_admin_create_competition_delete', comp_id=info.id)}}" role="button">Delete</a>
+                    <a class="btn btn-lg btn-block btn-danger mb-5"
+                       href="{{url_for('account_admin_create_competition_delete', comp_id=info.id)}}" role="button">Delete</a>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="collapse" id="go-live-submit">
+        <div class="border border-info rounded-lg p-3">
+            <div class="text-info">
+                <strong>Please note</strong>: After a competition is live, you won't be able to delete it and it will be visible to users.
+            </div>
+            <div class="row">
+                <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-12">
+                    <form class="" action="" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-row mt-3">
+                    <div class="col-xl-4 col-lg-4 col-md-5 col-sm-5 col-4">
+                        {% if form.pin.errors %}
+                        {{ form.pin(class="form-control bg-dark text-light is-invalid", autocomplete="off", value="", placeholder="2FA*") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.pin.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off",
+                        placeholder="2FA*", value="", maxlength="6") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-xl col-lg col-md col-sm col-8">
+                        {{ form.submit_4(class="btn btn-block btn-success mb-5") }}
+                    </div>
+                </div>
+            </form>
                 </div>
             </div>
         </div>
