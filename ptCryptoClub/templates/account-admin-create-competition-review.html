@@ -105,8 +105,12 @@
                     {% endif %}
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-6 mt-xl-5 mt-lg-5 mt-md-0 mt-sm-5 mt-0 text-center">
+                    {% if info.is_live %}
+                    <a class="btn btn-lg btn-block btn-warning mb-5 disabled" href="#" role="button">Edit</a>
+                    {% else %}
                     <a class="btn btn-lg btn-block btn-warning mb-5"
                        href="{{url_for('account_admin_create_competition', edit=comp_id)}}" role="button">Edit</a>
+                    {% endif %}
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-6 mt-xl-5 mt-lg-5 mt-md-0 mt-sm-5 mt-0 text-center">
                     {% if info.is_live %}
@@ -122,7 +126,7 @@
     <div class="collapse" id="go-live-submit">
         <div class="border border-info rounded-lg p-3">
             <div class="text-info">
-                <strong>Please note</strong>: After a competition is live, you won't be able to delete it and it will be visible to users.
+                <strong>Please note</strong>: After a competition is live, you won't be able to <u>edit or delete</u> it and it will be visible to users.
             </div>
             <div class="row">
                 <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-12">

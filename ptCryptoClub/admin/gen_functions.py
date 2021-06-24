@@ -1,6 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord
+from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord, \
+    Competitions
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -1029,11 +1030,7 @@ def my_competitions(user_id):
                 "start_amount": 100000,
                 "amount_quote": "eur",
                 "buy_fee": 0.2,
-                "sell_fee": 0.3,
-                "max_users": None,
-                "type_users": None,
-                "send_email": True,
-                "is_live": True,
+                "sell_fee": 0.3
             }
         )
     return to_return
@@ -1041,21 +1038,18 @@ def my_competitions(user_id):
 
 def future_competitions():
     to_return = []
-    for line in range(5):
+    comps = Competitions.query.filter(Competitions.start_date > datetime.utcnow(), Competitions.is_live).all()
+    for line in comps:
         to_return.append(
             {
-                "id": line,
-                "name": "This is the name",
-                "start_date": "2021/08/01 00:00:00",
-                "end_date": "2021/10/01 00:00:00",
-                "start_amount": 100000,
-                "amount_quote": "eur",
-                "buy_fee": 0.2,
-                "sell_fee": 0.3,
-                "max_users": None,
-                "type_users": None,
-                "send_email": True,
-                "is_live": True,
+                "id": line.id,
+                "name": line.name,
+                "start_date": line.start_date,
+                "end_date": line.end_date,
+                "start_amount": line.start_amount,
+                "amount_quote": line.amount_quote,
+                "buy_fee": line.buy_fee,
+                "sell_fee": line.sell_fee
             }
         )
     return to_return
@@ -1063,21 +1057,22 @@ def future_competitions():
 
 def ongoing_competitions():
     to_return = []
-    for line in range(2):
+    comps = Competitions.query.filter(
+        Competitions.start_date <= datetime.utcnow(),
+        Competitions.end_date > datetime.utcnow(),
+        Competitions.is_live
+    ).all()
+    for line in comps:
         to_return.append(
             {
-                "id": line,
-                "name": "This is the name",
-                "start_date": "2021/08/01 00:00:00",
-                "end_date": "2021/10/01 00:00:00",
-                "start_amount": 100000,
-                "amount_quote": "eur",
-                "buy_fee": 0.2,
-                "sell_fee": 0.3,
-                "max_users": None,
-                "type_users": None,
-                "send_email": True,
-                "is_live": True,
+                "id": line.id,
+                "name": line.name,
+                "start_date": line.start_date,
+                "end_date": line.end_date,
+                "start_amount": line.start_amount,
+                "amount_quote": line.amount_quote,
+                "buy_fee": line.buy_fee,
+                "sell_fee": line.sell_fee
             }
         )
     return to_return

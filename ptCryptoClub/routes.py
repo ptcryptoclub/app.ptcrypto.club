@@ -1193,7 +1193,7 @@ def account_admin_create_competition_review(comp_id):
                     if totp.verify(form.pin.data):
                         to_review.is_live = True
                         db.session.commit()
-                        flash("Competition is now live", "success")
+                        flash("Competition is now live and visible to users.", "success")
                         return redirect(url_for("account_admin"))
                     else:
                         flash("2FA is not correct, please try again.", "danger")
@@ -2030,10 +2030,24 @@ def newsfeed_page(page, per_page):
 
 @app.route("/competitions/")
 def competitions_home():
+    if current_user.is_authenticated:
+        my_comp = my_competitions(user_id=current_user.id)
+    else:
+        my_comp = []
     return render_template(
         "competitions-home.html",
         title="Competitions",
-        my_competitions=my_competitions(user_id=1),
+        my_competitions=my_comp,
         future_competitions=future_competitions(),
         ongoing_competitions=ongoing_competitions()
+    )
+
+
+@app.route("/competitions/<compt_id>/details/")
+def competition_details_home(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    return render_template(
+        "competitions-detail.html",
+        title="Competitions",
+        competition=compt
     )
