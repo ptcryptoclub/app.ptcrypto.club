@@ -135,4 +135,6 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
 function expandChart(divID) {
     let htmlDIV = document.getElementById(divID);
     htmlDIV.className = "col-lg-12";
+    let htmlICON = document.getElementById("icon-"+divID);
+    htmlICON.outerHTML = ""
 }
