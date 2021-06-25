@@ -1,7 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord, \
-    Competitions
+    Competitions, UsersInCompetitions
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -1018,27 +1018,54 @@ def portfolio_rank_table():
     return to_return
 
 
-def my_competitions(user_id):
+def my_competitions(user_id, limit=None):
+    if limit is not None and isinstance(limit, int):
+        competitions_in = UsersInCompetitions.query.filter_by(user_id=user_id).limit(limit)
+    else:
+        competitions_in = UsersInCompetitions.query.filter_by(user_id=user_id).all()
+    list_ = []
+    for line in competitions_in:
+        list_.append(line.competition_id)
     to_return = []
-    for line in range(3):
+    for id_ in list_:
+        comp = Competitions.query.filter_by(id=id_).first()
+        if comp.start_date < datetime.utcnow() < comp.end_date:
+            status = "live"
+        elif datetime.utcnow() > comp.end_date:
+            status = "past"
+        else:
+            status = "future"
         to_return.append(
             {
-                "id": line,
-                "name": "This is the name",
-                "start_date": "2021/08/01 00:00:00",
-                "end_date": "2021/10/01 00:00:00",
-                "start_amount": 100000,
-                "amount_quote": "eur",
-                "buy_fee": 0.2,
-                "sell_fee": 0.3
+                "id": comp.id,
+                "name": comp.name,
+                "start_date": comp.start_date,
+                "end_date": comp.end_date,
+                "start_amount": comp.start_amount,
+                "amount_quote": comp.amount_quote,
+                "buy_fee": comp.buy_fee,
+                "sell_fee": comp.sell_fee,
+                "status": status
             }
         )
+    to_return = sorted(to_return, key=lambda k: k['start_date'])
     return to_return
 
 
-def future_competitions():
+def future_competitions(limit=None):
     to_return = []
-    comps = Competitions.query.filter(Competitions.start_date > datetime.utcnow(), Competitions.is_live).all()
+    if limit is not None and isinstance(limit, int):
+        comps = Competitions.query.filter(
+            Competitions.start_date > datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).limit(limit)
+    else:
+        comps = Competitions.query.filter(
+            Competitions.start_date > datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).all()
     for line in comps:
         to_return.append(
             {
@@ -1055,13 +1082,20 @@ def future_competitions():
     return to_return
 
 
-def ongoing_competitions():
+def ongoing_competitions(limit=None):
     to_return = []
-    comps = Competitions.query.filter(
-        Competitions.start_date <= datetime.utcnow(),
-        Competitions.end_date > datetime.utcnow(),
-        Competitions.is_live
-    ).all()
+    if limit is not None and isinstance(limit, int):
+        comps = Competitions.query.filter(
+            Competitions.start_date <= datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).limit(limit)
+    else:
+        comps = Competitions.query.filter(
+            Competitions.start_date <= datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).all()
     for line in comps:
         to_return.append(
             {

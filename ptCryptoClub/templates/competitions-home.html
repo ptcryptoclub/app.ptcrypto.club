@@ -33,7 +33,7 @@
 <div class="container mt-3 mb-5">
     {% if current_user.is_authenticated %}
     <div class="row justify-content-end mr-2 mb-3">
-        <H6 class="text-light text-decoration-none">My competitions</H6>
+        <H6><a href="#" class="text-light text-decoration-none">My competitions</a></H6><small class="ml-3"><a href="#" class="text-decoration-none">See all</a></small>
     </div>
     {% if my_competitions.__len__() == 0 %}
     <div class="text-muted text-center">
@@ -54,7 +54,14 @@
         </thead>
         <tbody class="text-muted">
         {% for line in my_competitions %}
-        <tr>
+        {% if line.status == "live" %}
+        {% set az = 'success' %}
+        {% elif line.status == "past" %}
+        {% set az = 'danger' %}
+        {% else %}
+        {% set az = '' %}
+        {% endif %}
+        <tr class="text-{{az}}">
             <td>{{line.name}}</td>
             <td>{{line.start_date}}</td>
             <td>{{line.end_date}}</td>
@@ -62,11 +69,19 @@
             </td>
             <td class="d-none d-sm-none d-md-table-cell">{{line.buy_fee}}%</td>
             <td class="d-none d-sm-none d-md-table-cell">{{line.sell_fee}}%</td>
+            {% if line.status == "live" or line.status == "past" %}
+            <td scope="col">
+                <a href="{{url_for('playground_home', compt_id=line.id)}}" class="text-decoration-none text-info">
+                    <span class="material-icons" style="font-size:20px">insights</span>
+                </a>
+            </td>
+            {% else %}
             <td>
                 <a href="{{url_for('competition_details_home', compt_id=line.id)}}" class="text-decoration-none text-info">
                     <span class="material-icons" style="font-size:20px">info</span>
                 </a>
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
         </tbody>
@@ -75,7 +90,7 @@
     {% endif %}
 
     <div class="row justify-content-end mr-2 mt-5 mb-3">
-        <H6 class="text-light text-decoration-none">Future competitions</H6>
+        <H6><a href="#" class="text-light text-decoration-none">Future competitions</a></H6><small class="ml-3"><a href="#" class="text-decoration-none">See all</a></small>
     </div>
     {% if future_competitions.__len__() == 0 %}
     <div class="text-muted text-center">
@@ -106,7 +121,7 @@
             <td class="d-none d-sm-none d-md-table-cell">{{line.sell_fee}}%</td>
             <td>
                 <a href="{{url_for('competition_details_home', compt_id=line.id)}}" class="text-decoration-none text-info">
-                    <span class="material-icons" style="font-size:20px">event_note</span>
+                    <span class="material-icons" style="font-size:20px">info</span>
                 </a>
             </td>
         </tr>
@@ -117,7 +132,7 @@
 
 
     <div class="row justify-content-end mr-2 mt-5 mb-3">
-        <H6 class="text-light text-decoration-none">Ongoing competitions</H6>
+        <H6><a href="#" class="text-light text-decoration-none">Ongoing competitions</a></H6><small class="ml-3"><a href="#" class="text-decoration-none">See all</a></small>
     </div>
     {% if ongoing_competitions.__len__() == 0 %}
     <div class="text-muted text-center">
@@ -147,7 +162,7 @@
             <td class="d-none d-sm-none d-md-table-cell">{{line.buy_fee}}%</td>
             <td class="d-none d-sm-none d-md-table-cell">{{line.sell_fee}}%</td>
             <td>
-                <a href="{{url_for('competition_details_home', compt_id=line.id)}}" class="text-decoration-none text-info">
+                <a href="{{url_for('playground_home', compt_id=line.id)}}" class="text-decoration-none text-info">
                     <span class="material-icons" style="font-size:20px">insights</span>
                 </a>
             </td>

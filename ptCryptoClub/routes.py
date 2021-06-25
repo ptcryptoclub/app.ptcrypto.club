@@ -1000,7 +1000,7 @@ def account_admin():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
-        # THIS NEEDS TO BE REVIEWED REALLY BAD SOLUTION
+        # THIS NEEDS TO BE REVIEWED REALLY BAD SOLUTION #
         raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(IpAddressLog.date.desc()).distinct()
         ip_list_7 = []
         for t in raw_ip_list:
@@ -1011,6 +1011,10 @@ def account_admin():
             if len(ip_list_7) == 7:
                 break
         ip_list = [admin_ip_info(ip_address=t, full_info=False) for t in ip_list_7]
+        #################################################
+        # next line will delete any competition that is not live and the start date is in the past #
+        Competitions.query.filter(Competitions.start_date < datetime.utcnow(), Competitions.is_live == False).delete() # PEP8 exception
+        db.session.commit()
         return render_template(
             "account-admin.html",
             title="Account",
@@ -1092,7 +1096,7 @@ def account_admin_create_competition():
         form = CreateCompetitionForm()
         competition_id = request.args.get('edit')
         if competition_id is not None:
-            competition_to_edit = Competitions.query.filter_by(id=competition_id).first()
+            competition_to_edit = Competitions.query.filter_by(id=competition_id, is_live=False).first()
             if competition_to_edit is None:
                 return redirect(url_for("account_user"))
             else:
@@ -2031,23 +2035,144 @@ def newsfeed_page(page, per_page):
 @app.route("/competitions/")
 def competitions_home():
     if current_user.is_authenticated:
-        my_comp = my_competitions(user_id=current_user.id)
+        my_comp = my_competitions(user_id=current_user.id, limit=None)
     else:
         my_comp = []
     return render_template(
         "competitions-home.html",
         title="Competitions",
         my_competitions=my_comp,
-        future_competitions=future_competitions(),
-        ongoing_competitions=ongoing_competitions()
+        future_competitions=future_competitions(limit=None),
+        ongoing_competitions=ongoing_competitions(limit=None)
     )
 
 
 @app.route("/competitions/<compt_id>/details/")
 def competition_details_home(compt_id):
     compt = Competitions.query.filter_by(id=compt_id).first()
-    return render_template(
-        "competitions-detail.html",
-        title="Competitions",
-        competition=compt
-    )
+    already_in = False
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        status = ""
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            status = "ongoing"
+        elif datetime.utcnow() > compt.end_date:
+            status = "past"
+        elif compt.start_date > datetime.utcnow():
+            status = "future"
+        if current_user.is_authenticated:
+            filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
+            if filter_ is not None:
+                already_in = True
+        return render_template(
+            "competitions-detail.html",
+            title="Competitions",
+            competition=compt,
+            already_in=already_in,
+            status=status
+        )
+
+
+@app.route("/competitions/<compt_id>/join/")
+@login_required
+def competition_join(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
+        if filter_ is not None:
+            if compt.start_date < datetime.utcnow() < compt.end_date:
+                flash("You cannot join an ongoing competition", "warning")
+                return redirect(url_for("competitions_home"))
+            elif datetime.utcnow() > compt.end_date:
+                flash("This competition has ended", "warning")
+                return redirect(url_for("competitions_home"))
+            else:
+                flash("You are already in the competition!", "info")
+                return redirect(url_for("competition_details_home", compt_id=compt_id))
+        else:
+            if compt.start_date < datetime.utcnow() < compt.end_date:
+                flash("You cannot join an ongoing competition", "warning")
+                return redirect(url_for("competitions_home"))
+            elif datetime.utcnow() > compt.end_date:
+                flash("This competition has ended", "warning")
+                return redirect(url_for("competitions_home"))
+            else:
+                # noinspection PyArgumentList
+                add = UsersInCompetitions(
+                    user_id=current_user.id,
+                    competition_id=compt.id
+                )
+                db.session.add(add)
+                db.session.commit()
+                flash(f"You've joined {compt.name}.", "success")
+                return redirect(url_for("competitions_home"))
+
+
+@app.route("/competitions/<compt_id>/leave/")
+@login_required
+def competition_leave(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            flash("You cannot leave an ongoing competition.", "info")
+            return redirect(url_for("competitions_home"))
+        filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
+        if filter_ is None:
+            flash("You didn't join this competition yet!", "info")
+            return redirect(url_for("competition_details_home", compt_id=compt_id))
+        else:
+            UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).delete()
+            db.session.commit()
+            flash("You are no longer part in this competition.", "warning")
+            return redirect(url_for("competitions_home"))
+
+
+@app.route("/playground/<compt_id>/live/")
+@login_required
+def playground_live_home(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            # CODE FOR LIVE COMPETITIONS WILL BE HERE
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                registered = False
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                registered = True
+            return render_template(
+                "playground-home-live.html",
+                title="Playground",
+                registered=registered
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/")
+@login_required
+def playground_home(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            return redirect(url_for('playground_live_home', compt_id=compt_id))
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            # CODE FOR ARCHIVED COMPETITIONS WILL BE HERE
+            return render_template(
+                "playground-home-archive.html",
+                title="Playground"
+            )

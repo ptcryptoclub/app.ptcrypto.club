@@ -95,7 +95,17 @@
     <div class="my-5">
         <div class="row no-gutters justify-content-center">
             <div class="col-xl-5 col-lg-5 col-md-7 col-sm-8 col-9">
-                <a class="btn btn-primary btn-lg btn-block" href="#" role="button">Join competition</a>
+                {% if status == "past" %}
+                <a class="btn btn-info btn-lg btn-block disabled" href="#" role="button">Competition ended</a>
+                {% elif status == "ongoing" %}
+                <a class="btn btn-info btn-lg btn-block disabled" href="#" role="button">Ongoing competition</a>
+                {% elif already_in %}
+                <a class="btn btn-warning btn-lg btn-block" href="{{url_for('competition_leave', compt_id=competition.id)}}" role="button">Leave competition</a>
+                {% elif status == "future" %}
+                <a class="btn btn-primary btn-lg btn-block" href="{{url_for('competition_join', compt_id=competition.id)}}" role="button">Join competition</a>
+                {% else %}
+
+                {% endif %}
             </div>
             <div class="col-12 mt-3 text-muted text-center small">By joining the competition you are accepting the <a href="#" class="text-decoration-none">terms and conditions</a>.</div>
             <div class="col-12 mt-2 mb-2 text-muted text-center small">Share this competition:</div>
@@ -110,7 +120,7 @@
                     <a href="#" class="text-light"><span class="fi fi-twitter"></span></a>
                 </div>
                 <div class="col-auto">
-                    <a href="mailto:?subject=PTCC competition&body=This is a test" class="text-light"><span class="material-icons" style="font-size:22px">mail</span></a>
+                    <a href="mailto:?subject=PTCC competition&body=This is a test<br><br><a href='#'>This is a link</>a>" class="text-light"><span class="material-icons" style="font-size:22px">mail</span></a>
                 </div>
             </div>
         </div>

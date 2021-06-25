@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">Link 1</a>
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">link 2</a>
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">Link 3</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
+<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
+<script src="{{url_for('static', filename='js/playground.js')}}"></script>
+
+<div class="container mt-3 mb-5">
+    <div class="row justify-content-end mt-5">
+        <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8 col-12">
+            <div class="row justify-content-end align-items-top no-gutters">
+                <div class="col">
+                    <H2 class="text-light text-right">Competition name</H2>
+                </div>
+                <div class="col-auto ml-2">
+                    <div class="spinner-grow spinner-grow-sm text-success" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <div class="col-auto ml-1">
+                    <small class="text-success"><strong>LIVE</strong></small>
+                </div>
+                <div class="col-12 border-top border-bottom border-info small pr-2 py-1">
+                    <div class="row no-gutters justify-content-end text-light">
+                        <div class="col-auto">
+                            58 days left to trade
+                        </div>
+                        <div class="col-auto mx-3"><strong>|</strong></div>
+                        <div class="col-auto">
+                            1024 registered users
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if registered %}
+    <div class="row align-items-end mt-xl-0 mt-lg-0 mt-5">
+        <div class="col-auto">
+            <small class="text-light">Current value:</small>
+            <div id="updateAll" class="row no-gutters">
+                <div class="col-auto">
+                    <h1 class="display-4 text-light"><small>11,081.52</small></h1>
+                </div>
+                <div class="col-auto">
+                    <small class="text-light">EUR</small>
+                </div>
+                <div class="col-auto">
+                    <span class="material-icons text-success" style="font-size:48px">north</span>
+                </div>
+                <div class="col-auto mr-2 text-success">
+                    <h5>10.8%</h5>
+                </div>
+            </div>
+            <div class="row no-gutters">
+                <div class="col-auto p-1">
+                    <small class="text-light">Assets:</small>
+                    <div class="row align-items-center no-gutters mb-2">
+                        <div class="col-auto">
+                            <img src="/static/crypto_icons/color/btc.png" alt="btc" style="width:20px;height:20px;" title="BTC">
+                        </div>
+                        <div class="col-auto ml-3 text-light">
+                             0.16305808
+                        </div>
+                    </div>
+                    <div class="row align-items-center no-gutters mb-2">
+                        <div class="col-auto">
+                            <img src="/static/crypto_icons/color/eth.png" alt="eth" style="width:20px;height:20px;" title="ETH">
+                        </div>
+                        <div class="col-auto ml-3 text-light">
+                             2.51306077
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto ml-5 p-1">
+                    <small class="text-light">Wallet:</small>
+                    <div class="row align-items-center no-gutters mb-2">
+                        <div class="col-auto">
+                            <img src="/static/crypto_icons/color/eur.png" alt="EUR" style="width:20px;height:20px;" title="EUR">
+                        </div>
+                        <div class="col-auto ml-3 text-light">
+                             2,739.52
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl col-lg col-md col-sm col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-0 mt-5">
+            <div class="row justify-content-around">
+                <div class="col-auto">
+                    <a href="#buyAsset" class="text-decoration-none text-success" data-toggle="collapse" role="button"
+                       aria-expanded="false" aria-controls="buyAsset">
+                        <div class="row no-gutters align-items-center h4">
+                            <div class="col-auto"><span class="material-icons p-1">add_circle</span></div>
+                            <div class="col-auto">Buy asset</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="#sellAsset" class="text-decoration-none text-danger" data-toggle="collapse" role="button"
+                       aria-expanded="false" aria-controls="sellAsset">
+                        <div class="row no-gutters align-items-center h4">
+                            <div class="col-auto"><span class="material-icons p-1">remove_circle</span></div>
+                            <div class="col-auto">Sell asset</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 collapse multi-collapse mt-4" id="buyAsset">
+            <p class="text-success p-2 border border-success">BUY ASSET</p>
+        </div>
+        <div class="col-12 collapse multi-collapse mt-4" id="sellAsset">
+            <p class="text-danger p-2 border border-danger">SELL ASSET</p>
+        </div>
+    </div>
+
+    <div class="row no-gutters mt-5">
+        <div class="col-lg-6" id="chart-left">
+            <div class="row">
+                <div class="col text-center text-light"><small>BTCEUR kraken 60s</small></div>
+                <div class="col-auto">
+                    <a class="p-3" href="#" onclick="expandChart('chart-left')">
+                        <span class="material-icons">swap_horiz</span>
+                    </a>
+                </div>
+            </div>
+            <div id="chartBTC" style="height: 350px;"></div>
+            <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, 60, 20)</script>
+        </div>
+        <div class="col-lg-6" id="chart-right">
+            <div class="row">
+                <div class="col text-center text-light"><small>ETHEUR kraken 60s</small></div>
+                <div class="col-auto">
+                    <a class="p-3" href="#" onclick="expandChart('chart-right')">
+                        <span class="material-icons">swap_horiz</span>
+                    </a>
+                </div>
+            </div>
+            <div id="chartETH" style="height: 350px;"></div>
+            <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, 60, 20)</script>
+        </div>
+    </div>
+    {% else %}
+    {% endif %}
+</div>
+
+{% endblock %}
