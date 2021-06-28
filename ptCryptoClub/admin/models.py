@@ -168,3 +168,18 @@ class UsersInCompetitions(db.Model, UserMixin):
     user_id = db.Column(db.Integer, nullable=False)
     competition_id = db.Column(db.Integer, nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class CompetitionWallet(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    compt_id = db.Column(db.Integer, nullable=False)
+    wallet = db.Column(db.Float, default=0)
+
+
+class CompetitionAssets(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    compt_id = db.Column(db.Integer, nullable=False)
+    asset = db.Column(db.String(255), nullable=False)
+    amount = db.Column(db.Float, default=0)

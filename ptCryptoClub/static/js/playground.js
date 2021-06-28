@@ -151,3 +151,199 @@ function closeChart(divID) {
     let htmlDIV = document.getElementById(divID);
     htmlDIV.outerHTML = "";
 }
+
+
+function buyReport() {
+    let market = document.getElementById("market").value;
+    let base = document.getElementById("base").value;
+    let quote = document.getElementById("quote").value;
+    let fee = document.getElementById("chargedFee").value / 100;
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    price = data['price']
+                    amountSpent = document.getElementById("amount_spent").value
+                    amountFee = (amountSpent * fee).toFixed(2)
+                    amountAsset = (amountSpent - amountFee)/price
+
+                    displayPrice = document.getElementById("price");
+                    displayAmount = document.getElementById("amount");
+                    displayFee = document.getElementById("fee");
+                    displayResult = document.getElementById("result");
+
+                    displayPrice.innerHTML = numberFormat(price) + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayAmount.innerHTML = numberFormat(amountSpent) + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayFee.innerHTML = numberFormat(amountFee) + ' <small>' + quote.toUpperCase() + '</small>';
+                    displayResult.innerHTML = numberFormat(amountAsset.toFixed(8)) + ' <small>' + base.toUpperCase() + '</small>';
+                }
+            )
+        }
+    )
+}
+
+
+function sellReport() {
+    let market = document.getElementById("market_sell").value;
+    let base = document.getElementById("base_sell").value;
+    let quote = document.getElementById("quote_sell").value;
+    let fee = document.getElementById("chargedFee_sell").value / 100;
+    let amount_available = document.getElementById("sellAmountAvailable");
+    let amount_available_value = document.getElementById("hidden-"+ base +"-value").value;
+    let apiSecret = document.getElementById("APISecret").value;
+
+    let max_ = document.getElementById("amount_spent_sell")
+
+    fetch('/api/account/portfolio/price/' + market + '/' + base + '/' + quote + '/' + apiSecret + '/').then(
+        function(response2){
+            response2.json().then(
+                function (data2){
+                    price = data2['price']
+                    amount_available.innerHTML = amount_available_value + '<small> ' + base.toUpperCase() + '</small>'
+                    max_.max = amount_available_value
+                    amountSell = document.getElementById("amount_spent_sell").value
+                    price_without_feee = (amountSell * price).toFixed(2)
+                    amountFee = (price_without_feee * fee).toFixed(2)
+                    price_with_fee = (price_without_feee - amountFee).toFixed(2)
+
+                    displayPrice = document.getElementById("price_sell");
+                    displayAmount = document.getElementById("amount_sell");
+                    displayPriceWithoutFee = document.getElementById("price_without_fee")
+                    displayFee = document.getElementById("fee_sell");
+                    displayResult = document.getElementById("result_sell");
+
+                    displayPrice.innerHTML = data2['price'] + '<small> ' + quote.toUpperCase() + '</small>'
+                    displayAmount.innerHTML = amountSell+ '<small> ' + base.toUpperCase() + '</small>'
+                    displayPriceWithoutFee.innerHTML = price_without_feee + '<small> ' + quote.toUpperCase() + '</small>'
+                    displayFee.innerHTML = amountFee + '<small> ' + quote.toUpperCase() + '</small>'
+                    displayResult.innerHTML = price_with_fee + '<small> ' + quote.toUpperCase() + '</small>'
+
+                }
+            )
+        }
+    )
+
+}
+
+
+function clearReport() {
+    displayPrice = document.getElementById("price");
+    displayAmount = document.getElementById("amount");
+    displayFee = document.getElementById("fee");
+    displayResult = document.getElementById("result");
+
+    displayPrice.innerHTML = "";
+    displayAmount.innerHTML = "";
+    displayFee.innerHTML = "";
+    displayResult.innerHTML = "";
+}
+
+
+function clearReportSell() {
+    displayPrice = document.getElementById("price_sell");
+    displayAmount = document.getElementById("amount_sell");
+    displayPriceWithoutFee = document.getElementById("price_without_fee")
+    displayFee = document.getElementById("fee_sell");
+    displayResult = document.getElementById("result_sell");
+
+    displayPrice.innerHTML = "";
+    displayAmount.innerHTML = "";
+    displayPriceWithoutFee.innerHTML = "";
+    displayFee.innerHTML = "";
+    displayResult.innerHTML = "";
+}
+
+
+
+function updateBase() {
+    let market = document.getElementById("market").value;
+    let base_select = document.getElementById("base");
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/dropdowns/base/' + market + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    let linesHTML = '';
+                    for (let line of data) {
+                        linesHTML += '<option value="' + line['base'] + '">' + line['base'].toUpperCase() + '</option>'
+                    }
+                    base_select.innerHTML = linesHTML
+                }
+            )
+        }
+    )
+}
+
+
+function updateBaseSell() {
+    let market = document.getElementById("market_sell").value;
+    let base_select_sell = document.getElementById("base_sell");
+    let apiSecret = document.getElementById("APISecret").value;
+    fetch('/api/account/portfolio/dropdowns/base/' + market + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data){
+                    let linesHTML = '';
+                    for (let line of data) {
+                        linesHTML += '<option value="' + line['base'] + '">' + line['base'].toUpperCase() + '</option>'
+                    }
+                    base_select_sell.innerHTML = linesHTML
+                }
+            )
+        }
+    )
+}
+
+
+
+function updateQuote() {
+    let market = document.getElementById("market").value;
+    let base = document.getElementById("base").value;
+    let quote_select = document.getElementById("quote");
+    let apiSecret = document.getElementById("APISecret").value;
+    if (base === '') {
+
+    } else {
+        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/' + apiSecret + '/').then(
+            function(response){
+                response.json().then(
+                    function (data){
+                        let linesHTML = '';
+                        for (let line of data) {
+                            linesHTML += '<option value="' + line['quote'] + '">' + line['quote'].toUpperCase() + '</option>'
+                        }
+                        quote_select.innerHTML = linesHTML
+                    }
+                )
+            }
+        )
+    }
+}
+
+
+
+function updateQuoteSell() {
+    let market = document.getElementById("market_sell").value;
+    let base = document.getElementById("base_sell").value;
+    let quote_select = document.getElementById("quote_sell");
+    let apiSecret = document.getElementById("APISecret").value;
+    if (base === '') {
+
+    } else {
+        fetch('/api/account/portfolio/dropdowns/quote/' + market + '/' + base + '/' + apiSecret + '/').then(
+            function(response){
+                response.json().then(
+                    function (data){
+                        let linesHTML = '';
+                        for (let line of data) {
+                            linesHTML += '<option value="' + line['quote'] + '">' + line['quote'].toUpperCase() + '</option>'
+                        }
+                        quote_select.innerHTML = linesHTML
+                    }
+                )
+            }
+        )
+    }
+}
+

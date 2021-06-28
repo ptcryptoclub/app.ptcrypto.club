@@ -180,3 +180,19 @@ class CreateCompetitionForm(FlaskForm):
             raise ValidationError("End date cannot be today")
         elif end_date.data < self.start_date.data:
             raise ValidationError("End date cannot be before start date")
+
+
+class BuyAssetFormCompetition(FlaskForm):
+    base = SelectField('base', validators=[DataRequired()])
+    quote = SelectField('quote', choices=[("eur", "EUR")], validators=[DataRequired()])
+    market = SelectField('market', choices=[("kraken", "kraken")], validators=[DataRequired()])
+    amount_spent = StringField('Amount', validators=[DataRequired()])
+    submit = SubmitField('Buy asset')
+
+
+class SellAssetFormCompetition(FlaskForm):
+    base_sell = SelectField('base', validators=[DataRequired()])
+    quote_sell = SelectField('quote', choices=[("eur", "EUR")], validators=[DataRequired()])
+    market_sell = SelectField('market', choices=[("kraken", "kraken")], validators=[DataRequired()])
+    amount_spent_sell = StringField('Amount', validators=[DataRequired()])
+    submit_sell = SubmitField('Sell asset')

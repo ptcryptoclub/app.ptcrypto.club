@@ -10,9 +10,10 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
-    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes, default_playground_candle, candle_values
+    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes, default_playground_candle, candle_values, default_assets_competitions
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, Competitions, UsersInCompetitions
+    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, Competitions, UsersInCompetitions, \
+    CompetitionWallet, CompetitionAssets
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
@@ -21,7 +22,8 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
-    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin, CreateCompetitionForm
+    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin, CreateCompetitionForm, \
+    BuyAssetFormCompetition, SellAssetFormCompetition
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
     admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info, admin_competition_list
@@ -2106,6 +2108,21 @@ def competition_join(compt_id):
                     competition_id=compt.id
                 )
                 db.session.add(add)
+                # noinspection PyArgumentList
+                compt_wallet = CompetitionWallet(
+                    user_id=current_user.id,
+                    compt_id=compt.id,
+                    wallet=compt.start_amount
+                )
+                db.session.add(compt_wallet)
+                for asset_ in default_assets_competitions:
+                    # noinspection PyArgumentList
+                    compt_asset = CompetitionAssets(
+                        user_id=current_user.id,
+                        compt_id=compt.id,
+                        asset=asset_
+                    )
+                    db.session.add(compt_asset)
                 db.session.commit()
                 flash(f"You've joined {compt.name}.", "success")
                 return redirect(url_for("competitions_home"))
@@ -2127,6 +2144,8 @@ def competition_leave(compt_id):
             return redirect(url_for("competition_details_home", compt_id=compt_id))
         else:
             UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).delete()
+            CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).delete()
+            CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).delete()
             db.session.commit()
             flash("You are no longer part in this competition.", "warning")
             return redirect(url_for("competitions_home"))
@@ -2164,14 +2183,34 @@ def playground_live_home(compt_id):
                 else:
                     if eth_candle not in candle_values:
                         eth_candle = default_playground_candle
-            # CODE FOR LIVE COMPETITIONS WILL BE HERE
             user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            form_buy = BuyAssetFormCompetition()
+            form_sell = SellAssetFormCompetition()
             if user_is_in is None:
                 # USER IS NOT REGISTERED FOR COMPETITION
                 registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
             else:
                 # USER IS REGISTERED FOR COMPETITION
                 registered = True
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": aa.amount
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 2)
             return render_template(
                 "playground-home-live.html",
                 title="Playground",
@@ -2180,7 +2219,19 @@ def playground_live_home(compt_id):
                 btc_candle_update=btc_candle // 3,
                 eth_candle=eth_candle,
                 eth_candle_update=eth_candle // 3,
-                compt_id=compt_id
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=available_funds,
+                available_assets=available_assets,
+                current_value=current_value,
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name
             )
         elif datetime.utcnow() < compt.start_date:
             return redirect(url_for('competitions_home'))

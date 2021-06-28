@@ -40,7 +40,7 @@
         <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8 col-12">
             <div class="row justify-content-end align-items-top no-gutters">
                 <div class="col">
-                    <H2 class="text-light text-right">Competition name</H2>
+                    <H2 class="text-light text-right">{{compt_name}}</H2>
                 </div>
                 <div class="col-auto ml-2">
                     <div class="spinner-grow spinner-grow-sm text-success" role="status">
@@ -53,11 +53,15 @@
                 <div class="col-12 border-top border-bottom border-info small pr-2 py-1">
                     <div class="row no-gutters justify-content-end text-light">
                         <div class="col-auto">
-                            58 days left to trade
+                            {{days_to_trade}} days left to trade
                         </div>
                         <div class="col-auto mx-3"><strong>|</strong></div>
                         <div class="col-auto">
-                            1024 registered users
+                            {% if users_in_compt > 1 %}
+                            {{users_in_compt | numberFormat}} registered users
+                            {% else %}
+                            {{users_in_compt | numberFormat}} registered user
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -67,49 +71,66 @@
     {% if registered %}
     <div class="row align-items-end mt-xl-0 mt-lg-0 mt-5">
         <div class="col-auto">
-            <small class="text-light">Current value:</small>
+            <small class="text-info">Current value:</small>
             <div id="updateAll" class="row no-gutters">
                 <div class="col-auto">
-                    <h1 class="display-4 text-light"><small>11,081.52</small></h1>
+                    <h1 class="display-4 text-light"><small>{{current_value | numberFormat}}</small></h1>
                 </div>
                 <div class="col-auto">
-                    <small class="text-light">EUR</small>
+                    <small class="text-light">{{amount_quote.upper()}}</small>
                 </div>
+                {% if var_pct > 0 %}
                 <div class="col-auto">
                     <span class="material-icons text-success" style="font-size:48px">north</span>
                 </div>
                 <div class="col-auto mr-2 text-success">
-                    <h5>10.8%</h5>
+                    <h5>{{var_pct}}%</h5>
                 </div>
+                {% elif var_pct < 0 %}
+                <div class="col-auto">
+                    <span class="material-icons text-danger" style="font-size:48px">south</span>
+                </div>
+                <div class="col-auto mr-2 text-danger">
+                    <h5>{{var_pct}}%</h5>
+                </div>
+                {% else %}
+                <div class="col-auto">
+                    <span class="material-icons text-warning" style="font-size:48px">unfold_less</span>
+                </div>
+                <div class="col-auto mr-2 text-warning">
+                    <h5>{{var_pct}}%</h5>
+                </div>
+                {% endif %}
             </div>
             <div class="row no-gutters">
                 <div class="col-auto p-1">
                     <small class="text-light">Assets:</small>
+                    {% for asset in available_assets %}
+
                     <div class="row align-items-center no-gutters mb-2">
                         <div class="col-auto">
-                            <img src="/static/crypto_icons/color/btc.png" alt="btc" style="width:20px;height:20px;" title="BTC">
+                            <img src="/static/crypto_icons/color/{{asset.base}}.png" alt="btc"
+                                 style="width:20px;height:20px;"
+                                 title="{{asset.base.upper()}}">
                         </div>
                         <div class="col-auto ml-3 text-light">
-                             0.16305808
+                            {{asset.amount | numberFormat}}
                         </div>
                     </div>
-                    <div class="row align-items-center no-gutters mb-2">
-                        <div class="col-auto">
-                            <img src="/static/crypto_icons/color/eth.png" alt="eth" style="width:20px;height:20px;" title="ETH">
-                        </div>
-                        <div class="col-auto ml-3 text-light">
-                             2.51306077
-                        </div>
-                    </div>
+
+                    {% endfor %}
+
                 </div>
                 <div class="col-auto ml-5 p-1">
                     <small class="text-light">Wallet:</small>
                     <div class="row align-items-center no-gutters mb-2">
                         <div class="col-auto">
-                            <img src="/static/crypto_icons/color/eur.png" alt="EUR" style="width:20px;height:20px;" title="EUR">
+                            <img src="/static/crypto_icons/color/{{amount_quote}}.png" alt="EUR"
+                                 style="width:20px;height:20px;"
+                                 title="EUR">
                         </div>
                         <div class="col-auto ml-3 text-light">
-                             2,739.52
+                            {{available_funds | numberFormat}}
                         </div>
                     </div>
                 </div>
@@ -138,10 +159,225 @@
             </div>
         </div>
         <div class="col-12 collapse multi-collapse mt-4" id="buyAsset">
-            <p class="text-success p-2 border border-success">BUY ASSET</p>
+            <div class="border border-success p-xl-5 p-lg-4 p-md-3 p-sm-3 p-1">
+
+                <form action="" method="POST">
+                    {{ form_buy.hidden_tag() }}
+                    <div class="pb-3 px-3">
+                        <div class="row no-gutters justify-content-between">
+                            <div class="col">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col-auto my-1" hidden>
+                                        {{form_buy.market(class="form-control form-control-sm mr-sm-2 bg-dark text-light
+                                        border
+                                        border-secondary", onchange="updateBase()")}}
+                                    </div>
+                                    <div class="col-sm-auto text-light mx-1 my-1">
+                                        Asset:
+                                    </div>
+                                    <div class="col-sm-auto mx-1 my-1">
+                                        {{form_buy.base(class="form-control form-control-sm mr-sm-2 bg-dark text-light
+                                        border
+                                        border-secondary", onchange="buyReport()")}}
+                                    </div>
+                                    <div class="col-auto my-1" hidden>
+                                        <select class="form-control form-control-sm mr-sm-2 bg-dark text-light border
+                                        border-secondary" id="quote" name="quote" onchange="buyReport()" required=""
+                                                disabled>
+                                            <option value="{{amount_quote}}">{{amount_quote.upper()}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <div class="row align-items-center no-gutters">
+                                            <div class="col-auto text-light ml-xl-3 ml-lg-3 ml-md-3 ml-0 mr-1 my-1">
+                                                Amount <small><i
+                                                    style="font-size:11px">({{amount_quote.upper()}})</i></small>:
+                                            </div>
+                                            <div class="col-auto mx-1 my-1">
+                                                {{ form_buy.amount_spent(class="form-control form-control-sm text-light
+                                                bg-dark border
+                                                border-secondary", type="number",
+                                                placeholder="Amount to be spent", oninput="buyReport()", step="0.01",
+                                                min="0",
+                                                max=available_funds)
+                                                }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script>
+                                    updateBase()
+
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="col-auto text-light">
+                                <div class="row no-gutters align-items-center justify-content-end">
+                                    <div class="col-auto"><small>Total amount available:</small></div>
+                                </div>
+                                <div class="row no-gutters align-items-center justify-content-end">
+                                    <div class="col-auto"><span class="material-icons p-1">account_balance_wallet</span>
+                                    </div>
+                                    <div class="col-auto">{{available_funds | numberFormat}} <small>{{amount_quote.upper()}}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Current price</small></div>
+                                <div class="text-success" id="price"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Amount</small></div>
+                                <div class="text-success" id="amount"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Fee <i>({{buy_fee}}%)</i></small></div>
+                                <input id="chargedFee" type="number" value="{{buy_fee}}" hidden
+                                       readonly>
+                                <div class="text-danger" id="fee"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Asset amount</small></div>
+                                <div class="text-success" id="result"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <i class="text-info"><q><small>Please note that price may change while the transaction is
+                                completed, all amounts shown are just representative.</small></q></i>
+                        </div>
+                    </div>
+                    <div class="py-3 px-xl-5 px-lg-4 px-md-3 px-sm-3 px-2 text-right">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                {{ form_buy.submit(class="btn btn-block btn-sm btn-outline-success") }}
+                            </div>
+                            <div class="col-sm-4 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-0 mt-2">
+                                <input type="reset" value="Clear" class="btn btn-block btn-sm btn-outline-warning"
+                                       onclick="clearReport()">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
         </div>
         <div class="col-12 collapse multi-collapse mt-4" id="sellAsset">
-            <p class="text-danger p-2 border border-danger">SELL ASSET</p>
+            <div class="border border-danger p-xl-5 p-lg-4 p-md-3 p-sm-3 p-1">
+
+                <form action="" method="POST">
+                    {{ form_sell.hidden_tag() }}
+                    {% for sell_asset in available_assets %}
+                    <input id="hidden-{{sell_asset['base']}}-value" type="number" value="{{sell_asset['amount']}}"
+                           hidden>
+                    {% endfor %}
+                    <div class="pb-3 px-3">
+                        <div class="row no-gutters justify-content-between">
+
+                            <div class="col">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col-auto my-1" hidden>
+                                        {{form_sell.market_sell(class="form-control form-control-sm mr-sm-2 bg-dark
+                                        text-light
+                                        border border-secondary", onchange="updateBaseSell()")}}
+                                    </div>
+                                    <div class="col-auto my-1 mx-1 text-light">
+                                        Asset to sell:
+                                    </div>
+                                    <div class="col-auto mx-1 my-1">
+                                        {{form_sell.base_sell(class="form-control form-control-sm mr-sm-2 bg-dark
+                                        text-light border
+                                        border-secondary", onchange="sellReport()")}}
+                                    </div>
+                                    <div class="col-auto my-1" hidden>
+                                        {{form_sell.quote_sell(class="form-control form-control-sm mr-sm-2 bg-dark
+                                        text-light border
+                                        border-secondary")}}
+                                    </div>
+                                    <script>
+                                    updateBaseSell()
+
+
+                                    </script>
+
+                                    <div class="col-sm-auto mx-1 my-1">
+
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col-auto mx-1 my-1 text-light">
+                                                Amount:
+                                            </div>
+                                            <div class="col-auto mx-1 my-1">
+                                                {{ form_sell.amount_spent_sell(class="form-control form-control-sm
+                                                text-light bg-dark",
+                                                type="number",
+                                                placeholder="Amount to be sold", oninput="sellReport()",
+                                                step="0.00000001", min="0")
+                                                }}
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-auto text-light">
+                                <div class="row no-gutters align-items-center justify-content-end">
+                                    <div class="col-auto"><small>Total amount available:</small></div>
+                                </div>
+                                <div class="row no-gutters align-items-center justify-content-end">
+                                    <div id="sellAmountAvailable" class="col-auto"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="p-3">
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Current price</small></div>
+                                <div class="text-success" id="price_sell"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Amount</small></div>
+                                <div class="text-success" id="amount_sell"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Price</small></div>
+                                <div class="text-success" id="price_without_fee"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Fee <i>({{sell_fee}}%)</i></small></div>
+                                <input id="chargedFee_sell" type="number" value="{{sell_fee}}" hidden
+                                       readonly>
+                                <div class="text-danger" id="fee_sell"></div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="text-muted"><small>Credit amount</small></div>
+                                <div class="text-success" id="result_sell"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <i class="text-info"><q><small>Please note that price may change while the transaction is
+                                completed, all amounts shown are just representative.</small></q></i>
+                        </div>
+                    </div>
+                    <div class="py-3 px-xl-5 px-lg-4 px-md-3 px-sm-3 px-2 text-right">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                {{ form_sell.submit_sell(class="btn btn-block btn-sm btn-outline-success") }}
+                            </div>
+                            <div class="col-sm-4 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-0 mt-2">
+                                <input type="reset" value="Clear" class="btn btn-block btn-sm btn-outline-warning"
+                                       onclick="clearReportSell()">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
 
@@ -170,12 +406,24 @@
                             {% endif %}
                         </button>
                         <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=20, eth_candle=eth_candle)}}"><small>20 seconds</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=60, eth_candle=eth_candle)}}"><small>60 seconds</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=300, eth_candle=eth_candle)}}"><small>05 minutes</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=900, eth_candle=eth_candle)}}"><small>15 minutes</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=1800, eth_candle=eth_candle)}}"><small>30 minutes</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=3600, eth_candle=eth_candle)}}"><small>01 hour</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=20, eth_candle=eth_candle)}}"><small>20
+                                seconds</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=60, eth_candle=eth_candle)}}"><small>60
+                                seconds</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=300, eth_candle=eth_candle)}}"><small>05
+                                minutes</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=900, eth_candle=eth_candle)}}"><small>15
+                                minutes</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=1800, eth_candle=eth_candle)}}"><small>30
+                                minutes</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=3600, eth_candle=eth_candle)}}"><small>01
+                                hour</small></a>
                         </div>
                     </div>
                 </div>
@@ -224,12 +472,24 @@
                             {% endif %}
                         </button>
                         <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=20, btc_candle=btc_candle)}}"><small>20 seconds</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=60, btc_candle=btc_candle)}}"><small>60 seconds</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=300, btc_candle=btc_candle)}}"><small>05 minutes</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=900, btc_candle=btc_candle)}}"><small>15 minutes</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=1800, btc_candle=btc_candle)}}"><small>30 minutes</small></a>
-                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=3600, btc_candle=btc_candle)}}"><small>01 hour</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=20, btc_candle=btc_candle)}}"><small>20
+                                seconds</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=60, btc_candle=btc_candle)}}"><small>60
+                                seconds</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=300, btc_candle=btc_candle)}}"><small>05
+                                minutes</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=900, btc_candle=btc_candle)}}"><small>15
+                                minutes</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=1800, btc_candle=btc_candle)}}"><small>30
+                                minutes</small></a>
+                            <a class="dropdown-item text-light small"
+                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=3600, btc_candle=btc_candle)}}"><small>01
+                                hour</small></a>
                         </div>
                     </div>
                 </div>
@@ -239,7 +499,7 @@
                         <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
                     </a>
                 </div>
-                <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-right" >
+                <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-right">
                     <a class="p-1" href="#" onclick="collapseChart('chart-right')">
                         <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
                     </a>
