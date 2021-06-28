@@ -10,7 +10,7 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
-    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes
+    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes, default_playground_candle, candle_values
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, Competitions, UsersInCompetitions
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
@@ -2140,6 +2140,30 @@ def playground_live_home(compt_id):
         return redirect(url_for("competitions_home"))
     else:
         if compt.start_date < datetime.utcnow() < compt.end_date:
+            btc_candle = request.args.get('btc_candle')
+            if btc_candle is None:
+                btc_candle = default_playground_candle
+            else:
+                try:
+                    btc_candle = int(btc_candle)
+                except Exception as e:
+                    print(e)  # no error log will be created
+                    btc_candle = default_playground_candle
+                else:
+                    if btc_candle not in candle_values:
+                        btc_candle = default_playground_candle
+            eth_candle = request.args.get('eth_candle')
+            if eth_candle is None:
+                eth_candle = default_playground_candle
+            else:
+                try:
+                    eth_candle = int(eth_candle)
+                except Exception as e:
+                    print(e)  # no error log will be created
+                    eth_candle = default_playground_candle
+                else:
+                    if eth_candle not in candle_values:
+                        eth_candle = default_playground_candle
             # CODE FOR LIVE COMPETITIONS WILL BE HERE
             user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
             if user_is_in is None:
@@ -2151,7 +2175,12 @@ def playground_live_home(compt_id):
             return render_template(
                 "playground-home-live.html",
                 title="Playground",
-                registered=registered
+                registered=registered,
+                btc_candle=btc_candle,
+                btc_candle_update=btc_candle // 3,
+                eth_candle=eth_candle,
+                eth_candle_update=eth_candle // 3,
+                compt_id=compt_id
             )
         elif datetime.utcnow() < compt.start_date:
             return redirect(url_for('competitions_home'))
@@ -2174,5 +2203,5 @@ def playground_home(compt_id):
             # CODE FOR ARCHIVED COMPETITIONS WILL BE HERE
             return render_template(
                 "playground-home-archive.html",
-                title="Playground"
+                title="Playground",
             )

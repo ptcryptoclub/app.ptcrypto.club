@@ -147,28 +147,111 @@
 
     <div class="row no-gutters mt-5">
         <div class="col-lg-6" id="chart-left">
-            <div class="row">
-                <div class="col text-center text-light"><small>BTCEUR kraken 60s</small></div>
-                <div class="col-auto" id="icon-chart-left">
-                    <a class="p-3" href="#" onclick="expandChart('chart-left')">
-                        <span class="material-icons">swap_horiz</span>
+            <div class="row justify-content-end align-items-center no-gutters">
+
+                <div class="col-auto mr-2 text-light">
+                    <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            {% if btc_candle == 20 %}
+                            20 seconds
+                            {% elif btc_candle == 60 %}
+                            60 seconds
+                            {% elif btc_candle == 300 %}
+                            05 minutes
+                            {% elif btc_candle == 900 %}
+                            15 minutes
+                            {% elif btc_candle == 1800 %}
+                            30 minutes
+                            {% elif btc_candle == 3600 %}
+                            01 hour
+                            {% else %}
+                            60 seconds
+                            {% endif %}
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=20, eth_candle=eth_candle)}}"><small>20 seconds</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=60, eth_candle=eth_candle)}}"><small>60 seconds</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=300, eth_candle=eth_candle)}}"><small>05 minutes</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=900, eth_candle=eth_candle)}}"><small>15 minutes</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=1800, eth_candle=eth_candle)}}"><small>30 minutes</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=3600, eth_candle=eth_candle)}}"><small>01 hour</small></a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-auto d-none d-lg-block" id="icon-expand-chart-left">
+                    <a class="p-1" href="#" onclick="expandChart('chart-left')">
+                        <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
+                    </a>
+                </div>
+                <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-left">
+                    <a class="p-1" href="#" onclick="collapseChart('chart-left')">
+                        <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
+                    </a>
+                </div>
+                <div class="col-auto" id="icon-close-chart-left">
+                    <a class="p-1" href="#" onclick="closeChart('chart-left')">
+                        <span class="material-icons text-danger" style="font-size:20px">clear</span>
                     </a>
                 </div>
             </div>
             <div id="chartBTC" style="height: 350px;"></div>
-            <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, 60, 20)</script>
+            <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, {{btc_candle}}, {{btc_candle_update}})</script>
         </div>
         <div class="col-lg-6" id="chart-right">
-            <div class="row">
-                <div class="col text-center text-light"><small>ETHEUR kraken 60s</small></div>
-                <div class="col-auto" id="icon-chart-right">
-                    <a class="p-3" href="#" onclick="expandChart('chart-right')">
-                        <span class="material-icons">swap_horiz</span>
+            <div class="row justify-content-end align-items-center no-gutters">
+
+                <div class="col-auto mr-2 text-light">
+                    <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            {% if eth_candle == 20 %}
+                            20 seconds
+                            {% elif eth_candle == 60 %}
+                            60 seconds
+                            {% elif eth_candle == 300 %}
+                            05 minutes
+                            {% elif eth_candle == 900 %}
+                            15 minutes
+                            {% elif eth_candle == 1800 %}
+                            30 minutes
+                            {% elif eth_candle == 3600 %}
+                            01 hour
+                            {% else %}
+                            60 seconds
+                            {% endif %}
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=20, btc_candle=btc_candle)}}"><small>20 seconds</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=60, btc_candle=btc_candle)}}"><small>60 seconds</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=300, btc_candle=btc_candle)}}"><small>05 minutes</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=900, btc_candle=btc_candle)}}"><small>15 minutes</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=1800, btc_candle=btc_candle)}}"><small>30 minutes</small></a>
+                            <a class="dropdown-item text-light small" href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=3600, btc_candle=btc_candle)}}"><small>01 hour</small></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-auto d-none d-lg-block" id="icon-expand-chart-right">
+                    <a class="p-1" href="#" onclick="expandChart('chart-right')">
+                        <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
+                    </a>
+                </div>
+                <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-right" >
+                    <a class="p-1" href="#" onclick="collapseChart('chart-right')">
+                        <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
+                    </a>
+                </div>
+                <div class="col-auto" id="icon-close-chart-right">
+                    <a class="p-1" href="#" onclick="closeChart('chart-right')">
+                        <span class="material-icons text-danger" style="font-size:20px">clear</span>
                     </a>
                 </div>
             </div>
             <div id="chartETH" style="height: 350px;"></div>
-            <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, 60, 20)</script>
+            <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, {{eth_candle}}, {{eth_candle_update}})</script>
         </div>
     </div>
     {% else %}

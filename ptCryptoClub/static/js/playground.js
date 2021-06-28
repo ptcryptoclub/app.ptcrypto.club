@@ -45,6 +45,9 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     valueAxis.tooltip.disabled = true;
     valueAxis.zIndex = 1;
     valueAxis.renderer.baseGrid.disabled = true;
+    valueAxis.title.text = base.toUpperCase() + quote.toUpperCase();
+    valueAxis.title.fontSize = "0.8em"
+    valueAxis.title.fill = am4core.color("#00bbff");
     // height of axis
     valueAxis.height = am4core.percent(90);
 
@@ -118,7 +121,7 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
     series2.clustered = false;
     series2.dataFields.valueY = "volume";
     series2.yAxis = valueAxis2;
-    series2.tooltipText = "{valueY.value}";
+    series2.tooltipText = "Volume: {valueY.value} " + base.toUpperCase();
     series2.fillOpacity = 0.2;
     // volume should be summed
     ///series2.groupFields.valueY = "sum";
@@ -135,6 +138,16 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
 function expandChart(divID) {
     let htmlDIV = document.getElementById(divID);
     htmlDIV.className = "col-lg-12";
-    let htmlICON = document.getElementById("icon-"+divID);
-    htmlICON.outerHTML = ""
+}
+
+
+function collapseChart(divID) {
+    let htmlDIV = document.getElementById(divID);
+    htmlDIV.className = "col-lg-6";
+}
+
+
+function closeChart(divID) {
+    let htmlDIV = document.getElementById(divID);
+    htmlDIV.outerHTML = "";
 }
