@@ -1,7 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord, \
-    Competitions, UsersInCompetitions, CompetitionWallet, CompetitionAssets
+    Competitions, UsersInCompetitions, CompetitionWallet, CompetitionAssets, CompetitionsTransactionsBuy, CompetitionsTransactionsSell
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -1128,6 +1128,51 @@ def competition_portfolio_value(user_id, compt_id):
                 last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
                 current_value += last_price * aa.amount
             current_value += available_funds
-            var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 2)
+            var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
             to_return = {"current_value": round(current_value, 2), "pct_change": var_pct}
             return to_return
+
+
+def competitions_transactions(user_id, compt_id, limit=None):
+    to_return = []
+    if limit is None:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+    else:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(
+            user_id=user_id, compt_id=compt_id).order_by(CompetitionsTransactionsBuy.date_created.desc()).limit(limit)
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(
+            user_id=user_id, compt_id=compt_id).order_by(CompetitionsTransactionsSell.date_created.desc()).limit(limit)
+    for line in trans_buy:
+        to_return.append(
+            {
+                "date_created": line.date_created,
+                "base": line.base,
+                "quote": line.quote,
+                "amount_gross": line.amount_gross,
+                "fee": line.fee,
+                "amount_net": line.amount_net,
+                "asset_price": line.asset_price,
+                "asset_amount": line.asset_amount,
+                "type": "buy"
+            }
+        )
+    for line in trans_sell:
+        to_return.append(
+            {
+                "date_created": line.date_created,
+                "base": line.base,
+                "quote": line.quote,
+                "amount_gross": line.amount_gross,
+                "fee": line.fee,
+                "amount_net": line.amount_net,
+                "asset_price": line.asset_price,
+                "asset_amount": line.asset_amount,
+                "type": "sell"
+            }
+        )
+    to_return.sort(key=lambda item: item['date_created'], reverse=True)
+    for i in to_return:
+        i["date_created"] = str(i["date_created"])[:19]
+    print(to_return)
+    return to_return

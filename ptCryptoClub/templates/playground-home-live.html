@@ -265,7 +265,7 @@
         <div class="col-12 collapse multi-collapse mt-4" id="sellAsset">
             <div class="border border-danger p-xl-5 p-lg-4 p-md-3 p-sm-3 p-1">
 
-                <form action="" method="POST">
+                <form action="{{url_for('playground_live_sell_asset', compt_id=compt_id)}}" method="POST">
                     {{ form_sell.hidden_tag() }}
                     {% for sell_asset in available_assets %}
                     <input id="hidden-{{sell_asset['base']}}-value" type="number" value="{{sell_asset['amount']}}"
@@ -606,6 +606,53 @@
             <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, {{eth_candle}}, {{eth_candle_update}})</script>
         </div>
     </div>
+
+    <div class="mt-5">
+        <hr class="border-secondary">
+        <div class="row justify-content-end mr-2">
+            <H6 class="text-light">My transactions</H6><small><a href="#" class="text-decoration-none ml-2"><i>See all</i></a></small>
+        </div>
+        <table class="table table-sm table-borderless small mt-3">
+            <thead>
+            <tr class="text-light">
+                <th class="text-left">Date</th>
+                <th class="d-none d-sm-none d-md-none d-lg-table-cell text-center">Type</th>
+                <th class="d-none d-sm-none d-md-none d-lg-table-cell text-center">Asset</th>
+                <th class="text-right">Asset amount</th>
+                <th class="d-none d-sm-none d-md-table-cell text-right">Asset price</th>
+                <th class="text-right">Gross amount</th>
+                <th class="d-none d-sm-none d-md-table-cell text-right">Fee</th>
+                <th class="d-none d-sm-table-cell text-right">Amount net</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+            {% if transaction['type'] == "buy" %}
+            {% set asd = "success" %}
+            {% elif transaction['type'] == "sell" %}
+            {% set asd = "danger" %}
+            {% else %}
+            {% set asd = "muted" %}
+            {% endif %}
+            <tr class="text-{{asd}}">
+                <td class="text-left">{{transaction['date_created']}}</td>
+                <td class="d-none d-sm-none d-md-none d-lg-table-cell text-center">{{transaction['type']}}</td>
+                <td class="d-none d-sm-none d-md-none d-lg-table-cell text-center">{{transaction['base'].upper()}}</td>
+                <td class="text-right">{{transaction['asset_amount']}} <small>{{transaction['base'].upper()}}</small></td>
+                <td class="d-none d-sm-none d-md-table-cell text-right">
+                    {{transaction['asset_price'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                </td>
+                <td class="text-right">{{transaction['amount_gross'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small></td>
+                <td class="d-none d-sm-none d-md-table-cell text-right">{{transaction['fee'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                </td>
+                <td class="d-none d-sm-table-cell text-right">{{transaction['amount_net'] | numberFormat}} <small>{{transaction['quote'].upper()}}</small>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     {% else %}
     {% endif %}
 </div>

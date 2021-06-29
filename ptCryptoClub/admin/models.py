@@ -183,3 +183,31 @@ class CompetitionAssets(db.Model, UserMixin):
     compt_id = db.Column(db.Integer, nullable=False)
     asset = db.Column(db.String(255), nullable=False)
     amount = db.Column(db.Float, default=0)
+
+
+class CompetitionsTransactionsBuy(db.Model, UserMixin):
+    trans_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    compt_id = db.Column(db.Integer, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    base = db.Column(db.String(255), nullable=False)
+    quote = db.Column(db.String(255), nullable=False)
+    amount_gross = db.Column(db.Float, nullable=False)
+    fee = db.Column(db.Float, nullable=False)
+    amount_net = db.Column(db.Float, nullable=False)
+    asset_price = db.Column(db.Float, nullable=False)
+    asset_amount = db.Column(db.Float, nullable=False)
+
+
+class CompetitionsTransactionsSell(db.Model, UserMixin):
+    trans_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    compt_id = db.Column(db.Integer, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    base = db.Column(db.String(255), nullable=False)
+    quote = db.Column(db.String(255), nullable=False)
+    asset_amount = db.Column(db.Float, nullable=False)
+    asset_price = db.Column(db.Float, nullable=False)
+    amount_gross = db.Column(db.Float, nullable=False)
+    fee = db.Column(db.Float, nullable=False)
+    amount_net = db.Column(db.Float, nullable=False)

@@ -13,12 +13,13 @@ from ptCryptoClub.admin.config import admins_emails, default_delta, default_late
     CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes, default_playground_candle, candle_values, default_assets_competitions
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
     ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, Competitions, UsersInCompetitions, \
-    CompetitionWallet, CompetitionAssets
+    CompetitionWallet, CompetitionAssets, CompetitionsTransactionsBuy, CompetitionsTransactionsSell
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
     gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news, get_all_news_source_id, portfolio_chart, \
-    portfolio_data_start_info, portfolio_rank_table, my_competitions, future_competitions, ongoing_competitions, competition_portfolio_value
+    portfolio_data_start_info, portfolio_rank_table, my_competitions, future_competitions, ongoing_competitions, competition_portfolio_value, \
+    competitions_transactions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -2193,6 +2194,7 @@ def playground_live_home(compt_id):
                 available_assets = []
                 current_value = 0
                 var_pct = 0
+                transactions = []
             else:
                 # USER IS REGISTERED FOR COMPETITION
                 registered = True
@@ -2210,7 +2212,8 @@ def playground_live_home(compt_id):
                     last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
                     current_value += last_price * aa.amount
                 current_value += available_funds
-                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 2)
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+                transactions = competitions_transactions(user_id=current_user.id, compt_id=compt_id, limit=5)
             return render_template(
                 "playground-home-live.html",
                 title="Playground",
@@ -2224,14 +2227,15 @@ def playground_live_home(compt_id):
                 form_sell=form_sell,
                 available_funds=available_funds,
                 available_assets=available_assets,
-                current_value=current_value,
+                current_value=round(current_value, 2),
                 var_pct=var_pct,
                 buy_fee=compt.buy_fee,
                 sell_fee=compt.sell_fee,
                 amount_quote=compt.amount_quote,
                 days_to_trade=(compt.end_date - datetime.utcnow()).days,
                 users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
-                compt_name=compt.name
+                compt_name=compt.name,
+                transactions=transactions
             )
         elif datetime.utcnow() < compt.start_date:
             return redirect(url_for('competitions_home'))
@@ -2263,18 +2267,94 @@ def playground_live_buy_asset(compt_id):
                 db.session.commit()
                 flash("Something went wrong, please try again later.", "danger")
                 return redirect(url_for("playground_live_home", compt_id=compt_id))
-            print(market)
-            print(base)
-            print(quote)
-            print(amount_to_be_spent)
-            fee_to_be_taken = amount_to_be_spent * compt.buy_fee / 100
+            # CHECK IF USER HAS ENOUGH FUNDS #
+            fee_to_be_taken = round(amount_to_be_spent * compt.buy_fee / 100, 2)
+            amount_net = round(amount_to_be_spent - fee_to_be_taken, 2)
             last_price = get_last_price(base=base, quote=quote, market=market)["price"]
             asset_to_be_bought = round((amount_to_be_spent - fee_to_be_taken) / last_price, 8)
-            print(last_price)
-            print(fee_to_be_taken)
-            print(asset_to_be_bought)
-            return redirect(url_for("playground_live_home", compt_id=compt_id))
+            line_wallet = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt_id).first()
+            if line_wallet.wallet < amount_to_be_spent:
+                flash("There is not enough funds in your wallet", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            else:
+                # noinspection PyArgumentList
+                transaction = CompetitionsTransactionsBuy(
+                    user_id=current_user.id,
+                    compt_id=compt_id,
+                    base=base,
+                    quote=quote,
+                    amount_gross=amount_to_be_spent,
+                    fee=fee_to_be_taken,
+                    amount_net=amount_net,
+                    asset_price=last_price,
+                    asset_amount=asset_to_be_bought
+                )
+                db.session.add(transaction)
+                line_asset = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt_id, asset=base).first()
+                line_asset.amount += asset_to_be_bought
+                line_wallet.wallet -= amount_to_be_spent
+                db.session.commit()
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
         else:
+            flash("This competition is now closed.", "danger")
+            return redirect(url_for("competitions_home"))
+
+
+@app.route("/playground/<compt_id>/sell/", methods=["POST"])
+@login_required
+def playground_live_sell_asset(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            form = SellAssetFormCompetition()
+            try:
+                market = str(form.market_sell.data)
+                base = str(form.base_sell.data)
+                quote = str(form.quote_sell.data)
+                amount_to_be_sold = float(form.amount_spent_sell.data)
+            except Exception as e:
+                # noinspection PyArgumentList
+                error_log = ErrorLogs(
+                    route=f'playground live sell asset',
+                    log=str(e).replace("'", "")
+                )
+                db.session.add(error_log)
+                db.session.commit()
+                flash("Something went wrong, please try again later.", "danger")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            # CHECK IF USER HAS ENOUGH FUNDS #
+            line_asset = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt_id, asset=base).first()
+            if amount_to_be_sold > line_asset.amount:
+                flash("There is not enough funds in your account", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            else:
+                last_price = get_last_price(base=base, quote=quote, market=market)["price"]
+                fee = compt.sell_fee
+                amount_gross = round(last_price * amount_to_be_sold, 2)
+                fee_to_be_taken = round(amount_gross * fee / 100, 2)
+                amount_net = amount_gross - fee_to_be_taken
+                line_wallet = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt_id).first()
+                # noinspection PyArgumentList
+                transaction = CompetitionsTransactionsSell(
+                    user_id=current_user.id,
+                    compt_id=compt_id,
+                    base=base,
+                    quote=quote,
+                    asset_amount=amount_to_be_sold,
+                    asset_price=last_price,
+                    amount_gross=amount_gross,
+                    fee=fee_to_be_taken,
+                    amount_net=amount_net
+                )
+                db.session.add(transaction)
+                line_asset.amount -= amount_to_be_sold
+                line_wallet.wallet += amount_net
+                db.session.commit()
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+        else:
+            flash("This competition is now closed.", "danger")
             return redirect(url_for("competitions_home"))
 
 
