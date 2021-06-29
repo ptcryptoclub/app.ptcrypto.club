@@ -137,19 +137,31 @@ function ohlc_chart(chartDiv, market, base, quote, datapoints, candle, candle_ra
 
 function expandChart(divID) {
     let htmlDIV = document.getElementById(divID);
-    htmlDIV.className = "col-lg-12";
+    htmlDIV.className = "col-lg-12 mt-5";
 }
 
 
 function collapseChart(divID) {
     let htmlDIV = document.getElementById(divID);
-    htmlDIV.className = "col-lg-6";
+    htmlDIV.className = "col-lg-6 mt-5";
 }
 
 
 function closeChart(divID) {
     let htmlDIV = document.getElementById(divID);
     htmlDIV.outerHTML = "";
+}
+
+
+function closeCard(divID) {
+    let htmlDIV = document.getElementById("card-" + divID);
+    htmlDIV.outerHTML = "";
+    if (divID == "1") {
+        clearInterval(runUpdates_1);
+    } else if (divID == "2") {
+        clearInterval(runUpdates_2);
+    }
+    
 }
 
 
@@ -347,3 +359,126 @@ function updateQuoteSell() {
     }
 }
 
+
+
+function update_values_1 () {
+    let borderLine = document.getElementById("generalCard-1");
+    let market = document.getElementById("marketCard-1");
+    let base = document.getElementById("baseCard-1");
+    let quote = document.getElementById("quoteCard-1");
+    let delta = document.getElementById("deltaCard-1");
+    let change = document.getElementById("changeCard-1");
+    let price = document.getElementById("lastCard-1");
+    let high = document.getElementById("highCard-1");
+    let low = document.getElementById("lowCard-1");
+    let volume = document.getElementById("volumeCard-1");
+    let volumeQuote = document.getElementById("volumequoteCard-1");
+    let apiSecret = document.getElementById("APISecret").value;
+
+    fetch('/api/line-chart/info/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + delta.innerHTML + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data) {
+                    change.innerHTML = data['change'] + '%';
+                    if (data['change'] < 0) {
+                        borderLine.className = 'p-4 my-4 border border-danger rounded-lg'
+                        change.className = 'text-danger ml-3'
+                        price.className = 'text-right text-danger'
+                    } else if (data['change'] === 0) {
+                        borderLine.className = 'p-4 my-4 border border-warning rounded-lg'
+                        change.className = 'text-warning ml-3'
+                        price.className = 'text-right text-warning'
+                    } else {
+                        borderLine.className = 'p-4 my-4 border border-success rounded-lg'
+                        change.className = 'text-success ml-3'
+                        price.className = 'text-right text-success'
+                    }
+                    price.innerHTML = numberFormat(data['last_price']);
+                    high.innerHTML = '<strong>High: </strong>' + numberFormat(data['high']);
+                    low.innerHTML = '<strong>Low: </strong>' + numberFormat(data['low']);
+                    volume.innerHTML = numberFormat(data['volume']) + ' ' + base.innerHTML.toUpperCase();
+                    volumeQuote.innerHTML = numberFormat(data['volume_quote']) + ' ' + quote.innerHTML.toUpperCase();
+                }
+            )
+        }
+    );
+}
+
+
+function update_values_2 () {
+    let borderLine = document.getElementById("generalCard-2");
+    let market = document.getElementById("marketCard-2");
+    let base = document.getElementById("baseCard-2");
+    let quote = document.getElementById("quoteCard-2");
+    let delta = document.getElementById("deltaCard-2");
+    let change = document.getElementById("changeCard-2");
+    let price = document.getElementById("lastCard-2");
+    let high = document.getElementById("highCard-2");
+    let low = document.getElementById("lowCard-2");
+    let volume = document.getElementById("volumeCard-2");
+    let volumeQuote = document.getElementById("volumequoteCard-2");
+    let apiSecret = document.getElementById("APISecret").value;
+
+    fetch('/api/line-chart/info/' + market.innerHTML + '/' + base.innerHTML + '/' + quote.innerHTML + '/' + delta.innerHTML + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data) {
+                    change.innerHTML = data['change'] + '%';
+                    if (data['change'] < 0) {
+                        borderLine.className = 'p-4 my-4 border border-danger rounded-lg'
+                        change.className = 'text-danger ml-3'
+                        price.className = 'text-right text-danger'
+                    } else if (data['change'] === 0) {
+                        borderLine.className = 'p-4 my-4 border border-warning rounded-lg'
+                        change.className = 'text-warning ml-3'
+                        price.className = 'text-right text-warning'
+                    } else {
+                        borderLine.className = 'p-4 my-4 border border-success rounded-lg'
+                        change.className = 'text-success ml-3'
+                        price.className = 'text-right text-success'
+                    }
+                    price.innerHTML = numberFormat(data['last_price']);
+                    high.innerHTML = '<strong>High: </strong>' + numberFormat(data['high']);
+                    low.innerHTML = '<strong>Low: </strong>' + numberFormat(data['low']);
+                    volume.innerHTML = numberFormat(data['volume']) + ' ' + base.innerHTML.toUpperCase();
+                    volumeQuote.innerHTML = numberFormat(data['volume_quote']) + ' ' + quote.innerHTML.toUpperCase();
+                }
+            )
+        }
+    );
+}
+
+
+
+function updateCompetitionPortfolio (user_id, compt_id) {
+    let apiSecret = document.getElementById("APISecret").value;
+    let cv_value = document.getElementById("cv_value");
+    let cv_icon = document.getElementById("cv_icon");
+    let cv_pct_change = document.getElementById("cv_pct_change");
+    
+    fetch('/api/competition/calculate-portfolio/' + user_id + '/' + compt_id + '/' + apiSecret + '/').then(
+        function(response){
+            response.json().then(
+                function (data) {
+
+                    cv_value.innerHTML = numberFormat(data["current_value"])
+
+                    if (data["pct_change"] > 0) {
+                        cv_icon.innerHTML = '<span class="material-icons text-success" style="font-size:48px">north</span>'
+                        cv_pct_change.innerHTML = '<h5>' + data["pct_change"] + '%</h5>'
+                        cv_pct_change.className = 'col-auto mr-2 text-success'
+                        
+                    } else if (data["pct_change"] < 0) {
+                        cv_icon.innerHTML = '<span class="material-icons text-danger" style="font-size:48px">south</span>'
+                        cv_pct_change.innerHTML = '<h5>' + data["pct_change"] + '%</h5>'
+                        cv_pct_change.className = 'col-auto mr-2 text-danger'
+                    } else {
+                        cv_icon.innerHTML = '<span class="material-icons text-warning" style="font-size:48px">unfold_less</span>'
+                        cv_pct_change.innerHTML = '<h5>' + data["pct_change"] + '%</h5>'
+                        cv_pct_change.className = 'col-auto mr-2 text-warning'
+                    }
+                }
+            )
+        }
+    );
+}

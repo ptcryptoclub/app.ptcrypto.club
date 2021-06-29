@@ -72,36 +72,39 @@
     <div class="row align-items-end mt-xl-0 mt-lg-0 mt-5">
         <div class="col-auto">
             <small class="text-info">Current value:</small>
-            <div id="updateAll" class="row no-gutters">
+            <div class="row no-gutters">
                 <div class="col-auto">
-                    <h1 class="display-4 text-light"><small>{{current_value | numberFormat}}</small></h1>
+                    <h1 class="display-4 text-light"><small  id="cv_value">{{current_value | numberFormat}}</small></h1>
                 </div>
                 <div class="col-auto">
                     <small class="text-light">{{amount_quote.upper()}}</small>
                 </div>
                 {% if var_pct > 0 %}
-                <div class="col-auto">
+                <div class="col-auto" id="cv_icon">
                     <span class="material-icons text-success" style="font-size:48px">north</span>
                 </div>
-                <div class="col-auto mr-2 text-success">
+                <div class="col-auto mr-2 text-success" id="cv_pct_change">
                     <h5>{{var_pct}}%</h5>
                 </div>
                 {% elif var_pct < 0 %}
-                <div class="col-auto">
+                <div class="col-auto" id="cv_icon">
                     <span class="material-icons text-danger" style="font-size:48px">south</span>
                 </div>
-                <div class="col-auto mr-2 text-danger">
+                <div class="col-auto mr-2 text-danger" id="cv_pct_change">
                     <h5>{{var_pct}}%</h5>
                 </div>
                 {% else %}
-                <div class="col-auto">
+                <div class="col-auto" id="cv_icon">
                     <span class="material-icons text-warning" style="font-size:48px">unfold_less</span>
                 </div>
-                <div class="col-auto mr-2 text-warning">
+                <div class="col-auto mr-2 text-warning" id="cv_pct_change">
                     <h5>{{var_pct}}%</h5>
                 </div>
                 {% endif %}
             </div>
+            <script>
+                var updatePortfolioCompt=setInterval( function() { updateCompetitionPortfolio({{current_user.id}}, {{compt_id}}); }, 15*1000 );
+            </script>
             <div class="row no-gutters">
                 <div class="col-auto p-1">
                     <small class="text-light">Assets:</small>
@@ -161,31 +164,26 @@
         <div class="col-12 collapse multi-collapse mt-4" id="buyAsset">
             <div class="border border-success p-xl-5 p-lg-4 p-md-3 p-sm-3 p-1">
 
-                <form action="" method="POST">
+                <form action="{{url_for('playground_live_buy_asset', compt_id=compt_id)}}" method="POST">
                     {{ form_buy.hidden_tag() }}
                     <div class="pb-3 px-3">
-                        <div class="row no-gutters justify-content-between">
+                        <div class="row no-gutters justify-content-between mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
                             <div class="col">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col-auto my-1" hidden>
                                         {{form_buy.market(class="form-control form-control-sm mr-sm-2 bg-dark text-light
-                                        border
-                                        border-secondary", onchange="updateBase()")}}
+                                        border border-secondary", onchange="updateBase()")}}
                                     </div>
-                                    <div class="col-sm-auto text-light mx-1 my-1">
-                                        Asset:
+                                    <div class="col-auto text-light mx-1 my-1">
+                                        Asset to buy:
                                     </div>
-                                    <div class="col-sm-auto mx-1 my-1">
+                                    <div class="col-auto mx-1 my-1">
                                         {{form_buy.base(class="form-control form-control-sm mr-sm-2 bg-dark text-light
-                                        border
-                                        border-secondary", onchange="buyReport()")}}
+                                        border border-secondary", onchange="buyReport()")}}
                                     </div>
                                     <div class="col-auto my-1" hidden>
-                                        <select class="form-control form-control-sm mr-sm-2 bg-dark text-light border
-                                        border-secondary" id="quote" name="quote" onchange="buyReport()" required=""
-                                                disabled>
-                                            <option value="{{amount_quote}}">{{amount_quote.upper()}}</option>
-                                        </select>
+                                        {{form_buy.quote(class="form-control form-control-sm mr-sm-2 bg-dark text-light
+                                        border border-secondary")}}
                                     </div>
                                     <div class="col-sm-auto">
                                         <div class="row align-items-center no-gutters">
@@ -274,7 +272,7 @@
                            hidden>
                     {% endfor %}
                     <div class="pb-3 px-3">
-                        <div class="row no-gutters justify-content-between">
+                        <div class="row no-gutters justify-content-between mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
 
                             <div class="col">
                                 <div class="row align-items-center no-gutters">
@@ -293,13 +291,10 @@
                                     </div>
                                     <div class="col-auto my-1" hidden>
                                         {{form_sell.quote_sell(class="form-control form-control-sm mr-sm-2 bg-dark
-                                        text-light border
-                                        border-secondary")}}
+                                        text-light border border-secondary")}}
                                     </div>
                                     <script>
                                     updateBaseSell()
-
-
                                     </script>
 
                                     <div class="col-sm-auto mx-1 my-1">
@@ -381,10 +376,111 @@
         </div>
     </div>
 
-    <div class="row no-gutters mt-5">
-        <div class="col-lg-6" id="chart-left">
-            <div class="row justify-content-end align-items-center no-gutters">
+    <div class="row align-items-center no-gutters">
+        <div class="col-lg-6 mt-5" id="card-1">
 
+            <div class="row justify-content-center">
+                <div class="col-xl-9 col-lg-10 col-md-7 col-sm-10">
+                    <div class="p-4 my-4 border border-secondary rounded-lg" id="generalCard-1">
+                    <div id="baseCard-1" hidden="">btc</div>
+                    <div id="quoteCard-1" hidden="">eur</div>
+                    <div id="deltaCard-1" hidden="">1440</div>
+                        <div class="row">
+                            <div class="col">
+                                <h4 class="text-light">BTCEUR</h4>
+                            </div>
+                            <div class="col-auto text-right" hidden>
+                                <small class="font-italic text-muted" id="marketCard-1">kraken</small>
+                            </div>
+                            <div class="col-auto">
+                                <a class="p-1" href="javascript:closeCard('1');">
+                                    <span class="material-icons text-danger" style="font-size:20px">clear</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto">
+                                <h5 class="text-muted ml-3" id="changeCard-1"></h5>
+                            </div>
+                            <div class="col">
+                                <h4 class="text-right text-muted" id="lastCard-1"></h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
+                                <div class="row-fluid text-muted small" id="highCard-1"><strong>High: </strong></div>
+                                <div class="row-fluid text-muted small" id="lowCard-1"><strong>Low: </strong></div>
+                            </div>
+                            <div class="col">
+                                <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
+                                </div>
+                                <div class="row justify-content-end mr-2 text-muted small" id="volumeCard-1"></div>
+                                <div class="row justify-content-end mr-2 text-muted small" id="volumequoteCard-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        update_values_1()
+                        var runUpdates_1=setInterval(update_values_1,5*1000);
+                    </script>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6 mt-5" id="card-2">
+
+            <div class="row justify-content-center">
+                <div class="col-xl-9 col-lg-10 col-md-7 col-sm-10">
+                    <div class="p-4 my-4 border border-secondary rounded-lg" id="generalCard-2">
+                    <div id="baseCard-2" hidden="">eth</div>
+                    <div id="quoteCard-2" hidden="">eur</div>
+                    <div id="deltaCard-2" hidden="">1440</div>
+                        <div class="row">
+                            <div class="col">
+                                <h4 class="text-light">ETHEUR</h4>
+                            </div>
+                            <div class="col-auto text-right" hidden>
+                                <small class="font-italic text-muted" id="marketCard-2">kraken</small>
+                            </div>
+                            <div class="col-auto">
+                                <a class="p-1" href="javascript:closeCard('2');">
+                                    <span class="material-icons text-danger" style="font-size:20px">clear</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto">
+                                <h5 class="text-muted ml-3" id="changeCard-2"></h5>
+                            </div>
+                            <div class="col">
+                                <h4 class="text-right text-muted" id="lastCard-2"></h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
+                                <div class="row-fluid text-muted small" id="highCard-2"><strong>High: </strong></div>
+                                <div class="row-fluid text-muted small" id="lowCard-2"><strong>Low: </strong></div>
+                            </div>
+                            <div class="col">
+                                <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
+                                </div>
+                                <div class="row justify-content-end mr-2 text-muted small" id="volumeCard-2"></div>
+                                <div class="row justify-content-end mr-2 text-muted small" id="volumequoteCard-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        update_values_2()
+                        var runUpdates_2=setInterval(update_values_2,5*1000);
+                    </script>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6 mt-5" id="chart-left">
+            <div class="row justify-content-end align-items-center no-gutters">
                 <div class="col-auto mr-2 text-light">
                     <div class="dropdown">
                         <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
@@ -427,20 +523,18 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="col-auto d-none d-lg-block" id="icon-expand-chart-left">
-                    <a class="p-1" href="#" onclick="expandChart('chart-left')">
+                    <a class="p-1" href="javascript:expandChart('chart-left');">
                         <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
                     </a>
                 </div>
                 <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-left">
-                    <a class="p-1" href="#" onclick="collapseChart('chart-left')">
+                    <a class="p-1" href="javascript:collapseChart('chart-left');">
                         <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
                     </a>
                 </div>
                 <div class="col-auto" id="icon-close-chart-left">
-                    <a class="p-1" href="#" onclick="closeChart('chart-left')">
+                    <a class="p-1" href="javascript:closeChart('chart-left');">
                         <span class="material-icons text-danger" style="font-size:20px">clear</span>
                     </a>
                 </div>
@@ -448,9 +542,8 @@
             <div id="chartBTC" style="height: 350px;"></div>
             <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, {{btc_candle}}, {{btc_candle_update}})</script>
         </div>
-        <div class="col-lg-6" id="chart-right">
+        <div class="col-lg-6 mt-5" id="chart-right">
             <div class="row justify-content-end align-items-center no-gutters">
-
                 <div class="col-auto mr-2 text-light">
                     <div class="dropdown">
                         <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
@@ -493,19 +586,18 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-auto d-none d-lg-block" id="icon-expand-chart-right">
-                    <a class="p-1" href="#" onclick="expandChart('chart-right')">
+                    <a class="p-1" href="javascript:expandChart('chart-right');">
                         <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
                     </a>
                 </div>
                 <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-right">
-                    <a class="p-1" href="#" onclick="collapseChart('chart-right')">
+                    <a class="p-1" href="javascript:collapseChart('chart-right');">
                         <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
                     </a>
                 </div>
                 <div class="col-auto" id="icon-close-chart-right">
-                    <a class="p-1" href="#" onclick="closeChart('chart-right')">
+                    <a class="p-1" href="javascript:closeChart('chart-right');">
                         <span class="material-icons text-danger" style="font-size:20px">clear</span>
                     </a>
                 </div>

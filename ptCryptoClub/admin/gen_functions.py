@@ -1,7 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord, \
-    Competitions, UsersInCompetitions
+    Competitions, UsersInCompetitions, CompetitionWallet, CompetitionAssets
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -1110,3 +1110,24 @@ def ongoing_competitions(limit=None):
             }
         )
     return to_return
+
+
+def competition_portfolio_value(user_id, compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return {}
+    else:
+        user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=user_id).first()
+        if user_is_in is None:
+            return {}
+        else:
+            current_value = 0
+            available_funds = CompetitionWallet.query.filter_by(user_id=user_id, compt_id=compt_id).first().wallet
+            aaa = CompetitionAssets.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+            for aa in aaa:
+                last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                current_value += last_price * aa.amount
+            current_value += available_funds
+            var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 2)
+            to_return = {"current_value": round(current_value, 2), "pct_change": var_pct}
+            return to_return

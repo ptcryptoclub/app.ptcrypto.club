@@ -18,7 +18,7 @@ from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, car
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
     gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news, get_all_news_source_id, portfolio_chart, \
-    portfolio_data_start_info, portfolio_rank_table, my_competitions, future_competitions, ongoing_competitions
+    portfolio_data_start_info, portfolio_rank_table, my_competitions, future_competitions, ongoing_competitions, competition_portfolio_value
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
@@ -2239,6 +2239,45 @@ def playground_live_home(compt_id):
             return redirect(url_for('playground_home', compt_id=compt_id))
 
 
+@app.route("/playground/<compt_id>/buy/", methods=["POST"])
+@login_required
+def playground_live_buy_asset(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            form = BuyAssetFormCompetition()
+            try:
+                market = str(form.market.data)
+                base = str(form.base.data)
+                quote = str(form.quote.data)
+                amount_to_be_spent = float(form.amount_spent.data)
+            except Exception as e:
+                # noinspection PyArgumentList
+                error_log = ErrorLogs(
+                    route=f'playground live buy asset',
+                    log=str(e).replace("'", "")
+                )
+                db.session.add(error_log)
+                db.session.commit()
+                flash("Something went wrong, please try again later.", "danger")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            print(market)
+            print(base)
+            print(quote)
+            print(amount_to_be_spent)
+            fee_to_be_taken = amount_to_be_spent * compt.buy_fee / 100
+            last_price = get_last_price(base=base, quote=quote, market=market)["price"]
+            asset_to_be_bought = round((amount_to_be_spent - fee_to_be_taken) / last_price, 8)
+            print(last_price)
+            print(fee_to_be_taken)
+            print(asset_to_be_bought)
+            return redirect(url_for("playground_live_home", compt_id=compt_id))
+        else:
+            return redirect(url_for("competitions_home"))
+
+
 @app.route("/playground/<compt_id>/")
 @login_required
 def playground_home(compt_id):
@@ -2256,3 +2295,15 @@ def playground_home(compt_id):
                 "playground-home-archive.html",
                 title="Playground",
             )
+
+
+@app.route("/api/competition/calculate-portfolio/<user_id>/<compt_id>/<api_secret>/")
+def api_competition_calculate_portfolio(user_id, compt_id, api_secret):
+    if SecureApi().validate(api_secret=api_secret, user_id=user_id):
+        return jsonify(
+            competition_portfolio_value(user_id=user_id, compt_id=compt_id)
+        )
+    else:
+        return jsonify(
+            {}
+        )
