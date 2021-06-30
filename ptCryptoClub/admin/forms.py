@@ -134,10 +134,10 @@ class CreateCompetitionForm(FlaskForm):
             fee = float(buy_fee.data)
         except Exception as e:
             print(e)
-            raise ValidationError('Must be a decimal between 0 and 1')
+            raise ValidationError('Must be a number')
         else:
             if fee >= 100:
-                raise ValidationError('Cannot be >= 1')
+                raise ValidationError('Cannot be >= 100')
             elif fee < 0:
                 raise ValidationError('Cannot be negative')
 
@@ -146,10 +146,10 @@ class CreateCompetitionForm(FlaskForm):
             fee = float(sell_fee.data)
         except Exception as e:
             print(e)
-            raise ValidationError('Must be a decimal between 0 and 1')
+            raise ValidationError('Must be a number')
         else:
             if fee >= 100:
-                raise ValidationError('Cannot be >= 1')
+                raise ValidationError('Cannot be >= 100')
             elif fee < 0:
                 raise ValidationError('Cannot be negative')
 

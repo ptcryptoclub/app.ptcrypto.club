@@ -1205,5 +1205,4 @@ def competitions_transactions(user_id, compt_id, limit=None):
     to_return.sort(key=lambda item: item['date_created'], reverse=True)
     for i in to_return:
         i["date_created"] = str(i["date_created"])[:19]
-    print(to_return)
     return to_return
