@@ -2278,6 +2278,9 @@ def playground_live_buy_asset(compt_id):
             if line_wallet.wallet < amount_to_be_spent:
                 flash("There is not enough funds in your wallet", "warning")
                 return redirect(url_for("playground_live_home", compt_id=compt_id))
+            elif amount_to_be_spent <= 0:
+                flash("You need to spend more than that...", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
             else:
                 # noinspection PyArgumentList
                 transaction = CompetitionsTransactionsBuy(
@@ -2330,6 +2333,9 @@ def playground_live_sell_asset(compt_id):
             line_asset = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt_id, asset=base).first()
             if amount_to_be_sold > line_asset.amount:
                 flash("There is not enough funds in your account", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            elif amount_to_be_sold <= 0:
+                flash("You need to sell more than that...", "warning")
                 return redirect(url_for("playground_live_home", compt_id=compt_id))
             else:
                 last_price = get_last_price(base=base, quote=quote, market=market)["price"]
