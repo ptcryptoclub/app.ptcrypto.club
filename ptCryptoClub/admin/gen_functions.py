@@ -1112,7 +1112,7 @@ def ongoing_competitions(limit=None):
     return to_return
 
 
-def competition_portfolio_value(user_id, compt_id):
+def competition_portfolio_value(user_id, compt_id, full_info=False):
     compt = Competitions.query.filter_by(id=compt_id).first()
     if compt is None:
         return {}
@@ -1121,23 +1121,54 @@ def competition_portfolio_value(user_id, compt_id):
         if user_is_in is None:
             return {}
         else:
+            to_return = {}
             current_value = 0
             available_funds = CompetitionWallet.query.filter_by(user_id=user_id, compt_id=compt_id).first().wallet
-            aaa = CompetitionAssets.query.filter_by(user_id=user_id, compt_id=compt_id).all()
-            for aa in aaa:
-                last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
-                current_value += last_price * aa.amount
+            assets_list = CompetitionAssets.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+            aux_list = []
+            for asset_line in assets_list:
+                last_price = get_last_price(market="kraken", base=asset_line.asset, quote="eur")['price']
+                current_value += last_price * asset_line.amount
+                if full_info:
+                    aux_list.append(
+                        {
+                            "asset": asset_line.asset,
+                            "value": round(last_price * asset_line.amount, 2)
+                        }
+                    )
+            if full_info:
+                aux_list.append(
+                    {
+                        "asset": "wallet",
+                        "value": round(available_funds, 2)
+                    }
+                )
+                to_return.update(
+                    {
+                        "breakdown": aux_list
+                    }
+                )
             current_value += available_funds
             var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
-            to_return = {"current_value": round(current_value, 2), "pct_change": var_pct}
+            to_return.update(
+                {"current_value": round(current_value, 2), "pct_change": var_pct}
+            )
             return to_return
 
 
 def competitions_transactions(user_id, compt_id, limit=None):
     to_return = []
-    if limit is None:
+    if limit is None and user_id is None:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(compt_id=compt_id).all()
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(compt_id=compt_id).all()
+    elif limit is None and user_id is not None:
         trans_buy = CompetitionsTransactionsBuy.query.filter_by(user_id=user_id, compt_id=compt_id).all()
         trans_sell = CompetitionsTransactionsSell.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+    elif limit is not None and user_id is None:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(
+            compt_id=compt_id).order_by(CompetitionsTransactionsBuy.date_created.desc()).limit(limit)
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(
+            compt_id=compt_id).order_by(CompetitionsTransactionsSell.date_created.desc()).limit(limit)
     else:
         trans_buy = CompetitionsTransactionsBuy.query.filter_by(
             user_id=user_id, compt_id=compt_id).order_by(CompetitionsTransactionsBuy.date_created.desc()).limit(limit)

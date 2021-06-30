@@ -2185,10 +2185,10 @@ def playground_live_home(compt_id):
                     if eth_candle not in candle_values:
                         eth_candle = default_playground_candle
             user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
-            form_buy = BuyAssetFormCompetition()
-            form_sell = SellAssetFormCompetition()
             if user_is_in is None:
                 # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
                 registered = False
                 available_funds = 0
                 available_assets = []
@@ -2197,6 +2197,8 @@ def playground_live_home(compt_id):
                 transactions = []
             else:
                 # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
                 registered = True
                 available_assets = []
                 current_value = 0
@@ -2206,7 +2208,7 @@ def playground_live_home(compt_id):
                     available_assets.append(
                         {
                             "base": aa.asset,
-                            "amount": aa.amount
+                            "amount": round(aa.amount, 8)
                         }
                     )
                     last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
@@ -2358,6 +2360,159 @@ def playground_live_sell_asset(compt_id):
             return redirect(url_for("competitions_home"))
 
 
+@app.route("/playground/<compt_id>/live/transaction/")
+@login_required
+def playground_live_transactions(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
+                registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                registered = True
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+            return render_template(
+                "playground-transactions-live.html",
+                title="Playground",
+                registered=registered,
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=available_funds,
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                transactions=competitions_transactions(user_id=None, compt_id=compt_id, limit=50)
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/live/hall-of-fame/")
+@login_required
+def playground_live_hall_of_fame(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            hall_of_fame = []
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            all_users = UsersInCompetitions.query.filter_by(competition_id=compt_id).all()
+            for user_ in all_users:
+                info_port = competition_portfolio_value(user_id=user_.user_id, compt_id=compt_id, full_info=True)
+                info_username = User.query.filter_by(id=user_.user_id).first().username
+                trans_buy = CompetitionsTransactionsBuy.query.filter_by(user_id=user_.user_id, compt_id=compt_id).count()
+                trans_sell = CompetitionsTransactionsSell.query.filter_by(user_id=user_.user_id, compt_id=compt_id).count()
+                total_trans = trans_buy + trans_sell
+                total_assets = 0
+                wallet = 0  # INITIALIZE VARIABLE
+                for item in info_port["breakdown"]:
+                    if item["asset"] != "wallet":
+                        total_assets += item["value"]
+                    else:
+                        wallet = item["value"]
+                hall_of_fame.append(
+                    {
+                        "info_username": info_username,
+                        "info_total_trans": total_trans,
+                        "info_total_assets": total_assets,
+                        "info_wallet": wallet,
+                        "info_current_value": info_port["current_value"],
+                        "info_pct_change": info_port["pct_change"],
+                    }
+                )
+            hall_of_fame.sort(key=lambda item: item['info_pct_change'], reverse=True)
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
+                registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                registered = True
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+            return render_template(
+                "playground-hall-of-fame-live.html",
+                title="Playground",
+                registered=registered,
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=available_funds,
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                hall_of_fame=hall_of_fame,
+                date_=str(datetime.utcnow())[:19]
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
 @app.route("/playground/<compt_id>/")
 @login_required
 def playground_home(compt_id):
@@ -2379,7 +2534,7 @@ def playground_home(compt_id):
 
 @app.route("/api/competition/calculate-portfolio/<user_id>/<compt_id>/<api_secret>/")
 def api_competition_calculate_portfolio(user_id, compt_id, api_secret):
-    if SecureApi().validate(api_secret=api_secret, user_id=user_id):
+    if SecureApi().validate(api_secret=api_secret, user_id=user_id, exception=True):
         return jsonify(
             competition_portfolio_value(user_id=user_id, compt_id=compt_id)
         )

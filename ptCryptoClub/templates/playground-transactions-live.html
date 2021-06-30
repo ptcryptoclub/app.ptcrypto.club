@@ -8,12 +8,12 @@
             <div class="row justify-content-start">
                 <div class="col-auto">
                     <small>
-                        <a href="{{url_for('playground_live_home', compt_id=compt_id)}}" class="text-light text-decoration-none">Main</a>
+                        <a href="{{url_for('playground_live_home', compt_id=compt_id)}}" class="text-muted text-decoration-none">Main</a>
                     </small>
                 </div>
                 <div class="col-auto">
                     <small>
-                        <a href="{{url_for('playground_live_transactions', compt_id=compt_id)}}" class="text-muted text-decoration-none">Transactions</a>
+                        <a href="{{url_for('playground_live_transactions', compt_id=compt_id)}}" class="text-light text-decoration-none">Transactions</a>
                     </small>
                 </div>
                 <div class="col-auto">
@@ -29,10 +29,6 @@
 
 
 {% block content %}
-<script src="{{url_for('static', filename='amcharts4/core.js')}}"></script>
-<script src="{{url_for('static', filename='amcharts4/charts.js')}}"></script>
-<script src="{{url_for('static', filename='amcharts4/themes/dark.js')}}"></script>
-<script src="{{url_for('static', filename='amcharts4/themes/animated.js')}}"></script>
 <script src="{{url_for('static', filename='js/playground.js')}}"></script>
 
 <div class="container mt-3 mb-5">
@@ -375,242 +371,14 @@
             </div>
         </div>
     </div>
-    <hr class="border-secondary mt-5">
-    <div class="row align-items-center no-gutters">
-        <div class="col-lg-6 mt-4" id="card-1">
 
-            <div class="row justify-content-center">
-                <div class="col-xl-9 col-lg-10 col-md-7 col-sm-10">
-                    <div class="p-4 my-4 border border-secondary rounded-lg" id="generalCard-1">
-                    <div id="baseCard-1" hidden="">btc</div>
-                    <div id="quoteCard-1" hidden="">eur</div>
-                    <div id="deltaCard-1" hidden="">1440</div>
-                        <div class="row">
-                            <div class="col">
-                                <h4 class="text-light">BTCEUR</h4>
-                            </div>
-                            <div class="col-auto text-right" hidden>
-                                <small class="font-italic text-muted" id="marketCard-1">kraken</small>
-                            </div>
-                            <div class="col-auto">
-                                <a class="p-1" href="javascript:closeCard('1');">
-                                    <span class="material-icons text-danger" style="font-size:20px">clear</span>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto">
-                                <h5 class="text-muted ml-3" id="changeCard-1"></h5>
-                            </div>
-                            <div class="col">
-                                <h4 class="text-right text-muted" id="lastCard-1"></h4>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto">
-                                <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
-                                <div class="row-fluid text-muted small" id="highCard-1"><strong>High: </strong></div>
-                                <div class="row-fluid text-muted small" id="lowCard-1"><strong>Low: </strong></div>
-                            </div>
-                            <div class="col">
-                                <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
-                                </div>
-                                <div class="row justify-content-end mr-2 text-muted small" id="volumeCard-1"></div>
-                                <div class="row justify-content-end mr-2 text-muted small" id="volumequoteCard-1"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                        update_values_1()
-                        var runUpdates_1=setInterval(update_values_1,5*1000);
-                    </script>
-                </div>
-            </div>
-
-        </div>
-        <div class="col-lg-6 mt-4" id="card-2">
-
-            <div class="row justify-content-center">
-                <div class="col-xl-9 col-lg-10 col-md-7 col-sm-10">
-                    <div class="p-4 my-4 border border-secondary rounded-lg" id="generalCard-2">
-                    <div id="baseCard-2" hidden="">eth</div>
-                    <div id="quoteCard-2" hidden="">eur</div>
-                    <div id="deltaCard-2" hidden="">1440</div>
-                        <div class="row">
-                            <div class="col">
-                                <h4 class="text-light">ETHEUR</h4>
-                            </div>
-                            <div class="col-auto text-right" hidden>
-                                <small class="font-italic text-muted" id="marketCard-2">kraken</small>
-                            </div>
-                            <div class="col-auto">
-                                <a class="p-1" href="javascript:closeCard('2');">
-                                    <span class="material-icons text-danger" style="font-size:20px">clear</span>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto">
-                                <h5 class="text-muted ml-3" id="changeCard-2"></h5>
-                            </div>
-                            <div class="col">
-                                <h4 class="text-right text-muted" id="lastCard-2"></h4>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto">
-                                <div class="row-fluid text-muted text-center"><small>Last 24h</small></div>
-                                <div class="row-fluid text-muted small" id="highCard-2"><strong>High: </strong></div>
-                                <div class="row-fluid text-muted small" id="lowCard-2"><strong>Low: </strong></div>
-                            </div>
-                            <div class="col">
-                                <div class="row justify-content-end mr-2 text-muted"><strong><small>Volume:</small></strong>
-                                </div>
-                                <div class="row justify-content-end mr-2 text-muted small" id="volumeCard-2"></div>
-                                <div class="row justify-content-end mr-2 text-muted small" id="volumequoteCard-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                        update_values_2()
-                        var runUpdates_2=setInterval(update_values_2,5*1000);
-                    </script>
-                </div>
-            </div>
-
-        </div>
-        <div class="col-lg-6 mt-4" id="chart-left">
-            <div class="row justify-content-end align-items-center no-gutters">
-                <div class="col-auto mr-2 text-light">
-                    <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            {% if btc_candle == 20 %}
-                            20 seconds
-                            {% elif btc_candle == 60 %}
-                            60 seconds
-                            {% elif btc_candle == 300 %}
-                            05 minutes
-                            {% elif btc_candle == 900 %}
-                            15 minutes
-                            {% elif btc_candle == 1800 %}
-                            30 minutes
-                            {% elif btc_candle == 3600 %}
-                            01 hour
-                            {% else %}
-                            60 seconds
-                            {% endif %}
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=20, eth_candle=eth_candle)}}"><small>20
-                                seconds</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=60, eth_candle=eth_candle)}}"><small>60
-                                seconds</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=300, eth_candle=eth_candle)}}"><small>05
-                                minutes</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=900, eth_candle=eth_candle)}}"><small>15
-                                minutes</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=1800, eth_candle=eth_candle)}}"><small>30
-                                minutes</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, btc_candle=3600, eth_candle=eth_candle)}}"><small>01
-                                hour</small></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-auto d-none d-lg-block" id="icon-expand-chart-left">
-                    <a class="p-1" href="javascript:expandChart('chart-left');">
-                        <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
-                    </a>
-                </div>
-                <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-left">
-                    <a class="p-1" href="javascript:collapseChart('chart-left');">
-                        <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
-                    </a>
-                </div>
-                <div class="col-auto" id="icon-close-chart-left">
-                    <a class="p-1" href="javascript:closeChart('chart-left');">
-                        <span class="material-icons text-danger" style="font-size:20px">clear</span>
-                    </a>
-                </div>
-            </div>
-            <div id="chartBTC" style="height: 350px;"></div>
-            <script>ohlc_chart('chartBTC', 'kraken', 'btc', 'eur', 100, {{btc_candle}}, {{btc_candle_update}})</script>
-        </div>
-        <div class="col-lg-6 mt-4" id="chart-right">
-            <div class="row justify-content-end align-items-center no-gutters">
-                <div class="col-auto mr-2 text-light">
-                    <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle text-light" type="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            {% if eth_candle == 20 %}
-                            20 seconds
-                            {% elif eth_candle == 60 %}
-                            60 seconds
-                            {% elif eth_candle == 300 %}
-                            05 minutes
-                            {% elif eth_candle == 900 %}
-                            15 minutes
-                            {% elif eth_candle == 1800 %}
-                            30 minutes
-                            {% elif eth_candle == 3600 %}
-                            01 hour
-                            {% else %}
-                            60 seconds
-                            {% endif %}
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdownCandles">
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=20, btc_candle=btc_candle)}}"><small>20
-                                seconds</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=60, btc_candle=btc_candle)}}"><small>60
-                                seconds</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=300, btc_candle=btc_candle)}}"><small>05
-                                minutes</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=900, btc_candle=btc_candle)}}"><small>15
-                                minutes</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=1800, btc_candle=btc_candle)}}"><small>30
-                                minutes</small></a>
-                            <a class="dropdown-item text-light small"
-                               href="{{url_for('playground_live_home', compt_id=compt_id, eth_candle=3600, btc_candle=btc_candle)}}"><small>01
-                                hour</small></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-auto d-none d-lg-block" id="icon-expand-chart-right">
-                    <a class="p-1" href="javascript:expandChart('chart-right');">
-                        <span class="material-icons text-success" style="font-size:16px">open_in_full</span>
-                    </a>
-                </div>
-                <div class="col-auto d-none d-lg-block" id="icon-collapse-chart-right">
-                    <a class="p-1" href="javascript:collapseChart('chart-right');">
-                        <span class="material-icons text-warning" style="font-size:16px">close_fullscreen</span>
-                    </a>
-                </div>
-                <div class="col-auto" id="icon-close-chart-right">
-                    <a class="p-1" href="javascript:closeChart('chart-right');">
-                        <span class="material-icons text-danger" style="font-size:20px">clear</span>
-                    </a>
-                </div>
-            </div>
-            <div id="chartETH" style="height: 350px;"></div>
-            <script>ohlc_chart('chartETH', 'kraken', 'eth', 'eur', 100, {{eth_candle}}, {{eth_candle_update}})</script>
-        </div>
-    </div>
+    {% else %}
+    {% endif %}
 
     <div class="mt-5">
         <hr class="border-secondary">
         <div class="row justify-content-end mr-2">
-            <H6><a href="#" class="text-light text-decoration-none">My transactions</a></H6><small><a href="#" class="text-decoration-none ml-2"><i>See all</i></a></small>
+            <H6 class="text-light">Latest transactions</H6><small class="ml-3"><i class="text-info">from all users in the competition</i></small>
         </div>
         <table class="table table-sm table-borderless small mt-3">
             <thead>
@@ -653,8 +421,6 @@
         </table>
     </div>
 
-    {% else %}
-    {% endif %}
 </div>
 
 {% endblock %}
