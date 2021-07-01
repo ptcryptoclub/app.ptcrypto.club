@@ -2376,7 +2376,7 @@ def playground_live_sell_asset(compt_id):
             return redirect(url_for("competitions_home"))
 
 
-@app.route("/playground/<compt_id>/live/transaction/")
+@app.route("/playground/<compt_id>/live/transactions/")
 @login_required
 def playground_live_transactions(compt_id):
     compt = Competitions.query.filter_by(id=compt_id).first()
@@ -2522,6 +2522,44 @@ def playground_live_hall_of_fame(compt_id):
                 compt_name=compt.name,
                 hall_of_fame=hall_of_fame,
                 date_=str(datetime.utcnow())[:19]
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/live/my-transactions/")
+@login_required
+def playground_live_my_transactions(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                registered = False
+                transactions = []
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                registered = True
+                transactions = competitions_transactions(user_id=current_user.id, compt_id=compt_id, limit=None)
+            return render_template(
+                "playground-my-transactions-live.html",
+                title="Playground",
+                registered=registered,
+                compt_id=compt_id,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                transactions=transactions,
+                starting_date_chart=str(compt.start_date - timedelta(days=1))[:19],
+                starting_date=str(compt.start_date)[:19],
+                ending_date_chart=str(compt.end_date + timedelta(days=1))[:19],
+                ending_date=str(compt.end_date)[:19]
             )
         elif datetime.utcnow() < compt.start_date:
             return redirect(url_for('competitions_home'))

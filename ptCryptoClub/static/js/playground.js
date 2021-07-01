@@ -482,3 +482,198 @@ function updateCompetitionPortfolio (user_id, compt_id) {
         }
     );
 }
+
+
+
+function historical_line(divName, base, quote, starting_date_chart, ending_date_chart, trans, starting_date, ending_date) {
+
+
+    
+
+
+    var apiSecret = document.getElementById("APISecret").value;
+
+
+    var nowTime = new Date();
+
+    var end_y = nowTime.getUTCFullYear()
+    var end_m = parseInt(nowTime.getUTCMonth()) + 1
+    var end_d = nowTime.getUTCDate()
+    var end_h = nowTime.getUTCHours()
+    var end_mm = nowTime.getUTCMinutes()
+    var end_s = nowTime.getUTCSeconds()
+
+    var end = ending_date_chart
+    // NOT IN USE //
+    prefix = 30
+    nowTime.setDate(nowTime.getDate() - prefix);
+    var start_y = nowTime.getUTCFullYear()
+    var start_m = parseInt(nowTime.getUTCMonth()) + 1
+    var start_d = nowTime.getUTCDate()
+    var start_h = nowTime.getUTCHours()
+    var start_mm = nowTime.getUTCMinutes()
+    var start_s = nowTime.getUTCSeconds()
+    ////////////////
+
+    var start = starting_date_chart
+
+    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/kraken/900/" + apiSecret + "/?start=" + start + "&end=" + end;
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    // Auto dispose charts
+    am4core.options.autoDispose = true;
+
+    // Create chart
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.padding(0, 15, 0, 15);
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+
+    // Load external data
+    chart.dataSource.url = urlToSend;
+    chart.dataSource.parser = new am4core.JSONParser();
+
+    // Title
+    let title = chart.titles.create();
+    title.text = base.toUpperCase() + quote.toUpperCase();
+    title.fontSize = 16;
+    title.marginBottom = 10;
+
+
+
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.grid.template.location = 0;
+    dateAxis.renderer.ticks.template.length = 8;
+    dateAxis.renderer.ticks.template.strokeOpacity = 0.1;
+    dateAxis.renderer.grid.template.disabled = true;
+    dateAxis.renderer.ticks.template.disabled = false;
+    dateAxis.renderer.ticks.template.strokeOpacity = 0.2;
+    dateAxis.renderer.minLabelPosition = 0.01;
+    dateAxis.renderer.maxLabelPosition = 0.99;
+    dateAxis.keepSelection = true;
+    dateAxis.minHeight = 30;
+    dateAxis.renderer.fontSize = "0.8em";
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.zIndex = 1;
+    valueAxis.renderer.baseGrid.disabled = true;
+    // valueAxis.title.text = base.innerHTML.toUpperCase() + quote.innerHTML.toUpperCase();
+    valueAxis.title.fontSize = "0.8em"
+    valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
+    valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
+    valueAxis.renderer.inside = true;
+    valueAxis.renderer.labels.template.verticalCenter = "bottom";
+    valueAxis.renderer.labels.template.padding(2, 2, 2, 2);
+    valueAxis.renderer.grid.template.disabled = true;
+
+    valueAxis.renderer.fontSize = "0.8em"
+
+    valueAxis.extraMin = 0.02;
+    valueAxis.extraMax = 0.02;
+
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "closeprice";
+    // series.tooltipText = "{valueY.value}";
+    series.defaultState.transitionDuration = 0;
+    series.fillOpacity = 0.2;
+
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.snapToSeries = series;
+    chart.cursor.behavior = "zoomX"
+
+    // vertical line to show competiton start date
+    function createEvent(date, text, color) {
+        var flag = new am4plugins_bullets.FlagBullet();
+        
+        flag.label.text = text;
+        flag.label.horizontalCenter = "middle";
+        flag.label.fontSize = 14;
+        
+        flag.pole.stroke = color;
+        flag.pole.strokeWidth = 2;
+        
+        flag.background.waveLength = 15;
+        flag.background.fill = color;
+        flag.background.stroke = color;
+        flag.background.strokeWidth = 2;
+        flag.background.fillOpacity = 0.6;
+        
+        var event = dateAxis.axisRanges.create();
+        event.date = date;
+        event.bullet = flag;
+        event.grid.strokeWidth = 0;
+        
+      }
+    createEvent(new Date(starting_date), "Start", am4core.color("#00c43b"));
+    createEvent(new Date(ending_date), "End", am4core.color("#c40000"));
+
+
+
+
+
+    function createDot(data, color, type_, price_, amountSpent_,amountAsset_, date_) {
+        var trend = chart.series.push(new am4charts.LineSeries());
+        trend.dataFields.valueY = "closeprice";
+        trend.dataFields.dateX = "date";
+        
+        trend.stroke = trend.fill = am4core.color(color);
+        trend.data = data;
+        
+        trend.strokeWidth = 0
+
+        var bullet = trend.bullets.push(new am4charts.CircleBullet());
+        
+        bullet.strokeWidth = 2;
+        bullet.stroke = am4core.color(color)
+        bullet.circle.fill = trend.stroke;
+        
+        // series.tooltip.background.propertyFields.stroke = am4core.color(color);
+      
+        var hoverState = bullet.states.create("hover");
+        hoverState.properties.scale = 1.7;
+
+        bullet.circle.hoverable = true;
+        bullet.circle.events.on("over", function(ev) {
+            if (type_ == "Buy") {
+                series.tooltipText = "Type: " + type_ + "\n" + "Amount spent: " + numberFormat(amountSpent_) + " " + quote.toUpperCase() + "\n" + "Price: " + numberFormat(price_) + " " + quote.toUpperCase() + "\n" + "Asset bought: " + numberFormat(amountAsset_) + " " + base.toUpperCase() + "\n" + "Date: " + date_;
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.background.fill = am4core.color(color);
+            } else {
+                series.tooltipText = "Type: " +  type_ + "\n" + "Amount sold: " + numberFormat(amountAsset_) + " " + base.toUpperCase() + "\n" + "Price: " + numberFormat(price_) + " " + quote.toUpperCase() + "\n" + "Amount net: " + numberFormat(amountSpent_) + " " + quote.toUpperCase() + "\n" + "Date: " + date_;
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.background.fill = am4core.color(color);
+            }
+            
+        })
+        bullet.circle.events.on("out", function(ev) {
+            series.tooltipText = "";
+          })
+
+
+    };
+
+
+    chart.dataSource.events.on("done", function (ev) {
+
+        
+        for (let i = 0; i < trans.length; i++) {
+            if (trans[i]['base'] == base) {
+                if (trans[i]['type'] == 'buy') {
+                    createDot([{ "date": trans[i]['date_created'], "closeprice": trans[i]['asset_price'] }], "#00c43b", "Buy", trans[i]['asset_price'], trans[i]['amount_gross'], trans[i]['asset_amount'], trans[i]['date_created'])
+                } else {
+                    createDot([{ "date": trans[i]['date_created'], "closeprice": trans[i]['asset_price'] }], "#c40000", "Sell", trans[i]['asset_price'], trans[i]['amount_net'], trans[i]['asset_amount'], trans[i]['date_created'])
+                }
+                
+            }
+            
+          } 
+
+    });
+
+    
+}

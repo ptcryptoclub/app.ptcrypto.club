@@ -1180,10 +1180,10 @@ def competitions_transactions(user_id, compt_id, limit=None):
                 "date_created": line.date_created,
                 "base": line.base,
                 "quote": line.quote,
-                "amount_gross": line.amount_gross,
+                "amount_gross": round(line.amount_gross, 2),
                 "fee": line.fee,
-                "amount_net": line.amount_net,
-                "asset_price": line.asset_price,
+                "amount_net": round(line.amount_net, 2),
+                "asset_price": round(line.asset_price, 2),
                 "asset_amount": line.asset_amount,
                 "type": "buy"
             }
@@ -1194,10 +1194,10 @@ def competitions_transactions(user_id, compt_id, limit=None):
                 "date_created": line.date_created,
                 "base": line.base,
                 "quote": line.quote,
-                "amount_gross": line.amount_gross,
+                "amount_gross": round(line.amount_gross, 2),
                 "fee": line.fee,
-                "amount_net": line.amount_net,
-                "asset_price": line.asset_price,
+                "amount_net": round(line.amount_net, 2),
+                "asset_price": round(line.asset_price, 2),
                 "asset_amount": line.asset_amount,
                 "type": "sell"
             }
