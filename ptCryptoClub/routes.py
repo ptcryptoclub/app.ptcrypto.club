@@ -2068,12 +2068,19 @@ def competition_details_home(compt_id):
             filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
             if filter_ is not None:
                 already_in = True
+        print("max users:", compt.max_users)
+        print("Users already in:", UsersInCompetitions.query.filter_by(competition_id=compt_id).count())
+        if UsersInCompetitions.query.filter_by(competition_id=compt_id).count() < compt.max_users:
+            fully_booked = False
+        else:
+            fully_booked = True
         return render_template(
             "competitions-detail.html",
             title="Competitions",
             competition=compt,
             already_in=already_in,
-            status=status
+            status=status,
+            fully_booked=fully_booked
         )
 
 
@@ -2084,6 +2091,9 @@ def competition_join(compt_id):
     if compt is None:
         return redirect(url_for("competitions_home"))
     else:
+        if UsersInCompetitions.query.filter_by(competition_id=compt_id).count() >= compt.max_users:
+            flash("This competition is now fully booked.", "warning")
+            return redirect(url_for("competitions_home"))
         filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
         if filter_ is not None:
             if compt.start_date < datetime.utcnow() < compt.end_date:
