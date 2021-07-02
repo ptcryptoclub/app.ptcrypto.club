@@ -2241,7 +2241,7 @@ def playground_live_home(compt_id):
                 compt_id=compt_id,
                 form_buy=form_buy,
                 form_sell=form_sell,
-                available_funds=available_funds,
+                available_funds=round(available_funds, 2),
                 available_assets=available_assets,
                 current_value=round(current_value, 2),
                 var_pct=var_pct,
@@ -2289,7 +2289,7 @@ def playground_live_buy_asset(compt_id):
             last_price = get_last_price(base=base, quote=quote, market=market)["price"]
             asset_to_be_bought = round((amount_to_be_spent - fee_to_be_taken) / last_price, 8)
             line_wallet = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt_id).first()
-            if line_wallet.wallet < amount_to_be_spent:
+            if round(line_wallet.wallet, 2) < amount_to_be_spent:
                 flash("There is not enough funds in your wallet", "warning")
                 return redirect(url_for("playground_live_home", compt_id=compt_id))
             elif amount_to_be_spent <= 0:
@@ -2312,6 +2312,7 @@ def playground_live_buy_asset(compt_id):
                 line_asset = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt_id, asset=base).first()
                 line_asset.amount += asset_to_be_bought
                 line_wallet.wallet -= amount_to_be_spent
+                line_wallet.wallet = round(line_wallet.wallet, 2)
                 db.session.commit()
                 return redirect(url_for("playground_live_home", compt_id=compt_id))
         else:
@@ -2372,7 +2373,9 @@ def playground_live_sell_asset(compt_id):
                 )
                 db.session.add(transaction)
                 line_asset.amount -= amount_to_be_sold
+                line_asset.amount = round(line_asset.amount, 8)
                 line_wallet.wallet += amount_net
+                line_wallet.wallet = round(line_wallet.wallet, 2)
                 db.session.commit()
                 return redirect(url_for("playground_live_home", compt_id=compt_id))
         else:
@@ -2425,7 +2428,7 @@ def playground_live_transactions(compt_id):
                 compt_id=compt_id,
                 form_buy=form_buy,
                 form_sell=form_sell,
-                available_funds=available_funds,
+                available_funds=round(available_funds, 2),
                 available_assets=available_assets,
                 current_value=round(current_value, 2),
                 var_pct=var_pct,
@@ -2514,7 +2517,7 @@ def playground_live_hall_of_fame(compt_id):
                 compt_id=compt_id,
                 form_buy=form_buy,
                 form_sell=form_sell,
-                available_funds=available_funds,
+                available_funds=round(available_funds, 2),
                 available_assets=available_assets,
                 current_value=round(current_value, 2),
                 var_pct=var_pct,
@@ -2544,10 +2547,33 @@ def playground_live_my_transactions(compt_id):
             user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
             if user_is_in is None:
                 # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
                 registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
                 transactions = []
             else:
                 # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
                 registered = True
                 transactions = competitions_transactions(user_id=current_user.id, compt_id=compt_id, limit=None)
             return render_template(
@@ -2555,6 +2581,14 @@ def playground_live_my_transactions(compt_id):
                 title="Playground",
                 registered=registered,
                 compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=round(available_funds, 2),
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
                 amount_quote=compt.amount_quote,
                 days_to_trade=(compt.end_date - datetime.utcnow()).days,
                 users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),

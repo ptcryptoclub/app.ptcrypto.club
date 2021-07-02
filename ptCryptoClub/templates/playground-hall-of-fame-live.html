@@ -11,9 +11,16 @@
                         <a href="{{url_for('playground_live_home', compt_id=compt_id)}}" class="text-muted text-decoration-none">Main</a>
                     </small>
                 </div>
+                {% if registered %}
                 <div class="col-auto">
                     <small>
-                        <a href="{{url_for('playground_live_transactions', compt_id=compt_id)}}" class="text-muted text-decoration-none">Transactions</a>
+                        <a href="{{url_for('playground_live_my_transactions', compt_id=compt_id)}}" class="text-muted text-decoration-none">My transactions</a>
+                    </small>
+                </div>
+                {% endif %}
+                <div class="col-auto">
+                    <small>
+                        <a href="{{url_for('playground_live_transactions', compt_id=compt_id)}}" class="text-muted text-decoration-none">All transactions</a>
                     </small>
                 </div>
                 <div class="col-auto">
@@ -373,6 +380,11 @@
     </div>
 
     {% else %}
+
+    <div class="container mt-3">
+        <h3 class="text-info text-center p-5 m-5">You haven't joined this competition!</h3>
+    </div>
+
     {% endif %}
 
     <div class="mt-5">

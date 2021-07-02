@@ -494,30 +494,7 @@ function historical_line(divName, base, quote, starting_date_chart, ending_date_
     var apiSecret = document.getElementById("APISecret").value;
 
 
-    var nowTime = new Date();
-
-    var end_y = nowTime.getUTCFullYear()
-    var end_m = parseInt(nowTime.getUTCMonth()) + 1
-    var end_d = nowTime.getUTCDate()
-    var end_h = nowTime.getUTCHours()
-    var end_mm = nowTime.getUTCMinutes()
-    var end_s = nowTime.getUTCSeconds()
-
-    var end = ending_date_chart
-    // NOT IN USE //
-    prefix = 30
-    nowTime.setDate(nowTime.getDate() - prefix);
-    var start_y = nowTime.getUTCFullYear()
-    var start_m = parseInt(nowTime.getUTCMonth()) + 1
-    var start_d = nowTime.getUTCDate()
-    var start_h = nowTime.getUTCHours()
-    var start_mm = nowTime.getUTCMinutes()
-    var start_s = nowTime.getUTCSeconds()
-    ////////////////
-
-    var start = starting_date_chart
-
-    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/kraken/900/" + apiSecret + "/?start=" + start + "&end=" + end;
+    urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/kraken/900/" + apiSecret + "/?start=" + starting_date_chart + "&end=" + ending_date_chart;
 
     // Themes begin
     am4core.useTheme(am4themes_dark);
@@ -531,6 +508,7 @@ function historical_line(divName, base, quote, starting_date_chart, ending_date_
     var chart = am4core.create(divName, am4charts.XYChart);
     chart.padding(0, 15, 0, 15);
     chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    
 
     // Load external data
     chart.dataSource.url = urlToSend;
@@ -556,13 +534,14 @@ function historical_line(divName, base, quote, starting_date_chart, ending_date_
     dateAxis.keepSelection = true;
     dateAxis.minHeight = 30;
     dateAxis.renderer.fontSize = "0.8em";
+    dateAxis.tooltip.disabled = true;
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.tooltip.disabled = true;
     valueAxis.zIndex = 1;
     valueAxis.renderer.baseGrid.disabled = true;
-    // valueAxis.title.text = base.innerHTML.toUpperCase() + quote.innerHTML.toUpperCase();
-    valueAxis.title.fontSize = "0.8em"
+    valueAxis.title.text = base.toUpperCase() + quote.toUpperCase();
+    valueAxis.title.fontSize = "0.7em"
     valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
     valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
     valueAxis.renderer.inside = true;
@@ -572,19 +551,20 @@ function historical_line(divName, base, quote, starting_date_chart, ending_date_
 
     valueAxis.renderer.fontSize = "0.8em"
 
-    valueAxis.extraMin = 0.02;
-    valueAxis.extraMax = 0.02;
+    valueAxis.extraMin = 0.01;
+    valueAxis.extraMax = 0.01;
 
     var series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.dateX = "date";
     series.dataFields.valueY = "closeprice";
     // series.tooltipText = "{valueY.value}";
     series.defaultState.transitionDuration = 0;
-    series.fillOpacity = 0.2;
+    series.fillOpacity = 0.1;
 
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.snapToSeries = series;
     chart.cursor.behavior = "zoomX"
+    chart.cursor.lineY.disabled = true;
 
     // vertical line to show competiton start date
     function createEvent(date, text, color) {
