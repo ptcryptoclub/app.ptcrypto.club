@@ -34,7 +34,7 @@ from ptCryptoClub.admin.stats import UsageStats
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=2)
+    app.permanent_session_lifetime = timedelta(minutes=15)
 
 
 @app.template_filter()
