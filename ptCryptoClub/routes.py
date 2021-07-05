@@ -93,12 +93,14 @@ def home():
         form_sell.market_sell.choices = markets_choices
         available_funds = get_available_amount(current_user.id)
         available_assets = get_available_assets(current_user.id)
+        my_comp = my_competitions(user_id=current_user.id, limit=None)
     else:
         total_portfolio = {}
         form_buy = None
         form_sell = None
         available_funds = 0
         available_assets = []
+        my_comp = []
     return render_template(
         "index.html",
         title="Home",
@@ -114,7 +116,8 @@ def home():
         delta=delta,
         number_days_buy_sell=default_number_days_buy_sell,
         fiats_data=gen_fiats(delta=delta),
-        available_deltas=available_deltas
+        available_deltas=available_deltas,
+        my_competitions=my_comp
     )
 
 
