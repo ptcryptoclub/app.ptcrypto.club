@@ -34,7 +34,7 @@ from ptCryptoClub.admin.stats import UsageStats
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=15)
+    app.permanent_session_lifetime = timedelta(minutes=2)
 
 
 @app.template_filter()
@@ -230,6 +230,7 @@ def login():
                         mfa = False
                 if mfa:
                     if totp.verify(given_code):
+                        next_ = request.args.get('next')
                         login_user(user, remember=False)
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -237,7 +238,7 @@ def login():
                                         status=True)
                         db.session.add(log)
                         db.session.commit()
-                        return redirect(url_for('first_time_pin_change'))
+                        return redirect(url_for('first_time_pin_change', next=next_))
                     else:
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -253,6 +254,7 @@ def login():
                         )
                 else:
                     if bcrypt.check_password_hash(mfa_active.r_pin, given_code):
+                        next_ = request.args.get('next')
                         login_user(user, remember=False)
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -260,7 +262,7 @@ def login():
                                         status=True)
                         db.session.add(log)
                         db.session.commit()
-                        return redirect(url_for('first_time_pin_change'))
+                        return redirect(url_for('first_time_pin_change', next=next_))
                     else:
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -897,12 +899,20 @@ def activate_2fa_confirmation(hash, user_id):
 @app.route("/A9hQDxZeu3Yc03rSaaMepCpCQDYc03urSqFxZqFaaM9h/", methods=["GET", "POST"])
 @login_required
 def first_time_pin_change():
+    next_ = request.args.get('next')
+    print(next_)
     test = MFA.query.filter_by(user_id=current_user.id).first()
     if test is None:
-        return redirect(url_for("portfolio"))
+        if next_ is None:
+            return redirect(url_for("portfolio"))
+        else:
+            return redirect(next_)
     else:
         if not test.first_login:
-            return redirect(url_for("portfolio"))
+            if next_ is None:
+                return redirect(url_for("portfolio"))
+            else:
+                return redirect(next_)
         else:
             form = FirstPinLogin()
             if form.validate_on_submit():
