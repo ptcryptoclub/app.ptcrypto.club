@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<!--
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">Link 1</a>
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">link 2</a>
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">Link 3</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    {% if current_user.is_authenticated %}
+    <div class="row justify-content-end mr-2 mb-3">
+        <H6><a href="#" class="text-light text-decoration-none">My competitions</a></H6><small class="ml-3"><a href="#" class="text-decoration-none">See all</a></small>
+    </div>
+    {% if my_competitions.__len__() == 0 %}
+    <div class="text-muted text-center">
+        You didn't join any competition yet, please see below for future and ongoing competitions.
+    </div>
+    {% else %}
+    <table class="table table-borderless table-sm small mt-2">
+        <thead class="text-light">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col" class="d-none d-sm-table-cell">Amount</th>
+            <th scope="col" class="d-none d-sm-none d-md-table-cell">Fee buy</th>
+            <th scope="col" class="d-none d-sm-none d-md-table-cell">Fee sell</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody class="text-muted">
+        {% for line in my_competitions %}
+        {% if line.status == "live" %}
+        {% set az = 'success' %}
+        {% elif line.status == "past" %}
+        {% set az = 'danger' %}
+        {% else %}
+        {% set az = '' %}
+        {% endif %}
+        <tr class="text-{{az}}">
+            <td>{{line.name}}</td>
+            <td>{{line.start_date}}</td>
+            <td>{{line.end_date}}</td>
+            <td class="d-none d-sm-table-cell">{{line.start_amount | numberFormat}} <small>{{line.amount_quote.upper()}}</small>
+            </td>
+            <td class="d-none d-sm-none d-md-table-cell">{{line.buy_fee}}%</td>
+            <td class="d-none d-sm-none d-md-table-cell">{{line.sell_fee}}%</td>
+            {% if line.status == "live" or line.status == "past" %}
+            <td scope="col">
+                <a href="{{url_for('playground_home', compt_id=line.id)}}" class="text-decoration-none text-info">
+                    <span class="material-icons" style="font-size:20px">insights</span>
+                </a>
+            </td>
+            {% else %}
+            <td>
+                <a href="{{url_for('competition_details_home', compt_id=line.id)}}" class="text-decoration-none text-info">
+                    <span class="material-icons" style="font-size:20px">info</span>
+                </a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    {% endif %}
+
+    <div class="row justify-content-end mr-2 mt-5 mb-3">
+        <H6><a href="#" class="text-light text-decoration-none">Future competitions</a></H6><small class="ml-3"><a href="#" class="text-decoration-none">See all</a></small>
+    </div>
+    {% if future_competitions.__len__() == 0 %}
+    <div class="text-muted text-center">
+        There is no schedule competitions.
+    </div>
+    {% else %}
+    <table class="table table-borderless table-sm small mt-2">
+        <thead class="text-light">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col" class="d-none d-sm-table-cell">Amount</th>
+            <th scope="col" class="d-none d-sm-none d-md-table-cell">Fee buy</th>
+            <th scope="col" class="d-none d-sm-none d-md-table-cell">Fee sell</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody class="text-muted">
+        {% for line in future_competitions %}
+        <tr>
+            <td>{{line.name}}</td>
+            <td>{{line.start_date}}</td>
+            <td>{{line.end_date}}</td>
+            <td class="d-none d-sm-table-cell">{{line.start_amount | numberFormat}} <small>{{line.amount_quote.upper()}}</small>
+            </td>
+            <td class="d-none d-sm-none d-md-table-cell">{{line.buy_fee}}%</td>
+            <td class="d-none d-sm-none d-md-table-cell">{{line.sell_fee}}%</td>
+            <td>
+                <a href="{{url_for('competition_details_home', compt_id=line.id)}}" class="text-decoration-none text-info">
+                    <span class="material-icons" style="font-size:20px">info</span>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+
+    <div class="row justify-content-end mr-2 mt-5 mb-3">
+        <H6><a href="#" class="text-light text-decoration-none">Ongoing competitions</a></H6><small class="ml-3"><a href="#" class="text-decoration-none">See all</a></small>
+    </div>
+    {% if ongoing_competitions.__len__() == 0 %}
+    <div class="text-muted text-center">
+        There is no ongoing competitions.
+    </div>
+    {% else %}
+    <table class="table table-borderless table-sm small mt-2">
+        <thead class="text-light">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col" class="d-none d-sm-table-cell">Amount</th>
+            <th scope="col" class="d-none d-sm-none d-md-table-cell">Fee buy</th>
+            <th scope="col" class="d-none d-sm-none d-md-table-cell">Fee sell</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody class="text-muted">
+        {% for line in ongoing_competitions %}
+        <tr>
+            <td>{{line.name}}</td>
+            <td>{{line.start_date}}</td>
+            <td>{{line.end_date}}</td>
+            <td class="d-none d-sm-table-cell">{{line.start_amount | numberFormat}} <small>{{line.amount_quote.upper()}}</small>
+            </td>
+            <td class="d-none d-sm-none d-md-table-cell">{{line.buy_fee}}%</td>
+            <td class="d-none d-sm-none d-md-table-cell">{{line.sell_fee}}%</td>
+            <td>
+                <a href="{{url_for('playground_home', compt_id=line.id)}}" class="text-decoration-none text-info">
+                    <span class="material-icons" style="font-size:20px">insights</span>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+{% endblock %}

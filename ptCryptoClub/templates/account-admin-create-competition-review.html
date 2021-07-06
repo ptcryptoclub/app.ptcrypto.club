@@ -1,0 +1,162 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-muted text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="{{url_for('account_admin')}}"
+                                                class="text-muted text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-3">
+    <div class="row justify-content-end mr-2 mb-3">
+        <H6 class="text-light text-decoration-none">Review competition</H6>
+    </div>
+    <div class="row align-items-end justify-content-center">
+        <div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 col-12">
+            <table class="table table-borderless mt-2 text-muted h5">
+                <tbody>
+                <tr>
+                    <th scope="row">Name</th>
+                    <td>{{info.name}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Start date</th>
+                    <td>{{info.start_date}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">End date</th>
+                    <td>{{info.end_date}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Amount</th>
+                    <td>{{info.start_amount | numberFormat}} <small>{{info.amount_quote.upper()}}</small></td>
+                </tr>
+                <tr>
+                    <th scope="row">Buy fee</th>
+                    <td>{{info.buy_fee}}%</td>
+                </tr>
+                <tr>
+                    <th scope="row">Sell fee</th>
+                    <td>{{info.sell_fee}}%</td>
+                </tr>
+                <tr>
+                    <th scope="row">Max users</th>
+                    {% if info.max_users is none %}
+                    <td class="text-success">No limit</td>
+                    {% else %}
+                    <td class="text-warning">{{info.max_users | numberFormat}}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <th scope="row">Users</th>
+                    {% if info.type_users is none %}
+                    <td class="text-success">All users</td>
+                    {% else %}
+                    <td class="text-warning">{{info.type_users}}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <th scope="row">Send email</th>
+                    {% if info.send_email %}
+                    <td class="text-success">Yes</td>
+                    {% else %}
+                    <td class="text-warning">No</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <th scope="row">Live</th>
+                    {% if info.is_live %}
+                    <td class="text-success">Yes</td>
+                    {% else %}
+                    <td class="text-warning">No</td>
+                    {% endif %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xl col-lg col-md col-sm-12 col-12">
+            <div class="row justify-content-center">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-12 mt-xl-5 mt-lg-5 mt-md-5 mt-sm-5 mt-5 text-center">
+                    {% if info.is_live %}
+                    <a class="btn btn-lg btn-block btn-success mb-5 disabled" href="#" role="button">Go live</a>
+                    {% else %}
+                    <a class="btn btn-lg btn-block btn-success mb-5" data-toggle="collapse" href="#go-live-submit"
+                       role="button" aria-expanded="false" aria-controls="go-live-submit">
+                        Go live
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-6 mt-xl-5 mt-lg-5 mt-md-0 mt-sm-5 mt-0 text-center">
+                    {% if info.is_live %}
+                    <a class="btn btn-lg btn-block btn-warning mb-5 disabled" href="#" role="button">Edit</a>
+                    {% else %}
+                    <a class="btn btn-lg btn-block btn-warning mb-5"
+                       href="{{url_for('account_admin_create_competition', edit=comp_id)}}" role="button">Edit</a>
+                    {% endif %}
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-6 mt-xl-5 mt-lg-5 mt-md-0 mt-sm-5 mt-0 text-center">
+                    {% if info.is_live %}
+                    <a class="btn btn-lg btn-block btn-danger mb-5 disabled" href="#" role="button">Delete</a>
+                    {% else %}
+                    <a class="btn btn-lg btn-block btn-danger mb-5"
+                       href="{{url_for('account_admin_create_competition_delete', comp_id=info.id)}}" role="button">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="collapse" id="go-live-submit">
+        <div class="border border-info rounded-lg p-3">
+            <div class="text-info">
+                <strong>Please note</strong>: After a competition is live, you won't be able to <u>edit or delete</u> it and it will be visible to users.
+            </div>
+            <div class="row">
+                <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-12">
+                    <form class="" action="" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-row mt-3">
+                    <div class="col-xl-4 col-lg-4 col-md-5 col-sm-5 col-4">
+                        {% if form.pin.errors %}
+                        {{ form.pin(class="form-control bg-dark text-light is-invalid", autocomplete="off", value="", placeholder="2FA*") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.pin.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.pin(class="form-control bg-dark text-light border-0", autocomplete="off",
+                        placeholder="2FA*", value="", maxlength="6") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-xl col-lg col-md col-sm col-8">
+                        {{ form.submit_4(class="btn btn-block btn-success mb-5") }}
+                    </div>
+                </div>
+            </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

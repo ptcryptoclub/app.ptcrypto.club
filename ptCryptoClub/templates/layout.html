@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fontisto@v3.0.4/css/fontisto/fontisto.min.css">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/fav.ico') }}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/custom.css')}}">
     <script src="{{url_for('static', filename='js/generic.js')}}"></script>
@@ -19,7 +20,7 @@
 
 
 <div class="container border-light border-bottom">
-    <nav class="navbar navbar-expand-md navbar-dark" style="background-color: #000000;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000000;">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="material-icons">apps</span>
@@ -109,6 +110,15 @@
                 {% endif %}
                 <li class="nav-item">
                     <a class="nav-link {{active}}" href="{{url_for('historical_charts_line')}}">Historical data</a>
+                </li>
+
+                {% if title == "Competitions" %}
+                {% set active = "active" %}
+                {% else %}
+                {% set active = "" %}
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {{active}}" href="{{url_for('competitions_home')}}">Competitions</a>
                 </li>
 
                 {% if title == "About" %}

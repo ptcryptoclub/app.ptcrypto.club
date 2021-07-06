@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto"><small><a href="{{url_for('account_user')}}"
+                                                class="text-muted text-decoration-none">User</a></small></div>
+                <div class="col-auto"><small><a href="{{url_for('portfolio')}}" class="text-muted text-decoration-none">Portfolio</a></small>
+                </div>
+                {% if current_user.email in admins_emails %}
+                <div class="col-auto"><small><a href="{{url_for('account_admin')}}"
+                                                class="text-muted text-decoration-none">Admin</a></small>
+                </div>
+                {% endif %}
+                <div class="col-auto"><small><a href="{{url_for('logout')}}" class="text-danger text-decoration-none">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-3">
+    <div class="row justify-content-end mr-2 mb-3">
+        <H6 class="text-light text-decoration-none">Create competition</H6>
+    </div>
+    <div class="mb-5">
+        <form method="POST" action="{{url_for('account_admin_create_competition', edit=request.args.get('edit'))}}">
+            {{ form.hidden_tag() }}
+            <div class="form-row">
+                <div class="col-xl-8 col-lg-7 col-md-6">
+                    <label for="name" class="text-muted">Competition name</label>
+                    {% if form.name.errors %}
+                    {{ form.name(class="form-control bg-dark text-light border-0 is-invalid", placeholder="This name will be visible to users", autocomplete="off") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.name(class="form-control bg-dark text-light border-0", placeholder="This name will be visible to users", autocomplete="off") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl col-lg col-md mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+                    <div class="form-row">
+                        <div class="col">
+                            <label for="start_date" class="text-muted">Start date</label>
+                            {% if form.start_date.errors %}
+                            {{ form.start_date(class="bg-dark text-light border border-dark rounded-lg form-control  is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.start_date.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.start_date(class="bg-dark text-light border border-dark rounded-lg form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <label for="end_date" class="text-muted">End date</label>
+                            {% if form.end_date.errors %}
+                            {{ form.end_date(class="bg-dark text-light border border-dark rounded-lg form-control  is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.end_date.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.end_date(class="bg-dark text-light border border-dark rounded-lg form-control") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row mt-3">
+                <div class="col-xl-7 col-lg-6 col-md-5 col-sm-12 col-12">
+                    <label for="amount" class="text-muted">Initial amount</label>
+                    {% if form.amount.errors %}
+                    {{ form.amount(class="form-control bg-dark text-light border-0 is-invalid", placeholder="All users will have this amount to start with", autocomplete="off") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.amount.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.amount(class="form-control bg-dark text-light border-0", placeholder="All users will have this amount to start with", autocomplete="off") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl-1 col-lg-2 col-md-2 col-sm-auto col-auto mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+                    <label for="quote" class="text-muted">Quote</label>
+                    {% if form.quote.errors %}
+                    {{ form.quote(class="custom-select bg-dark border border-dark text-light is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.quote.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.quote(class="custom-select bg-dark border border-dark text-light") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl col-lg col-md col-sm col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+                    <label for="buy_fee" class="text-muted">Buy fee (%)</label>
+                    {% if form.buy_fee.errors %}
+                    {{ form.buy_fee(class="form-control bg-dark text-light border-0 is-invalid", placeholder="", autocomplete="off") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.buy_fee.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.buy_fee(class="form-control bg-dark text-light border-0", placeholder="", autocomplete="off") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl col-lg col-md col-sm col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+                    <label for="sell_fee" class="text-muted">Sell fee (%)</label>
+                    {% if form.sell_fee.errors %}
+                    {{ form.sell_fee(class="form-control bg-dark text-light border-0 is-invalid", placeholder="", autocomplete="off") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.sell_fee.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.sell_fee(class="form-control bg-dark text-light border-0", placeholder="", autocomplete="off") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-row mt-3">
+                <div class="col-xl-4 col-lg-5 col-md-6 col-sm-12 col-12">
+                    <label for="max_users" class="text-muted">Users limit</label>
+                    {% if form.max_users.errors %}
+                    {{ form.max_users(class="form-control bg-dark text-light border-0 is-invalid", placeholder="This will limit the number of users", autocomplete="off") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.max_users.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.max_users(class="form-control bg-dark text-light border-0", placeholder="This will limit the number of users", autocomplete="off") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl-1 col-lg-2 col-md-2 col-sm-auto col-auto mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+                    <label for="users" class="text-muted">Users type</label>
+                    {% if form.users.errors %}
+                    {{ form.users(class="custom-select bg-dark border border-dark text-light is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.users.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.users(class="custom-select bg-dark border border-dark text-light") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl col-lg col-md col-sm col ml-xl-4 ml-lg-4 ml-md-4 ml-sm-4 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3 align-self-center">
+                    <div class="form-check">
+                        {{ form.p_email(class="form-check-input") }}
+                        <label class="form-check-label text-muted" for="p_email">Promotional email</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row mt-5 justify-content-center">
+                <div class="col-xl-5 col-lg-5 col-md-7 col-sm-9 col-12">
+                    {% if not request.args.get('edit') %}
+                    {{ form.submit(class="btn btn-block btn-success text-light mt-4") }}
+                    {% else %}
+                    {{ form.submit_2(class="btn btn-block btn-success text-light mt-4") }}
+                    {% endif %}
+                </div>
+                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-6">
+                    {% if not request.args.get('edit') %}
+                    <a class="btn btn-block btn-danger text-light mt-4" href="{{url_for('account_admin')}}" role="button">Cancel</a>
+                    {% else %}
+                    <a class="btn btn-block btn-danger text-light mt-4" href="{{url_for('account_admin')}}" role="button">Discard</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

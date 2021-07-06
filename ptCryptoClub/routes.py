@@ -10,21 +10,24 @@ import os
 from ptCryptoClub import app, db, bcrypt
 from ptCryptoClub.admin.config import admins_emails, default_delta, default_latest_transactions, default_last_x_hours, default_datapoints, \
     candle_options, default_candle, QRCode, default_transaction_fee, qr_code_folder, default_number_days_buy_sell, available_deltas, \
-    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes
+    CloudWatchLogin, default_fiat, default_news_per_page, mfa_routes, default_playground_candle, candle_values, default_assets_competitions
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, \
-    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests
+    ResetPasswordAuthorizations, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, Competitions, UsersInCompetitions, \
+    CompetitionWallet, CompetitionAssets, CompetitionsTransactionsBuy, CompetitionsTransactionsSell
 from ptCryptoClub.admin.gen_functions import get_all_markets, get_all_pairs, card_generic, table_latest_transactions, hide_ip, get_last_price, \
     get_pairs_for_portfolio_dropdown, get_quotes_for_portfolio_dropdown, get_available_amount, get_available_amount_sell, get_ptcc_transactions, \
     get_available_assets, calculate_total_value, SecureApi, buy_sell_line_data, hash_generator, get_data_live_chart, get_price, cci, cci_chart, \
     gen_fiats, fiat_line_chart_data, get_all_fiats, get_fiat_name, newsfeed, news_search, count_all_news, get_all_news_source_id, portfolio_chart, \
-    portfolio_data_start_info, portfolio_rank_table
+    portfolio_data_start_info, portfolio_rank_table, my_competitions, future_competitions, ongoing_competitions, competition_portfolio_value, \
+    competitions_transactions
 from ptCryptoClub.admin.sql.ohlc_functions import line_chart_data, ohlc_chart_data, vtp_chart_data, get_historical_data_line, \
     get_historical_data_ohlc, get_historical_data_vtp
 from ptCryptoClub.admin.forms import RegistrationForm, LoginForm, AuthorizationForm, UpdateDetailsForm, BuyAssetForm, SellAssetForm, \
-    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin
+    PasswordRecoveryEmailForm, PasswordRecoveryUsernameForm, PasswordRecoveryConfirmationForm, FirstPinLogin, CreateCompetitionForm, \
+    BuyAssetFormCompetition, SellAssetFormCompetition
 from ptCryptoClub.admin.auto_email import Email
 from ptCryptoClub.admin.admin_functions import admin_main_tables, admin_last_update, admin_api_usage_data, admin_api_details, \
-    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info
+    admin_users_data_sample, admin_api_usage_top_5, admin_users_data, admin_delete_user, admin_ip_info, admin_competition_list
 from ptCryptoClub.admin.stats import UsageStats
 
 
@@ -90,12 +93,14 @@ def home():
         form_sell.market_sell.choices = markets_choices
         available_funds = get_available_amount(current_user.id)
         available_assets = get_available_assets(current_user.id)
+        my_comp = my_competitions(user_id=current_user.id, limit=None)
     else:
         total_portfolio = {}
         form_buy = None
         form_sell = None
         available_funds = 0
         available_assets = []
+        my_comp = []
     return render_template(
         "index.html",
         title="Home",
@@ -111,7 +116,8 @@ def home():
         delta=delta,
         number_days_buy_sell=default_number_days_buy_sell,
         fiats_data=gen_fiats(delta=delta),
-        available_deltas=available_deltas
+        available_deltas=available_deltas,
+        my_competitions=my_comp
     )
 
 
@@ -227,6 +233,7 @@ def login():
                         mfa = False
                 if mfa:
                     if totp.verify(given_code):
+                        next_ = request.args.get('next')
                         login_user(user, remember=False)
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -234,7 +241,7 @@ def login():
                                         status=True)
                         db.session.add(log)
                         db.session.commit()
-                        return redirect(url_for('first_time_pin_change'))
+                        return redirect(url_for('first_time_pin_change', next=next_))
                     else:
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -250,6 +257,7 @@ def login():
                         )
                 else:
                     if bcrypt.check_password_hash(mfa_active.r_pin, given_code):
+                        next_ = request.args.get('next')
                         login_user(user, remember=False)
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -257,7 +265,7 @@ def login():
                                         status=True)
                         db.session.add(log)
                         db.session.commit()
-                        return redirect(url_for('first_time_pin_change'))
+                        return redirect(url_for('first_time_pin_change', next=next_))
                     else:
                         # noinspection PyArgumentList
                         log = LoginUser(user_ID=user.id,
@@ -894,12 +902,20 @@ def activate_2fa_confirmation(hash, user_id):
 @app.route("/A9hQDxZeu3Yc03rSaaMepCpCQDYc03urSqFxZqFaaM9h/", methods=["GET", "POST"])
 @login_required
 def first_time_pin_change():
+    next_ = request.args.get('next')
+    print(next_)
     test = MFA.query.filter_by(user_id=current_user.id).first()
     if test is None:
-        return redirect(url_for("portfolio"))
+        if next_ is None:
+            return redirect(url_for("portfolio"))
+        else:
+            return redirect(next_)
     else:
         if not test.first_login:
-            return redirect(url_for("portfolio"))
+            if next_ is None:
+                return redirect(url_for("portfolio"))
+            else:
+                return redirect(next_)
         else:
             form = FirstPinLogin()
             if form.validate_on_submit():
@@ -1000,7 +1016,7 @@ def account_admin():
     if current_user.email not in admins_emails:
         return redirect(url_for("account_user"))
     else:
-        # THIS NEEDS TO BE REVIEWED REALLY BAD SOLUTION
+        # THIS NEEDS TO BE REVIEWED REALLY BAD SOLUTION #
         raw_ip_list = IpAddressLog.query.with_entities(IpAddressLog.ip_address).order_by(IpAddressLog.date.desc()).distinct()
         ip_list_7 = []
         for t in raw_ip_list:
@@ -1011,13 +1027,18 @@ def account_admin():
             if len(ip_list_7) == 7:
                 break
         ip_list = [admin_ip_info(ip_address=t, full_info=False) for t in ip_list_7]
+        #################################################
+        # next line will delete any competition that is not live and the start date is in the past #
+        Competitions.query.filter(Competitions.start_date < datetime.utcnow(), Competitions.is_live == False).delete() # PEP8 exception
+        db.session.commit()
         return render_template(
             "account-admin.html",
             title="Account",
             table_data=admin_main_tables(),
             last_update=admin_last_update(),
             users_sample=admin_users_data_sample(),
-            ip_list=ip_list
+            ip_list=ip_list,
+            competition_list=admin_competition_list(limit=5)
         )
 
 
@@ -1080,6 +1101,166 @@ def account_admin_ip_info():
             title="IP info",
             full_list=full_list
         )
+
+
+@app.route("/account/admin/create-competition/", methods=["GET", "POST"])
+@login_required
+def account_admin_create_competition():
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        form = CreateCompetitionForm()
+        competition_id = request.args.get('edit')
+        if competition_id is not None:
+            competition_to_edit = Competitions.query.filter_by(id=competition_id, is_live=False).first()
+            if competition_to_edit is None:
+                return redirect(url_for("account_user"))
+            else:
+                if request.method == "POST":
+                    if form.validate_on_submit():
+                        if form.max_users.data == "":
+                            m_users = None
+                        else:
+                            m_users = form.max_users.data
+                        if form.users.data == "0":
+                            t_users = None
+                        else:
+                            t_users = form.users.data
+                        competition_to_edit.name = form.name.data
+                        competition_to_edit.modified_by = current_user.id
+                        competition_to_edit.date_modified = datetime.utcnow()
+                        competition_to_edit.start_date = form.start_date.data
+                        competition_to_edit.end_date = form.end_date.data
+                        competition_to_edit.start_amount = form.amount.data
+                        competition_to_edit.amount_quote = form.quote.data
+                        competition_to_edit.buy_fee = form.buy_fee.data
+                        competition_to_edit.sell_fee = form.sell_fee.data
+                        competition_to_edit.max_users = m_users
+                        competition_to_edit.type_users = t_users
+                        competition_to_edit.send_email = form.p_email.data
+                        db.session.commit()
+                        return redirect(url_for('account_admin'))
+
+                    else:
+                        return render_template(
+                            "account-admin-create-competition.html",
+                            title="Create competition",
+                            form=form
+                        )
+                else:
+                    form.name.data = competition_to_edit.name
+                    form.start_date.data = competition_to_edit.start_date
+                    form.end_date.data = competition_to_edit.end_date
+                    form.amount.data = competition_to_edit.start_amount
+                    form.quote.data = competition_to_edit.amount_quote
+                    form.buy_fee.data = competition_to_edit.buy_fee
+                    form.sell_fee.data = competition_to_edit.sell_fee
+                    form.max_users.data = competition_to_edit.max_users
+                    form.users.data = competition_to_edit.type_users
+                    form.p_email.data = competition_to_edit.send_email
+                    return render_template(
+                        "account-admin-create-competition.html",
+                        title="Create competition",
+                        form=form
+                    )
+        else:
+            if form.validate_on_submit():
+                if form.max_users.data == "":
+                    m_users = None
+                else:
+                    m_users = form.max_users.data
+                if form.users.data == '0':
+                    t_users = None
+                else:
+                    t_users = form.users.data
+                # noinspection PyArgumentList
+                new_competition = Competitions(
+                    name=form.name.data,
+                    created_by=current_user.id,
+                    start_date=form.start_date.data,
+                    end_date=form.end_date.data,
+                    start_amount=form.amount.data,
+                    amount_quote=form.quote.data,
+                    buy_fee=form.buy_fee.data,
+                    sell_fee=form.sell_fee.data,
+                    max_users=m_users,
+                    type_users=t_users,
+                    send_email=form.p_email.data,
+                )
+                db.session.add(new_competition)
+                db.session.commit()
+                return redirect(url_for('account_admin'))
+            return render_template(
+                "account-admin-create-competition.html",
+                title="Create competition",
+                form=form
+            )
+
+
+@app.route("/account/admin/competition/review/<comp_id>/", methods=["GET", "POST"])
+@login_required
+def account_admin_create_competition_review(comp_id):
+    if current_user.email not in admins_emails:
+        return redirect(url_for("account_user"))
+    else:
+        to_review = Competitions.query.filter_by(id=comp_id).first()
+        if to_review is not None:
+            form = AuthorizationForm()
+            if request.method == "POST":
+                if form.validate_on_submit():
+                    secret = current_user.qrcode_secret
+                    totp = pyotp.TOTP(secret)
+                    if totp.verify(form.pin.data):
+                        to_review.is_live = True
+                        db.session.commit()
+                        flash("Competition is now live and visible to users.", "success")
+                        return redirect(url_for("account_admin"))
+                    else:
+                        flash("2FA is not correct, please try again.", "danger")
+                        return redirect(url_for("account_admin_create_competition_review", comp_id=comp_id))
+                else:
+                    return redirect(url_for("account_admin_create_competition_review", comp_id=comp_id))
+            else:
+                info = {
+                    "id": to_review.id,
+                    "name": to_review.name,
+                    "start_date": to_review.start_date,
+                    "end_date": to_review.end_date,
+                    "start_amount": to_review.start_amount,
+                    "amount_quote": to_review.amount_quote,
+                    "buy_fee": to_review.buy_fee,
+                    "sell_fee": to_review.sell_fee,
+                    "max_users": to_review.max_users,
+                    "type_users": to_review.type_users,
+                    "send_email": to_review.send_email,
+                    "is_live": to_review.is_live
+                }
+                return render_template(
+                    "account-admin-create-competition-review.html",
+                    title="Competition review",
+                    info=info,
+                    comp_id=comp_id,
+                    form=form
+                )
+        else:
+            return redirect(url_for("account_user"))
+
+
+@app.route("/account/admin/competition/delete/<comp_id>/")
+@login_required
+def account_admin_create_competition_delete(comp_id):
+    to_delete = Competitions.query.filter_by(id=comp_id).first()
+    if to_delete is not None:
+        if to_delete.is_live:
+            flash("You cannot delete a live competition", "danger")
+            return redirect(url_for("account_admin"))
+        else:
+            Competitions.query.filter_by(id=comp_id).delete()
+            db.session.commit()
+            flash("Competition deleted", "success")
+            return redirect(url_for("account_admin"))
+    else:
+        return redirect(url_for("account_user"))
 
 
 @app.route("/api/admin/live-data/<api_secret>/")
@@ -1865,3 +2046,604 @@ def newsfeed_page(page, per_page):
         total_news=total_news,
         all_sources=get_all_news_source_id()
     )
+
+
+@app.route("/competitions/")
+def competitions_home():
+    if current_user.is_authenticated:
+        my_comp = my_competitions(user_id=current_user.id, limit=None)
+    else:
+        my_comp = []
+    return render_template(
+        "competitions-home.html",
+        title="Competitions",
+        my_competitions=my_comp,
+        future_competitions=future_competitions(limit=None),
+        ongoing_competitions=ongoing_competitions(limit=None)
+    )
+
+
+@app.route("/competitions/<compt_id>/details/")
+def competition_details_home(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    already_in = False
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        status = ""
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            status = "ongoing"
+        elif datetime.utcnow() > compt.end_date:
+            status = "past"
+        elif compt.start_date > datetime.utcnow():
+            status = "future"
+        if current_user.is_authenticated:
+            filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
+            if filter_ is not None:
+                already_in = True
+        if compt.max_users is None:
+            fully_booked = False
+        else:
+            if UsersInCompetitions.query.filter_by(competition_id=compt_id).count() < compt.max_users:
+                fully_booked = False
+            else:
+                fully_booked = True
+        return render_template(
+            "competitions-detail.html",
+            title="Competitions",
+            competition=compt,
+            already_in=already_in,
+            status=status,
+            fully_booked=fully_booked
+        )
+
+
+@app.route("/competitions/<compt_id>/join/")
+@login_required
+def competition_join(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.max_users is None:
+            pass
+        else:
+            if UsersInCompetitions.query.filter_by(competition_id=compt_id).count() >= compt.max_users:
+                flash("This competition is now fully booked.", "warning")
+                return redirect(url_for("competitions_home"))
+        filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
+        if filter_ is not None:
+            if compt.start_date < datetime.utcnow() < compt.end_date:
+                flash("You cannot join an ongoing competition", "warning")
+                return redirect(url_for("competitions_home"))
+            elif datetime.utcnow() > compt.end_date:
+                flash("This competition has ended", "warning")
+                return redirect(url_for("competitions_home"))
+            else:
+                flash("You are already in the competition!", "info")
+                return redirect(url_for("competition_details_home", compt_id=compt_id))
+        else:
+            if compt.start_date < datetime.utcnow() < compt.end_date:
+                flash("You cannot join an ongoing competition", "warning")
+                return redirect(url_for("competitions_home"))
+            elif datetime.utcnow() > compt.end_date:
+                flash("This competition has ended", "warning")
+                return redirect(url_for("competitions_home"))
+            else:
+                # noinspection PyArgumentList
+                add = UsersInCompetitions(
+                    user_id=current_user.id,
+                    competition_id=compt.id
+                )
+                db.session.add(add)
+                # noinspection PyArgumentList
+                compt_wallet = CompetitionWallet(
+                    user_id=current_user.id,
+                    compt_id=compt.id,
+                    wallet=compt.start_amount
+                )
+                db.session.add(compt_wallet)
+                for asset_ in default_assets_competitions:
+                    # noinspection PyArgumentList
+                    compt_asset = CompetitionAssets(
+                        user_id=current_user.id,
+                        compt_id=compt.id,
+                        asset=asset_
+                    )
+                    db.session.add(compt_asset)
+                db.session.commit()
+                flash(f"You've joined {compt.name}.", "success")
+                return redirect(url_for("competitions_home"))
+
+
+@app.route("/competitions/<compt_id>/leave/")
+@login_required
+def competition_leave(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            flash("You cannot leave an ongoing competition.", "info")
+            return redirect(url_for("competitions_home"))
+        filter_ = UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).first()
+        if filter_ is None:
+            flash("You didn't join this competition yet!", "info")
+            return redirect(url_for("competition_details_home", compt_id=compt_id))
+        else:
+            UsersInCompetitions.query.filter_by(user_id=current_user.id, competition_id=compt.id).delete()
+            CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).delete()
+            CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).delete()
+            db.session.commit()
+            flash("You are no longer part in this competition.", "warning")
+            return redirect(url_for("competitions_home"))
+
+
+@app.route("/playground/<compt_id>/live/")
+@login_required
+def playground_live_home(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            btc_candle = request.args.get('btc_candle')
+            if btc_candle is None:
+                btc_candle = default_playground_candle
+            else:
+                try:
+                    btc_candle = int(btc_candle)
+                except Exception as e:
+                    print(e)  # no error log will be created
+                    btc_candle = default_playground_candle
+                else:
+                    if btc_candle not in candle_values:
+                        btc_candle = default_playground_candle
+            eth_candle = request.args.get('eth_candle')
+            if eth_candle is None:
+                eth_candle = default_playground_candle
+            else:
+                try:
+                    eth_candle = int(eth_candle)
+                except Exception as e:
+                    print(e)  # no error log will be created
+                    eth_candle = default_playground_candle
+                else:
+                    if eth_candle not in candle_values:
+                        eth_candle = default_playground_candle
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
+                registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
+                transactions = []
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                registered = True
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+                transactions = competitions_transactions(user_id=current_user.id, compt_id=compt_id, limit=5)
+            return render_template(
+                "playground-home-live.html",
+                title="Playground",
+                registered=registered,
+                btc_candle=btc_candle,
+                btc_candle_update=btc_candle // 3,
+                eth_candle=eth_candle,
+                eth_candle_update=eth_candle // 3,
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=round(available_funds, 2),
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                transactions=transactions
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/buy/", methods=["POST"])
+@login_required
+def playground_live_buy_asset(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            form = BuyAssetFormCompetition()
+            try:
+                market = str(form.market.data)
+                base = str(form.base.data)
+                quote = str(form.quote.data)
+                amount_to_be_spent = float(form.amount_spent.data)
+            except Exception as e:
+                # noinspection PyArgumentList
+                error_log = ErrorLogs(
+                    route=f'playground live buy asset',
+                    log=str(e).replace("'", "")
+                )
+                db.session.add(error_log)
+                db.session.commit()
+                flash("Something went wrong, please try again later.", "danger")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            # CHECK IF USER HAS ENOUGH FUNDS #
+            fee_to_be_taken = round(amount_to_be_spent * compt.buy_fee / 100, 2)
+            amount_net = round(amount_to_be_spent - fee_to_be_taken, 2)
+            last_price = get_last_price(base=base, quote=quote, market=market)["price"]
+            asset_to_be_bought = round((amount_to_be_spent - fee_to_be_taken) / last_price, 8)
+            line_wallet = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt_id).first()
+            if round(line_wallet.wallet, 2) < amount_to_be_spent:
+                flash("There is not enough funds in your wallet", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            elif amount_to_be_spent <= 0:
+                flash("You need to spend more than that...", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            else:
+                # noinspection PyArgumentList
+                transaction = CompetitionsTransactionsBuy(
+                    user_id=current_user.id,
+                    compt_id=compt_id,
+                    base=base,
+                    quote=quote,
+                    amount_gross=amount_to_be_spent,
+                    fee=fee_to_be_taken,
+                    amount_net=amount_net,
+                    asset_price=last_price,
+                    asset_amount=asset_to_be_bought
+                )
+                db.session.add(transaction)
+                line_asset = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt_id, asset=base).first()
+                line_asset.amount += asset_to_be_bought
+                line_wallet.wallet -= amount_to_be_spent
+                line_wallet.wallet = round(line_wallet.wallet, 2)
+                db.session.commit()
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+        else:
+            flash("This competition is now closed.", "danger")
+            return redirect(url_for("competitions_home"))
+
+
+@app.route("/playground/<compt_id>/sell/", methods=["POST"])
+@login_required
+def playground_live_sell_asset(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            form = SellAssetFormCompetition()
+            try:
+                market = str(form.market_sell.data)
+                base = str(form.base_sell.data)
+                quote = str(form.quote_sell.data)
+                amount_to_be_sold = float(form.amount_spent_sell.data)
+            except Exception as e:
+                # noinspection PyArgumentList
+                error_log = ErrorLogs(
+                    route=f'playground live sell asset',
+                    log=str(e).replace("'", "")
+                )
+                db.session.add(error_log)
+                db.session.commit()
+                flash("Something went wrong, please try again later.", "danger")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            # CHECK IF USER HAS ENOUGH FUNDS #
+            line_asset = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt_id, asset=base).first()
+            if amount_to_be_sold > line_asset.amount:
+                flash("There is not enough funds in your account", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            elif amount_to_be_sold <= 0:
+                flash("You need to sell more than that...", "warning")
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+            else:
+                last_price = get_last_price(base=base, quote=quote, market=market)["price"]
+                fee = compt.sell_fee
+                amount_gross = round(last_price * amount_to_be_sold, 2)
+                fee_to_be_taken = round(amount_gross * fee / 100, 2)
+                amount_net = amount_gross - fee_to_be_taken
+                line_wallet = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt_id).first()
+                # noinspection PyArgumentList
+                transaction = CompetitionsTransactionsSell(
+                    user_id=current_user.id,
+                    compt_id=compt_id,
+                    base=base,
+                    quote=quote,
+                    asset_amount=amount_to_be_sold,
+                    asset_price=last_price,
+                    amount_gross=amount_gross,
+                    fee=fee_to_be_taken,
+                    amount_net=amount_net
+                )
+                db.session.add(transaction)
+                line_asset.amount -= amount_to_be_sold
+                line_asset.amount = round(line_asset.amount, 8)
+                line_wallet.wallet += amount_net
+                line_wallet.wallet = round(line_wallet.wallet, 2)
+                db.session.commit()
+                return redirect(url_for("playground_live_home", compt_id=compt_id))
+        else:
+            flash("This competition is now closed.", "danger")
+            return redirect(url_for("competitions_home"))
+
+
+@app.route("/playground/<compt_id>/live/transactions/")
+@login_required
+def playground_live_transactions(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
+                registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                registered = True
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+            return render_template(
+                "playground-transactions-live.html",
+                title="Playground",
+                registered=registered,
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=round(available_funds, 2),
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                transactions=competitions_transactions(user_id=None, compt_id=compt_id, limit=50)
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/live/hall-of-fame/")
+@login_required
+def playground_live_hall_of_fame(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            hall_of_fame = []
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            all_users = UsersInCompetitions.query.filter_by(competition_id=compt_id).all()
+            for user_ in all_users:
+                info_port = competition_portfolio_value(user_id=user_.user_id, compt_id=compt_id, full_info=True)
+                info_username = User.query.filter_by(id=user_.user_id).first().username
+                trans_buy = CompetitionsTransactionsBuy.query.filter_by(user_id=user_.user_id, compt_id=compt_id).count()
+                trans_sell = CompetitionsTransactionsSell.query.filter_by(user_id=user_.user_id, compt_id=compt_id).count()
+                total_trans = trans_buy + trans_sell
+                total_assets = 0
+                wallet = 0  # INITIALIZE VARIABLE
+                for item in info_port["breakdown"]:
+                    if item["asset"] != "wallet":
+                        total_assets += item["value"]
+                    else:
+                        wallet = item["value"]
+                hall_of_fame.append(
+                    {
+                        "info_username": info_username,
+                        "info_total_trans": total_trans,
+                        "info_total_assets": total_assets,
+                        "info_wallet": wallet,
+                        "info_current_value": info_port["current_value"],
+                        "info_pct_change": info_port["pct_change"],
+                    }
+                )
+            hall_of_fame.sort(key=lambda item: item['info_pct_change'], reverse=True)
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
+                registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                registered = True
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+            return render_template(
+                "playground-hall-of-fame-live.html",
+                title="Playground",
+                registered=registered,
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=round(available_funds, 2),
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                hall_of_fame=hall_of_fame,
+                date_=str(datetime.utcnow())[:19]
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/live/my-transactions/")
+@login_required
+def playground_live_my_transactions(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=current_user.id).first()
+            if user_is_in is None:
+                # USER IS NOT REGISTERED FOR COMPETITION
+                form_buy = None
+                form_sell = None
+                registered = False
+                available_funds = 0
+                available_assets = []
+                current_value = 0
+                var_pct = 0
+                transactions = []
+            else:
+                # USER IS REGISTERED FOR COMPETITION
+                form_buy = BuyAssetFormCompetition()
+                form_sell = SellAssetFormCompetition()
+                available_assets = []
+                current_value = 0
+                available_funds = CompetitionWallet.query.filter_by(user_id=current_user.id, compt_id=compt.id).first().wallet
+                aaa = CompetitionAssets.query.filter_by(user_id=current_user.id, compt_id=compt.id).all()
+                for aa in aaa:
+                    available_assets.append(
+                        {
+                            "base": aa.asset,
+                            "amount": round(aa.amount, 8)
+                        }
+                    )
+                    last_price = get_last_price(market="kraken", base=aa.asset, quote="eur")['price']
+                    current_value += last_price * aa.amount
+                current_value += available_funds
+                var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+                registered = True
+                transactions = competitions_transactions(user_id=current_user.id, compt_id=compt_id, limit=None)
+            return render_template(
+                "playground-my-transactions-live.html",
+                title="Playground",
+                registered=registered,
+                compt_id=compt_id,
+                form_buy=form_buy,
+                form_sell=form_sell,
+                available_funds=round(available_funds, 2),
+                available_assets=available_assets,
+                current_value=round(current_value, 2),
+                var_pct=var_pct,
+                buy_fee=compt.buy_fee,
+                sell_fee=compt.sell_fee,
+                amount_quote=compt.amount_quote,
+                days_to_trade=(compt.end_date - datetime.utcnow()).days,
+                users_in_compt=UsersInCompetitions.query.filter_by(competition_id=compt.id).count(),
+                compt_name=compt.name,
+                transactions=transactions,
+                starting_date_chart=str(compt.start_date - timedelta(days=1))[:19],
+                starting_date=str(compt.start_date)[:19],
+                ending_date_chart=str(compt.end_date + timedelta(days=1))[:19],
+                ending_date=str(compt.end_date)[:19]
+            )
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            return redirect(url_for('playground_home', compt_id=compt_id))
+
+
+@app.route("/playground/<compt_id>/")
+@login_required
+def playground_home(compt_id):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return redirect(url_for("competitions_home"))
+    else:
+        if compt.start_date < datetime.utcnow() < compt.end_date:
+            return redirect(url_for('playground_live_home', compt_id=compt_id))
+        elif datetime.utcnow() < compt.start_date:
+            return redirect(url_for('competitions_home'))
+        else:
+            # CODE FOR ARCHIVED COMPETITIONS WILL BE HERE
+            return render_template(
+                "playground-home-archive.html",
+                title="Playground",
+            )
+
+
+@app.route("/api/competition/calculate-portfolio/<user_id>/<compt_id>/<api_secret>/")
+def api_competition_calculate_portfolio(user_id, compt_id, api_secret):
+    if SecureApi().validate(api_secret=api_secret, user_id=user_id, exception=True):
+        return jsonify(
+            competition_portfolio_value(user_id=user_id, compt_id=compt_id)
+        )
+    else:
+        return jsonify(
+            {}
+        )

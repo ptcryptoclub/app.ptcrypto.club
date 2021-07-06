@@ -1,7 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, qr_code_folder, admins_emails, IpInfo
 from ptCryptoClub import db
 from ptCryptoClub.admin.models import User, LoginUser, UpdateAuthorizationDetails, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets,\
-    ApiUsage, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, ResetPasswordAuthorizations
+    ApiUsage, IpAddressLog, PortfolioRecord, MFA, MFARequests, Reset2FARequests, ResetPasswordAuthorizations, Competitions
 
 from sqlalchemy import create_engine, func
 import pandas as pd
@@ -574,4 +574,30 @@ def admin_ip_info(ip_address: str, full_info=False):
             'country_name': "NA",
             'city': 'NA'
         }
+    return to_return
+
+
+def admin_competition_list(limit=None):
+    if limit is None:
+        data = Competitions.query.order_by(Competitions.date_created.desc()).all()
+    else:
+        data = Competitions.query.order_by(Competitions.date_created.desc()).limit(limit)
+    to_return = []
+    for line in data:
+        to_return.append(
+            {
+                "id": line.id,
+                "name": line.name,
+                "start_date": line.start_date,
+                "end_date": line.end_date,
+                "start_amount": line.start_amount,
+                "amount_quote": line.amount_quote,
+                "buy_fee": line.buy_fee,
+                "sell_fee": line.sell_fee,
+                "max_users": line.max_users,
+                "type_users": line.type_users,
+                "send_email": line.send_email,
+                "is_live": line.is_live,
+            }
+        )
     return to_return

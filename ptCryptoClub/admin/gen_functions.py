@@ -1,6 +1,7 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
-from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord
+from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord, \
+    Competitions, UsersInCompetitions, CompetitionWallet, CompetitionAssets, CompetitionsTransactionsBuy, CompetitionsTransactionsSell
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -1027,3 +1028,191 @@ def portfolio_rank_table():
     return to_return
 
 
+def my_competitions(user_id, limit=None):
+    if limit is not None and isinstance(limit, int):
+        competitions_in = UsersInCompetitions.query.filter_by(user_id=user_id).limit(limit)
+    else:
+        competitions_in = UsersInCompetitions.query.filter_by(user_id=user_id).all()
+    list_ = []
+    for line in competitions_in:
+        list_.append(line.competition_id)
+    to_return = []
+    for id_ in list_:
+        comp = Competitions.query.filter_by(id=id_).first()
+        if comp.start_date < datetime.utcnow() < comp.end_date:
+            status = "live"
+        elif datetime.utcnow() > comp.end_date:
+            status = "past"
+        else:
+            status = "future"
+        to_return.append(
+            {
+                "id": comp.id,
+                "name": comp.name,
+                "start_date": comp.start_date,
+                "end_date": comp.end_date,
+                "start_amount": comp.start_amount,
+                "amount_quote": comp.amount_quote,
+                "buy_fee": comp.buy_fee,
+                "sell_fee": comp.sell_fee,
+                "status": status
+            }
+        )
+    to_return = sorted(to_return, key=lambda k: k['start_date'])
+    return to_return
+
+
+def future_competitions(limit=None):
+    to_return = []
+    if limit is not None and isinstance(limit, int):
+        comps = Competitions.query.filter(
+            Competitions.start_date > datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).limit(limit)
+    else:
+        comps = Competitions.query.filter(
+            Competitions.start_date > datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).all()
+    for line in comps:
+        to_return.append(
+            {
+                "id": line.id,
+                "name": line.name,
+                "start_date": line.start_date,
+                "end_date": line.end_date,
+                "start_amount": line.start_amount,
+                "amount_quote": line.amount_quote,
+                "buy_fee": line.buy_fee,
+                "sell_fee": line.sell_fee
+            }
+        )
+    return to_return
+
+
+def ongoing_competitions(limit=None):
+    to_return = []
+    if limit is not None and isinstance(limit, int):
+        comps = Competitions.query.filter(
+            Competitions.start_date <= datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).limit(limit)
+    else:
+        comps = Competitions.query.filter(
+            Competitions.start_date <= datetime.utcnow(),
+            Competitions.end_date > datetime.utcnow(),
+            Competitions.is_live
+        ).all()
+    for line in comps:
+        to_return.append(
+            {
+                "id": line.id,
+                "name": line.name,
+                "start_date": line.start_date,
+                "end_date": line.end_date,
+                "start_amount": line.start_amount,
+                "amount_quote": line.amount_quote,
+                "buy_fee": line.buy_fee,
+                "sell_fee": line.sell_fee
+            }
+        )
+    return to_return
+
+
+def competition_portfolio_value(user_id, compt_id, full_info=False):
+    compt = Competitions.query.filter_by(id=compt_id).first()
+    if compt is None:
+        return {}
+    else:
+        user_is_in = UsersInCompetitions.query.filter_by(competition_id=compt_id, user_id=user_id).first()
+        if user_is_in is None:
+            return {}
+        else:
+            to_return = {}
+            current_value = 0
+            available_funds = CompetitionWallet.query.filter_by(user_id=user_id, compt_id=compt_id).first().wallet
+            assets_list = CompetitionAssets.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+            aux_list = []
+            for asset_line in assets_list:
+                last_price = get_last_price(market="kraken", base=asset_line.asset, quote="eur")['price']
+                current_value += last_price * asset_line.amount
+                if full_info:
+                    aux_list.append(
+                        {
+                            "asset": asset_line.asset,
+                            "value": round(last_price * asset_line.amount, 2)
+                        }
+                    )
+            if full_info:
+                aux_list.append(
+                    {
+                        "asset": "wallet",
+                        "value": round(available_funds, 2)
+                    }
+                )
+                to_return.update(
+                    {
+                        "breakdown": aux_list
+                    }
+                )
+            current_value += available_funds
+            var_pct = round((current_value - compt.start_amount) / compt.start_amount * 100, 3)
+            to_return.update(
+                {"current_value": round(current_value, 2), "pct_change": var_pct}
+            )
+            return to_return
+
+
+def competitions_transactions(user_id, compt_id, limit=None):
+    to_return = []
+    if limit is None and user_id is None:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(compt_id=compt_id).all()
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(compt_id=compt_id).all()
+    elif limit is None and user_id is not None:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(user_id=user_id, compt_id=compt_id).all()
+    elif limit is not None and user_id is None:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(
+            compt_id=compt_id).order_by(CompetitionsTransactionsBuy.date_created.desc()).limit(limit)
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(
+            compt_id=compt_id).order_by(CompetitionsTransactionsSell.date_created.desc()).limit(limit)
+    else:
+        trans_buy = CompetitionsTransactionsBuy.query.filter_by(
+            user_id=user_id, compt_id=compt_id).order_by(CompetitionsTransactionsBuy.date_created.desc()).limit(limit)
+        trans_sell = CompetitionsTransactionsSell.query.filter_by(
+            user_id=user_id, compt_id=compt_id).order_by(CompetitionsTransactionsSell.date_created.desc()).limit(limit)
+    for line in trans_buy:
+        to_return.append(
+            {
+                "date_created": line.date_created,
+                "base": line.base,
+                "quote": line.quote,
+                "amount_gross": round(line.amount_gross, 2),
+                "fee": line.fee,
+                "amount_net": round(line.amount_net, 2),
+                "asset_price": round(line.asset_price, 2),
+                "asset_amount": line.asset_amount,
+                "type": "buy"
+            }
+        )
+    for line in trans_sell:
+        to_return.append(
+            {
+                "date_created": line.date_created,
+                "base": line.base,
+                "quote": line.quote,
+                "amount_gross": round(line.amount_gross, 2),
+                "fee": line.fee,
+                "amount_net": round(line.amount_net, 2),
+                "asset_price": round(line.asset_price, 2),
+                "asset_amount": line.asset_amount,
+                "type": "sell"
+            }
+        )
+    to_return.sort(key=lambda item: item['date_created'], reverse=True)
+    for i in to_return:
+        i["date_created"] = str(i["date_created"])[:19]
+    return to_return

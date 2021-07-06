@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+
+{% block info_line %}
+<!--
+<div class="container border-light border-bottom">
+    <div class="row">
+        <div class="col">
+            <div class="row justify-content-start">
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">Link 1</a>
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">link 2</a>
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none">Link 3</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-3 mb-5">
+    <div class="h2 mt-5 text-light">{{competition.name}}</div>
+    <div class="border-bottom border-dark my-4"></div>
+    <div class="row text-muted mt-4">
+        <div class="col-md-auto">
+            <div class="row no-gutters align-items-center">
+                <div class="col-auto h4 text-light">
+                    Start:
+                </div>
+                <div class="col h5 ml-2">
+                    {{competition.start_date}} <small><small>UTC</small></small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="row no-gutters align-items-end">
+                <div class="col-auto h4 text-light">
+                    End:
+                </div>
+                <div class="col h5 ml-2">
+                    {{competition.end_date}} <small><small>UTC</small></small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-muted mt-3">
+        <div class="col-xl-6 col-lg-6 col-md-5 col-sm-12 col-12">
+            <div class="row align-items-end">
+                <div class="col-auto h4 text-light">
+                    Amount:
+                </div>
+                <div class="col h5">
+                    {{competition.start_amount | numberFormat}} <small>{{competition.amount_quote.upper()}}*</small>
+                </div>
+                <div class="small px-3 text-info mt-n2">
+                    * This is <strong>not real money</strong> and you will not be able to withdraw, transfer or claim any of this amount.
+                    <a href="#" class="text-decoration-none">More info</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl col-lg col-md col-sm-6 col-6 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+            <div class="row no-gutters align-items-end">
+                <div class="col-auto h4 text-light">
+                    Buy fee:
+                </div>
+                <div class="col h5 ml-2">
+                    {{competition.buy_fee}} <small>%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl col-lg col-md col-sm-6 col-6 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-3 mt-3">
+            <div class="row no-gutters align-items-end">
+                <div class="col-auto h4 text-light">
+                    Sell fee:
+                </div>
+                <div class="col h5 ml-2">
+                    {{competition.sell_fee}} <small>%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="border-top border-dark my-4"></div>
+    <div class="my-5">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-xl-5 col-lg-5 col-md-7 col-sm-8 col-9">
+
+                {% if status == "past" %}
+                <a class="btn btn-info btn-lg btn-block disabled" href="#" role="button">Competition ended</a>
+                {% elif status == "ongoing" %}
+                <a class="btn btn-info btn-lg btn-block disabled" href="#" role="button">Ongoing competition</a>
+                {% elif already_in %}
+                <a class="btn btn-warning btn-lg btn-block" href="{{url_for('competition_leave', compt_id=competition.id)}}" role="button">Leave competition</a>
+                {% elif fully_booked %}
+                <a class="btn btn-info btn-lg btn-block disabled" href="#" role="button">Competition is fully booked</a>
+                {% elif status == "future" %}
+                <a class="btn btn-primary btn-lg btn-block" href="{{url_for('competition_join', compt_id=competition.id)}}" role="button">Join competition</a>
+                {% else %}
+
+                {% endif %}
+            </div>
+            <div class="col-12 mt-3 text-muted text-center small">By joining the competition you are accepting the <a href="#" class="text-decoration-none">terms and conditions</a>.</div>
+            <div class="col-12 mt-2 mb-2 text-muted text-center small">Share this competition:</div>
+            <div class="row">
+                <div class="col-auto">
+                    <a href="#" class="text-light"><span class="fi fi-facebook"></span></a>
+                </div>
+                <div class="col-auto">
+                    <a href="#" class="text-light"><span class="fi fi-instagram"></span></a>
+                </div>
+                <div class="col-auto">
+                    <a href="#" class="text-light"><span class="fi fi-twitter"></span></a>
+                </div>
+                <div class="col-auto">
+                    <a href="#" class="text-light"><span class="material-icons" style="font-size:22px">mail</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
