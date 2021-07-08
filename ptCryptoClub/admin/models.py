@@ -211,3 +211,15 @@ class CompetitionsTransactionsSell(db.Model, UserMixin):
     amount_gross = db.Column(db.Float, nullable=False)
     fee = db.Column(db.Float, nullable=False)
     amount_net = db.Column(db.Float, nullable=False)
+
+
+class CompetitionRecord(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    compt_id = db.Column(db.Integer, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    value = db.Column(db.Float)
+    wallet = db.Column(db.Float)
+    assets = db.Column(db.Float)
+    percentage = db.Column(db.Float)
+    quote = db.Column(db.String(255), default="eur")
