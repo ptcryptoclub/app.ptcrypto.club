@@ -1,7 +1,8 @@
 from ptCryptoClub.admin.config import CryptoData, admins_emails, default_delta, default_fiat, BlockEmail
 from ptCryptoClub.admin.sql.latest_transactions import table_latest_trans
 from ptCryptoClub.admin.models import User, ErrorLogs, TransactionsPTCC, Portfolio, PortfolioAssets, ApiUsage, IpAddressLog, PortfolioRecord, \
-    Competitions, UsersInCompetitions, CompetitionWallet, CompetitionAssets, CompetitionsTransactionsBuy, CompetitionsTransactionsSell
+    Competitions, UsersInCompetitions, CompetitionWallet, CompetitionAssets, CompetitionsTransactionsBuy, CompetitionsTransactionsSell, \
+    CompetitionRecord
 from ptCryptoClub import db
 
 from sqlalchemy import create_engine
@@ -1215,4 +1216,30 @@ def competitions_transactions(user_id, compt_id, limit=None):
     to_return.sort(key=lambda item: item['date_created'], reverse=True)
     for i in to_return:
         i["date_created"] = str(i["date_created"])[:19]
+    return to_return
+
+
+def competition_portfolio_chart_data(compt_id, user_id, full_data=False):
+    data = CompetitionRecord.query.filter_by(compt_id=compt_id, user_id=user_id).order_by(CompetitionRecord.date_created.asc()).all()
+    to_return = []
+    if full_data:
+        for line in data:
+            to_return.append(
+                {
+                    "date_created": str(line.date_created)[:19],
+                    "value": line.value,
+                    "wallet": line.wallet,
+                    "assets": line.assets,
+                    "percentage": line.percentage
+                }
+            )
+    else:
+        for line in data:
+            to_return.append(
+                {
+                    "date_created": str(line.date_created)[:19],
+                    "value": line.value,
+                    "percentage": line.percentage
+                }
+            )
     return to_return

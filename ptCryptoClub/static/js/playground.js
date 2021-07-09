@@ -487,12 +487,7 @@ function updateCompetitionPortfolio (user_id, compt_id) {
 
 function historical_line(divName, base, quote, starting_date_chart, ending_date_chart, trans, starting_date, ending_date) {
 
-
-    
-
-
     var apiSecret = document.getElementById("APISecret").value;
-
 
     urlToSend = "/api/historical-charts/line/" + base + "/" + quote + "/kraken/900/" + apiSecret + "/?start=" + starting_date_chart + "&end=" + ending_date_chart;
 
@@ -656,4 +651,105 @@ function historical_line(divName, base, quote, starting_date_chart, ending_date_
     });
 
     
+}
+
+
+function portfolio_chart (divName, user_id, compt_id, quote) {
+
+    var apiSecret = document.getElementById("APISecret").value;
+
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    // Auto dispose charts
+    am4core.options.autoDispose = true;
+
+    // Create chart
+    var chart = am4core.create(divName, am4charts.XYChart);
+    chart.padding(0, 0, 0, 0);
+    chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+    chart.leftAxesContainer.layout = "vertical";
+    chart.colors.step = 6;
+
+    // Load external data
+    chart.dataSource.url = "/api/competition/chart-data/" + user_id + "/" + compt_id + "/" + apiSecret + "/";
+    chart.dataSource.parser = new am4core.JSONParser();
+
+
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.grid.template.location = 0;
+    dateAxis.renderer.ticks.template.strokeOpacity = 0.1;
+    dateAxis.renderer.grid.template.disabled = true;
+    dateAxis.renderer.ticks.template.disabled = false;
+    dateAxis.renderer.ticks.template.strokeOpacity = 0.2;
+    dateAxis.renderer.minLabelPosition = 0.01;
+    dateAxis.renderer.maxLabelPosition = 0.99;
+    dateAxis.tooltip.disabled = true;
+    dateAxis.renderer.fontSize = "0.8em";
+    
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.zIndex = 1;
+    valueAxis.renderer.baseGrid.disabled = true;
+    valueAxis.title.text = quote;
+    valueAxis.title.fontSize = "0.8em"
+    valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
+    valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
+    valueAxis.renderer.inside = false;
+    valueAxis.renderer.labels.template.verticalCenter = "bottom";
+    valueAxis.renderer.labels.template.padding(0, 0, 0, 0);
+    valueAxis.renderer.grid.template.disabled = true;
+    valueAxis.renderer.fontSize = "0.8em"
+    valueAxis.height = am4core.percent(80);
+
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date_created";
+    series.dataFields.valueY = "value";
+    series.tooltipText = "Value: {valueY.value}" + quote;
+    series.defaultState.transitionDuration = 0;
+    series.fillOpacity = 0;
+    series.yAxis = valueAxis;
+    // Make bullets
+    var bullet = series.bullets.push(new am4charts.CircleBullet());
+    bullet.circle.radius = 2;
+    bullet.circle.fill = am4core.color("#fff");
+
+
+    var valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis2.tooltip.disabled = true;
+    // height of axis
+    valueAxis2.height = am4core.percent(20);
+    valueAxis2.zIndex = 3;
+    // this makes gap between panels
+    valueAxis2.renderer.baseGrid.disabled = true;
+    valueAxis2.renderer.inside = false;
+    valueAxis2.renderer.labels.template.verticalCenter = "bottom";
+    valueAxis2.renderer.labels.template.padding(2, 2, 2, 2);
+    valueAxis2.renderer.maxLabelPosition = 0.95;
+    valueAxis2.renderer.fontSize = "0.8em";
+    valueAxis2.hidden = true;
+
+    valueAxis2.renderer.gridContainer.background.fill = am4core.color("#000000");
+    valueAxis2.renderer.gridContainer.background.fillOpacity = 0.05;
+
+    var series2 = chart.series.push(new am4charts.LineSeries());
+    series2.dataFields.dateX = "date_created";
+    series2.dataFields.valueY = "percentage";
+    series2.tooltipText = "Pct: {valueY.value}%";
+    series2.defaultState.transitionDuration = 0;
+    series2.fillOpacity = 0;
+    series2.yAxis = valueAxis2;
+    // Make bullets
+    var bullet = series2.bullets.push(new am4charts.CircleBullet());
+    bullet.circle.radius = 2;
+    bullet.circle.fill = am4core.color("#fff");
+
+
+
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.behavior = "zoomX"
+
+
 }
